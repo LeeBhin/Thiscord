@@ -1,0 +1,117 @@
+.background {
+    background-image: url('./../../../public/images/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    background-image: url('../../../public/images/logo.png');
+    background-repeat: no-repeat;
+    width: 124px;
+    height: 24px;
+    position: absolute;
+    top: 48px;
+    left: 48px;
+}
+
+.loginForm {
+    width: 480px;
+    height: 400px;
+    background-color: #313338;
+    padding: 32px;
+    border-radius: 5px;
+}
+
+.welcomeWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.welcome {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.subWelcome {
+    color: #b5bac1;
+    font-size: 16px;
+}
+
+.inputWrap{
+    margin: 18px 0 1px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.idWrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.inputTxt {
+    font-size: 12px;
+    color: #b5bac1;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #F23F42;
+    font-size: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.input{
+    width: 416px;
+    height: 40px;
+    background-color: #1E1F22;
+    border-radius: 3px;
+    border: none;
+    padding: 10px;
+    font-size: 15px;
+    color: #DBDEE1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.goRegister{
+    font-size: 14px;
+    color: #02a8fc;
+}
+
+.goRegister:hover{
+    text-decoration: underline;
+}
+
+.submit{
+    width: 100%;
+    height: 44px;
+    padding: 2px;
+    border-radius: 3px;
+    border: none;
+    background-color: #5865f2;
+    color: white;
+    font-size: 16px;
+    margin: 18px 0 8px 0;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.submit:hover{
+    background-color: #4B5CBF;
+}
+
+.needAccount{
+    font-size: 14px;
+    color: #949ba4;
+}

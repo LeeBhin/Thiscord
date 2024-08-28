@@ -1,0 +1,53 @@
+.loginForm {
+    width: 480px;
+    height: 700px;
+    background-color: #313338;
+    padding: 32px;
+    border-radius: 5px;
+}
+
+.welcome {
+    margin-bottom: 10px;
+}
+
+.inputWrap {
+    margin-top: 10px;
+}
+
+.birthWrap {
+    width: 100%;
+    justify-content: space-between;
+    display: flex;
+}
+
+.birth {
+    background-color: #1E1F22;
+    color: #B5BAC1;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 3px;
+    border: none;
+}
+
+.birthWrap .dropWrap:nth-of-type(odd) .birth {
+    width: 125px;
+}
+
+.birthWrap .dropWrap:nth-of-type(even) .birth {
+    width: 140px;
+}
+
+
+
+.dropBtn {
+    position: relative;
+}
+
+.downSVG {
+    position: absolute;
+    font-size: 30px;
+    background-color: #1E1F22;
+    border-radius: 3px;
+    right: 0;
+    color: #B5BAC1;
+}
