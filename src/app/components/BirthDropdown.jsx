@@ -1,6 +1,6 @@
 import styles from '@/app/register/register.module.css';
 
-import { BiChevronDown } from "react-icons/bi";
+import { HiChevronDown } from "react-icons/hi";
 
 export default function BirthDropdown() {
     const years = [];
@@ -27,7 +27,7 @@ export default function BirthDropdown() {
                     className={styles.birth}
                     placeholder="년"
                 />
-                <dvi className={styles.dropBtn}><BiChevronDown className={styles.downSVG} /></dvi>
+                <div className={styles.dropBtn}><HiChevronDown className={styles.downSVG} /></div>
             </div>
 
             <div className={styles.dropWrap}>
@@ -36,7 +36,7 @@ export default function BirthDropdown() {
                     className={styles.birth}
                     placeholder="월"
                 />
-                <dvi className={styles.dropBtn}><BiChevronDown className={styles.downSVG} /></dvi>
+                <div className={styles.dropBtn}><HiChevronDown className={styles.downSVG} /></div>
             </div>
 
             <div className={styles.dropWrap}>
@@ -45,7 +45,7 @@ export default function BirthDropdown() {
                     className={styles.birth}
                     placeholder="일"
                 />
-                <dvi className={styles.dropBtn}><BiChevronDown className={styles.downSVG} /></dvi>
+                <div className={styles.dropBtn}><HiChevronDown className={styles.downSVG} /></div>
             </div>
 
         </div>
