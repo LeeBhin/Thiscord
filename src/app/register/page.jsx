@@ -1,14 +1,27 @@
+'use client';
+
 import Link from 'next/link';
 import loginSt from '../login/login.module.css';
 import rgstrSt from './register.module.css'
 import BirthDropdown from '../components/BirthDropdown';
 import { GoCheck } from "react-icons/go";
+import { motion } from 'framer-motion';
 
 export default function Register() {
   return (
     <div className={loginSt.background}>
       <div className={loginSt.logo}></div>
-      <div className={rgstrSt.loginForm}>
+      <motion.div
+        className={rgstrSt.loginForm}
+        initial={{ opacity: 0, y: -60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: .1,
+          type: "spring",
+          stiffness: 600,
+          damping: 30,
+        }}
+      >
         <div className={loginSt.formWrap}>
 
           <div className={loginSt.welcomeWrap}>
@@ -64,7 +77,7 @@ export default function Register() {
 
           <Link href="/login" className={loginSt.goRegister}>이미 계정이 있으신가요?</Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
