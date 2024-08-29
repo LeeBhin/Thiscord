@@ -37,11 +37,11 @@
 }
 
 .birthWrap .dropWrap:nth-of-type(odd) .birth {
-    width: 125px;
+    max-width: 125px;
 }
 
 .birthWrap .dropWrap:nth-of-type(even) .birth {
-    width: 144px;
+    max-width: 144px;
 }
 
 .dropWrap {
@@ -71,7 +71,7 @@
     font-size: 12px;
 }
 
-.agreeInfo{
+.agreeInfo {
     margin-bottom: 18px;
 }
 
@@ -119,4 +119,29 @@
 .goPolicy {
     font-size: 12px;
     color: #02a8fc;
+}
+
+@media (max-width: 490px) {
+    .loginForm {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .birthWrap {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .birth {
+        width: 25vw;
+    }
+
+    .checkmark {
+        width: 30px;
+        height: 20px;
+    }
+
+    .checkmark svg {
+        width: 15px;
+    }
 }
