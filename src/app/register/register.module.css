@@ -6,15 +6,15 @@
     border-radius: 5px;
     position: relative;
     z-index: 1;
-    transition: height .4s cubic-bezier(0, 0.7, 1, 1);
+    transition: height .4s ease-out;
 }
 
 .formHeightName {
-    height: 742px;
+    height: 730px;
 }
 
 .formHeightPW {
-    height: 724px;
+    height: 720px;
 }
 
 .welcome {
@@ -25,17 +25,22 @@
     margin-top: 10px;
 }
 
+.input {
+    margin-bottom: 18px;
+}
+
 .inputInfo {
-    height: 0;
+    transform: translateY(15px);
     opacity: 0;
-    color: #f9fcff;
+    color: #dbe1e7;
     font-size: 14px;
-    margin-top: 7px;
-    transition: .4s;
+    margin-top: -20px;
+    transition: opacity 0.2s ease, transform 0.4s ease;
+    position: absolute;
 }
 
 .showInputInfo {
-    height: auto;
+    transform: translateY(0px);
     opacity: 1;
 }
 
