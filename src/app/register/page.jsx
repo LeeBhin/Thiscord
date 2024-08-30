@@ -6,13 +6,45 @@ import rgstrSt from './register.module.css'
 import BirthDropdown from '../components/BirthDropdown';
 import { GoCheck } from "react-icons/go";
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 export default function Register() {
+  const [isNameFocus, setIsNameFocus] = useState(false);
+  const [isPwFocus, setIsPwFocus] = useState(false);
+
+  const inputClick = (event) => {
+    toggleActive(event.target.type);
+  }
+
+  const getFormClasses = () => {
+    if (isNameFocus) {
+      return `${rgstrSt.loginForm} ${rgstrSt.formHeightName}`;
+    } else {
+      if (isPwFocus) {
+        return `${rgstrSt.loginForm} ${rgstrSt.formHeightPW}`;
+      }
+    }
+  }
+
+  const toggleActive = (type) => {
+    if (type === 'text') {
+      setIsNameFocus(!isNameFocus);
+      if (isPwFocus) {
+        setIsPwFocus(!isPwFocus);
+      }
+    } else {
+      setIsPwFocus(!isPwFocus);
+      if (isNameFocus) {
+        setIsNameFocus(!isNameFocus)
+      }
+    }
+  }
+
   return (
     <div className={loginSt.background}>
       <div className={loginSt.logo}></div>
       <motion.div
-        className={rgstrSt.loginForm}
+        className={`${getFormClasses()} ${rgstrSt.loginForm}`}
         initial={{ opacity: 0, y: -60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
@@ -39,13 +71,19 @@ export default function Register() {
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>별명 <span className={loginSt.required}>*</span></p>
-                <input type="text" className={loginSt.input} required />
+                <input type="text" className={loginSt.input} onClick={inputClick} required />
+                <p className={`${isNameFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`}>
+                  다른 회원에게 표시되는 이름이에요. 특수 문자와 이모지를 사용할 수 있어요.
+                </p>
               </div>
             </div>
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>비밀번호 <span className={loginSt.required}>*</span></p>
-                <input type="password" className={loginSt.input} required />
+                <input type="password" className={loginSt.input} onClick={inputClick} required />
+                <p className={`${isPwFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`}>
+                  제가 유추할 수 있도록 쉽게 만들어주세요.
+                </p>
               </div>
             </div>
             <div className={loginSt.inputTxtWrap}>

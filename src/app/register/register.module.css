@@ -4,6 +4,17 @@
     background-color: #313338;
     padding: 32px;
     border-radius: 5px;
+    position: relative;
+    z-index: 1;
+    transition: height .4s cubic-bezier(0, 0.7, 1, 1);
+}
+
+.formHeightName {
+    height: 742px;
+}
+
+.formHeightPW {
+    height: 724px;
 }
 
 .welcome {
@@ -12,6 +23,20 @@
 
 .inputWrap {
     margin-top: 10px;
+}
+
+.inputInfo {
+    height: 0;
+    opacity: 0;
+    color: #f9fcff;
+    font-size: 14px;
+    margin-top: 7px;
+    transition: .4s;
+}
+
+.showInputInfo {
+    height: auto;
+    opacity: 1;
 }
 
 .birthWrap {
@@ -87,7 +112,7 @@
 }
 
 .checkmark {
-    width: 32px;
+    width: 30px;
     height: 24px;
     background: none;
     border: solid 1px #949ba4;
