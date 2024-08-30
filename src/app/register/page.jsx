@@ -6,37 +6,47 @@ import rgstrSt from './register.module.css'
 import BirthDropdown from '../components/BirthDropdown';
 import { GoCheck } from "react-icons/go";
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Register() {
   const [isNameFocus, setIsNameFocus] = useState(false);
   const [isPwFocus, setIsPwFocus] = useState(false);
 
+  const nameRef = useRef(null);
+  const pwRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (nameRef.current && !nameRef.current.contains(event.target) &&
+        pwRef.current && !pwRef.current.contains(event.target)) {
+        setIsNameFocus(false);
+        setIsPwFocus(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const inputClick = (event) => {
-    toggleActive(event.target.type);
+    const type = event.target.type;
+    if (type === 'text') {
+      setIsNameFocus(true);
+      setIsPwFocus(false);
+    } else if (type === 'password') {
+      setIsPwFocus(true);
+      setIsNameFocus(false);
+    }
   }
 
   const getFormClasses = () => {
     if (isNameFocus) {
       return `${rgstrSt.loginForm} ${rgstrSt.formHeightName}`;
-    } else {
-      if (isPwFocus) {
-        return `${rgstrSt.loginForm} ${rgstrSt.formHeightPW}`;
-      }
-    }
-  }
-
-  const toggleActive = (type) => {
-    if (type === 'text') {
-      setIsNameFocus(!isNameFocus);
-      if (isPwFocus) {
-        setIsPwFocus(!isPwFocus);
-      }
-    } else {
-      setIsPwFocus(!isPwFocus);
-      if (isNameFocus) {
-        setIsNameFocus(!isNameFocus)
-      }
+    } else if (isPwFocus) {
+      return `${rgstrSt.loginForm} ${rgstrSt.formHeightPW}`;
     }
   }
 
@@ -74,7 +84,7 @@ export default function Register() {
             transition={{ duration: .4, ease: "easeOut" }}
           >
 
-            <div className={loginSt.welcomeWrap} style={{'marginBottom':'13px'}}>
+            <div className={loginSt.welcomeWrap} style={{ 'marginBottom': '13px' }}>
               <p className={loginSt.welcome}>계정 만들기</p>
             </div>
 
@@ -87,7 +97,7 @@ export default function Register() {
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>별명 <span className={loginSt.required}>*</span></p>
-                <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} onClick={inputClick} required />
+                <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} ref={nameRef} onClick={inputClick} required />
               </div>
             </div>
           </motion.div>
@@ -107,7 +117,7 @@ export default function Register() {
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>비밀번호 <span className={loginSt.required}>*</span></p>
-                <input type="password" className={`${loginSt.input} ${rgstrSt.input}`} onClick={inputClick} required />
+                <input type="password" className={`${loginSt.input} ${rgstrSt.input}`} ref={pwRef} onClick={inputClick} required />
                 <p className={`${isPwFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`} style={{ 'marginTop': '70px' }}>
                   제가 유추할 수 있도록 쉽게 만들어주세요.
                 </p>
