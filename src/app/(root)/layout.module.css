@@ -1,0 +1,36 @@
+.header {
+    background-color: #1e1f22;
+    width: 72px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.channel {
+    width: 48px;
+    height: 48px;
+    border-radius: 100%;
+    background-color: #313338;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: .3s;
+}
+
+.channel:hover {
+    border-radius: 15px;
+}
+
+.direct {
+    margin: 12px;
+}
+
+.serverImg {
+    background-image: url(@/../../../../public/images/icon.png);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
