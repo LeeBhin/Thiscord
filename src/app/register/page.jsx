@@ -94,12 +94,14 @@ export default function Register() {
                 <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} required />
               </div>
             </div>
+
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>별명 <span className={loginSt.required}>*</span></p>
                 <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} ref={nameRef} onClick={inputClick} required />
               </div>
             </div>
+
           </motion.div>
 
           <p className={`${isNameFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`}>
@@ -137,6 +139,7 @@ export default function Register() {
                   <input type="password" className={`${loginSt.input} ${rgstrSt.input}`} required />
                 </div>
               </div>
+
               <div className={loginSt.inputTxtWrap}>
                 <div className={`${loginSt.idWrap} ${rgstrSt.birthWrap}`}>
                   <p className={loginSt.inputTxt}>생년월일</p>

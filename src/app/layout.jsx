@@ -1,5 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import styles from "./layout.module.css";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +13,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <header>
+
+          <div className={styles.channelWrap}>
+            <div className={styles.channelBar} />
+            <Link href="/channels/me" className={styles.channel} />
+          </div>
+
+        </header>
+        {children}
+      </body>
     </html>
   );
 }
