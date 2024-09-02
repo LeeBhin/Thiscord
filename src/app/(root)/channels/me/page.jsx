@@ -9,6 +9,10 @@ export default function Friends() {
         </head>
       </html>
 
+      {/* <Head>
+        <title>Thiscord | 친구</title>
+      </Head> 안됨 */}
+
       ddd
     </div>
   )
