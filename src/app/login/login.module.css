@@ -27,6 +27,10 @@
     border-radius: 5px;
 }
 
+.formWrap{
+    position: relative;
+}
+
 .welcomeWrap {
     display: flex;
     flex-direction: column;
