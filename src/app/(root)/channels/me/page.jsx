@@ -1,3 +1,4 @@
+import Head from "next/head"
 import styles from "./friends.module.css"
 
 export default function Friends() {
@@ -7,11 +8,11 @@ export default function Friends() {
         <head>
           <title>Thiscord | 친구</title>
         </head>
-      </html> 되는데 에러 뜸 */}
+      </html> */}
 
       {/* <Head>
         <title>Thiscord | 친구</title>
-      </Head> 안됨 */}
+      </Head> */}
 
       ddd
     </div>
