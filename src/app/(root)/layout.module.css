@@ -8,6 +8,25 @@
     float: left;
 }
 
+.channelWrap {
+    display: flex;
+    align-items: center;
+}
+
+.channelBar {
+    position: absolute;
+    transform: translateX(-5px);
+    width: 9px;
+    height: 30px;
+    background-color: #f2f3f5;
+    border-radius: 20px;
+    clip-path: inset(0 0 0 50%);
+}
+
+.channel:hover .channelBar {
+    transform: translateX(-5px) scale(0);
+}
+
 .channel {
     width: 48px;
     height: 48px;
@@ -16,11 +35,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: .3s;
+    transition: 0.25s ease;
 }
 
 .channel:hover {
     border-radius: 15px;
+    background-color: #5865F2;
 }
 
 .direct {
@@ -34,4 +54,58 @@
     width: 30px;
     height: 30px;
     filter: brightness(0) invert(1);
+}
+
+.friendsHeader {
+    float: left;
+    width: 240px;
+    height: 100vh;
+    background-color: color-mix(in oklab, hsl(220 calc(1 * 6.5%) 18% / 1) 100%, black 0%);
+}
+
+.searchDiv {
+    width: 100%;
+    height: 48px;
+    box-shadow: 0 1px 0 hsl(0 calc(1 * 0%) 0.8% / 0.2), 0 1.5px 0 hsl(240 calc(1 * 7.7%) 2.5% / 0.05), 0 2px 0 hsl(0 calc(1 * 0%) 0.8% / 0.05);
+    padding: 10px;
+}
+
+.searchChat {
+    width: 220px;
+    height: 28px;
+    font-size: 14px;
+    background-color: #1e1f22;
+    border: none;
+    padding: 0 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.searchChat::placeholder {
+    color: #7ba3a5;
+    letter-spacing: -0.23px;
+}
+
+.friendsWrap {
+    width: 100%;
+    height: 100vh;
+}
+
+.topNav {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.friendsLink {
+    display: block;
+    width: 224px;
+    height: 42px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+    color: #949ba4;
 }

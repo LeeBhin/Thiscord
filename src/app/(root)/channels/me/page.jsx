@@ -3,11 +3,11 @@ import styles from "./friends.module.css"
 export default function Friends() {
   return (
     <div className={styles.friends}>
-      <html>
+      {/* <html>
         <head>
           <title>Thiscord | 친구</title>
         </head>
-      </html>
+      </html> 되는데 에러 뜸 */}
 
       {/* <Head>
         <title>Thiscord | 친구</title>
