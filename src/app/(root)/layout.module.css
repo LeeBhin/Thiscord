@@ -8,6 +8,12 @@
     float: left;
 }
 
+.headerWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .channelWrap {
     display: flex;
     align-items: center;
@@ -44,16 +50,20 @@
 }
 
 .direct {
-    margin: 12px;
+    margin: 12px 12px 8px 12px;
 }
 
 .serverImg {
-    background-image: url(@/../../../../public/images/icon.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
     width: 30px;
     height: 30px;
-    filter: brightness(0) invert(1);
+    color: white;
+}
+
+.barricade {
+    width: 32px;
+    height: 2px;
+    background-color: #4e50587a;
+    border-radius: 100px;
 }
 
 .friendsHeader {
@@ -89,6 +99,9 @@
 .friendsWrap {
     width: 100%;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .topNav {
@@ -97,6 +110,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 9px 10px;
+    gap: 2px;
+    margin-bottom: 8px;
 }
 
 .friendsLink {
@@ -106,6 +122,68 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 10px;
+    padding: 12px;
     color: #949ba4;
+    border-radius: 4px;
+    gap: 16px;
+    line-height: 42px;
+}
+
+.friendsLink:hover {
+    background-color: #35373c;
+    color: #dbdee1;
+}
+
+.friendsLink:active,
+.friendsLinkActive {
+    background-color: #404249;
+    color: white;
+}
+
+.directTxtWrap {
+    width: 205px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #949ba4;
+    display: flex;
+    justify-content: space-between;
+}
+
+.directTxtWrap p:hover {
+    color: #dbdee1;
+}
+
+.plus {
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.friends {
+    padding-top: 7px;
+}
+
+.friendProfile {
+    cursor: pointer;
+    gap: 12px;
+    padding: 12px 8px;
+}
+
+.profileIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    background-color: #5865F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profileImg {
+    color: white;
+    width: 20px;
+    height: 20px;
+}
+
+.name {
+    font-size: 16px;
 }
