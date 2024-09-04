@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import loginSt from '../login/login.module.css';
 import rgstrSt from './register.module.css'
-import BirthDropdown from '../../components/BirthDropdown';
+import BirthDropdown from '../components/BirthDropdown';
 import { GoCheck } from "react-icons/go";
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';

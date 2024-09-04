@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import styles from '../(no-layout)/register/register.module.css';
+import styles from '../register/register.module.css';
 import { HiChevronDown } from "react-icons/hi";
 
 export default function BirthDropdown() {

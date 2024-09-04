@@ -1,5 +1,5 @@
 .background {
-    background-image: url('@/../../../../../public/images/background.png');
+    background-image: url('@/../../../../public/images/background.png');
     background-size: cover;
     background-repeat: no-repeat;
     width: 100vw;
@@ -10,7 +10,7 @@
 }
 
 .logo {
-    background-image: url('../../../../public/images/logo.png');
+    background-image: url('../../../public/images/logo.png');
     background-repeat: no-repeat;
     width: 124px;
     height: 24px;
