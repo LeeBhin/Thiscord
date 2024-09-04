@@ -1,3 +1,67 @@
-.friends {
+.header {
+    height: 48px;
+    box-shadow: 0 1px 0 hsl(0 calc(1 * 0%) 0.8% / 0.2), 0 1.5px 0 hsl(240 calc(1 * 7.7%) 2.5% / 0.05), 0 2px 0 hsl(0 calc(1 * 0%) 0.8% / 0.05);
+    background-color: #313338;
+}
+
+.headerWrap {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 8px;
+}
+
+.frinedsTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 1px 10px 8px;
+    font-size: 16px;
+    color: #f2f3f5;
+    font-weight: bold;
+}
+
+.friendSvg {
+    color: #80848e;
+    width: 24px;
+    height: 24px;
+}
+
+.friendsTxt {
+    height: 24px;
+    line-height: 21px;
+}
+
+.barricade {
+    width: 1px;
+    height: 24px;
+    background-color: #4e50587a;
+    border-radius: 100px;
+    margin-right: 5px;
+}
+
+.statusWrap {
+    display: flex;
+    gap: 15px;
+    width: 400px;
+    color: #80848e;
+    font-size: 16px;
+}
+
+.statusWrap>div {
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.statusActive {
+    background-color: #4e505899;
+    color: white;
+}
+
+.body {
     float: left;
+    width: calc(100vw - 312px);
+    height: 100vh;
+    /* background-color: #313338; */
 }
