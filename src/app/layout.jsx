@@ -3,9 +3,8 @@
 import "./globals.css";
 import styles from "./layout.module.css";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Images from "@/Images";
-
+import { usePathname } from "next/navigation";
 export default function RootLayout({ children }) {
 
   const currentPath = usePathname();
@@ -20,10 +19,11 @@ export default function RootLayout({ children }) {
       </html>
     );
   }
+
   return (
     <html lang="ko">
       <head>
-        <title>Thiscord</title>
+        <title>{currentPath === '/channels/me' ? 'Thiscord | 친구' : 'Thiscord'}</title>
       </head>
       <body className={styles.body}>
         <header className={styles.header}>

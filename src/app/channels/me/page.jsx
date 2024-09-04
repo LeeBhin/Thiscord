@@ -9,7 +9,7 @@ export default function Friends() {
       </Head>
 
       <header className={styles.header}>
-        
+
       </header>
     </div>
   );
