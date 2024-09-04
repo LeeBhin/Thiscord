@@ -4,6 +4,7 @@ import nitro from '@/../../public/svgs/nitro.svg';
 import shop from '@/../../public/svgs/shop.svg';
 import plus from '@/../../public/svgs/plus.svg';
 import icon from '@/../../public/svgs/icon.svg'
+import notFound from '@/../../public/images/404gif.gif'
 
 const Images = {
   background,
@@ -11,7 +12,10 @@ const Images = {
   nitro,
   shop,
   plus,
-  icon
+  icon,
+  notFound
 };
 
-export default { Images, friends, nitro, shop, plus, icon };
+export default {
+  Images, friends, nitro, shop, plus, icon, notFound
+};

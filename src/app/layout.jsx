@@ -11,15 +11,20 @@ export default function RootLayout({ children }) {
   const currentPath = usePathname();
 
   if (currentPath === '/login' || currentPath === '/register') {
-    return <html>
-      <body>
-        {children}
-      </body>
-    </html>
+    return (
+      <html lang="ko">
+        <head><title>Thiscord</title></head>
+        <body>
+          {children}
+        </body>
+      </html>
+    );
   }
-
   return (
     <html lang="ko">
+      <head>
+        <title>Thiscord</title>
+      </head>
       <body className={styles.body}>
         <header className={styles.header}>
           <div className={styles.headerWrap}>
