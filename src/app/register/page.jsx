@@ -7,10 +7,15 @@ import BirthDropdown from '../components/BirthDropdown';
 import { GoCheck } from "react-icons/go";
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { register } from '@/utils/api';
 
 export default function Register() {
   const [isNameFocus, setIsNameFocus] = useState(false);
   const [isPwFocus, setIsPwFocus] = useState(false);
+  const [name, setName] = useState('');
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [cfEmailOrPhone, setCfEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
 
   const nameRef = useRef(null);
   const pwRef = useRef(null);
@@ -60,6 +65,10 @@ export default function Register() {
     animate: { y }
   });
 
+  const submit = () => {
+    register(name, emailOrPhone, password)
+  }
+
   return (
     <div className={loginSt.background}>
       <div className={loginSt.logo}></div>
@@ -91,14 +100,28 @@ export default function Register() {
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>이메일 또는 전화번호 <span className={loginSt.required}>*</span></p>
-                <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} required />
+                <input
+                  type="text"
+                  className={`${loginSt.input} ${rgstrSt.input}`}
+                  required
+                  value={emailOrPhone}
+                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                />
               </div>
             </div>
 
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>이름 <span className={loginSt.required}>*</span></p>
-                <input type="text" className={`${loginSt.input} ${rgstrSt.input}`} ref={nameRef} onClick={inputClick} required />
+                <input
+                  type="text"
+                  className={`${loginSt.input} ${rgstrSt.input}`}
+                  ref={nameRef}
+                  onClick={inputClick}
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
             </div>
 
@@ -119,7 +142,15 @@ export default function Register() {
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
                 <p className={loginSt.inputTxt}>비밀번호 <span className={loginSt.required}>*</span></p>
-                <input type="password" className={`${loginSt.input} ${rgstrSt.input}`} ref={pwRef} onClick={inputClick} required />
+                <input
+                  type="password"
+                  className={`${loginSt.input} ${rgstrSt.input}`}
+                  ref={pwRef}
+                  onClick={inputClick}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
                 <p className={`${isPwFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`} style={{ 'marginTop': '70px' }}>
                   제가 유추할 수 있도록 쉽게 만들어주세요.
                 </p>
@@ -136,7 +167,13 @@ export default function Register() {
               <div className={loginSt.inputTxtWrap}>
                 <div className={loginSt.idWrap}>
                   <p className={loginSt.inputTxt}>비밀번호 확인 <span className={loginSt.required}>*</span></p>
-                  <input type="password" className={`${loginSt.input} ${rgstrSt.input}`} required />
+                  <input
+                    type="password"
+                    className={`${loginSt.input} ${rgstrSt.input}`}
+                    required
+                    value={cfEmailOrPhone}
+                    onChange={(e) => setCfEmailOrPhone(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -155,7 +192,7 @@ export default function Register() {
                 </label>
               </div>
 
-              <button className={loginSt.submit}>계속하기</button>
+              <button className={loginSt.submit} onClick={submit}>계속하기</button>
 
               <p className={`${rgstrSt.agreeTxt} ${rgstrSt.agreeInfo}`}>등록하는 순간 Thiscord의 <Link href="/policy" className={rgstrSt.goPolicy}>서비스 이용 약관</Link>과 <Link href="/policy" className={rgstrSt.goPolicy}>개인정보 보호 정책</Link>에 동의하게 됩니다.</p>
 
