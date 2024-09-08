@@ -11,7 +11,7 @@ async function apiRequest(endpoint, method, body) {
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'An error occurred');
+        throw new Error(error.message || '영 좋지 않아요.');
     }
 
     return response.json();

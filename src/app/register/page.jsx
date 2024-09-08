@@ -8,6 +8,7 @@ import { GoCheck } from "react-icons/go";
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { register } from '@/utils/api';
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
   const [isNameFocus, setIsNameFocus] = useState(false);
@@ -19,6 +20,8 @@ export default function Register() {
 
   const nameRef = useRef(null);
   const pwRef = useRef(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -65,8 +68,16 @@ export default function Register() {
     animate: { y }
   });
 
-  const submit = () => {
-    register(name, emailOrPhone, password)
+  const submit = async () => {
+    try {
+      const response = await register(name, emailOrPhone, password);
+      if (response) {
+        router.push('/login');
+      }
+    } catch (err) {
+      alert(err)
+      console.error(err);
+    }
   }
 
   return (
@@ -128,7 +139,7 @@ export default function Register() {
           </motion.div>
 
           <p className={`${isNameFocus ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}` : rgstrSt.inputInfo}`}>
-            다른 회원에게 표시되는 이름이에요. 특수 문자와 이모지를 사용할 수 있어요.
+            다른 회원에게 표시되는 이름이에요. 특수 문자와 이모지를 사용할 수 없어요.
           </p>
 
           <motion.div
