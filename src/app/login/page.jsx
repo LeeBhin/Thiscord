@@ -18,9 +18,15 @@ export default function Login() {
     try {
       const response = await login(emailOrPhone, password);
       if (response) {
+        const userInfo = {
+          name: response.name,
+          iconColor: response.iconColor
+        }
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
         router.push('/channels/me');
       }
     } catch (err) {
+      alert(err)
       console.error('Login error:', err);
       setErr(true)
     }

@@ -5,9 +5,18 @@ import styles from "./layout.module.css";
 import Link from "next/link";
 import Images from "@/Images";
 import { usePathname } from "next/navigation";
-export default function RootLayout({ children }) {
+import { useEffect, useState } from "react";
 
+export default function RootLayout({ children }) {
+  const [userInfo, setUserInfo] = useState(null);
   const currentPath = usePathname();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      setUserInfo(JSON.parse(userInfo));
+    }
+  }, []);
 
   if (currentPath === '/login' || currentPath === '/register') {
     return (
@@ -93,6 +102,12 @@ export default function RootLayout({ children }) {
             </div>
           </div>
 
+          <div className={styles.myInfo}>
+            <div className={styles.profileIcon} style={{ backgroundColor: userInfo?.iconColor }}>
+              <Images.icon className={styles.profileImg} />
+            </div>
+            <div className={styles.name}>{userInfo?.name || ''}</div>
+          </div>
         </header>
 
         {children}

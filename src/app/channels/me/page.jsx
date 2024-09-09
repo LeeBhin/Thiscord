@@ -57,7 +57,7 @@ export default function Friends() {
       </header >
 
       <div className={styles.body}>
-
+        
       </div>
     </div >
   );
