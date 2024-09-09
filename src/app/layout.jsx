@@ -107,6 +107,9 @@ export default function RootLayout({ children }) {
               <Images.icon className={styles.profileImg} />
             </div>
             <div className={styles.name}>{userInfo?.name || ''}</div>
+            <Link href="/setting" className={styles.setting}>
+              <Images.setting />
+            </Link>
           </div>
         </header>
 

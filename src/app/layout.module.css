@@ -206,7 +206,18 @@
     gap: 8px;
 }
 
-.myInfo .name{
+.myInfo .name {
     font-size: 14px;
 }
 
+.setting {
+    position: absolute;
+    right: 14px;
+    transition: .5s ease;
+    padding-top: 5px;
+}
+
+.setting:hover {
+    transition: 1s;
+    transform: rotate(180deg) translateY(-1px);
+}
