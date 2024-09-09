@@ -28,7 +28,7 @@ export async function login(phoneOrEmail, password) {
 export async function checkToken() {
     const response = await fetch(`${API_URL}/auth/check-token`, {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include',
     });
 
     if (response.status === 401) {
