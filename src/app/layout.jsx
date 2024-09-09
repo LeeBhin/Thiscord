@@ -6,17 +6,31 @@ import Link from "next/link";
 import Images from "@/Images";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { checkToken } from "@/utils/api";
 
 export default function RootLayout({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const currentPath = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      setUserInfo(JSON.parse(userInfo));
-    }
-  }, []);
+    const verifyToken = async () => {
+      try {
+        await checkToken();
+
+        const storedUserInfo = localStorage.getItem('userInfo');
+        if (storedUserInfo) {
+          setUserInfo(JSON.parse(storedUserInfo));
+        }
+      } catch (err) {
+        console.error('Error checking token:', err);
+        router.push('/login');
+      }
+    };
+
+    verifyToken();
+  }, [router, currentPath]);
 
   if (currentPath === '/login' || currentPath === '/register') {
     return (

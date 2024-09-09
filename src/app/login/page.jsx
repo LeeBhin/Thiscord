@@ -17,10 +17,11 @@ export default function Login() {
   const submit = async () => {
     try {
       const response = await login(emailOrPhone, password);
+      console.log(response)
       if (response) {
         const userInfo = {
-          name: response.name,
-          iconColor: response.iconColor
+          name: response.userInfo.name,
+          iconColor: response.userInfo.iconColor
         }
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         router.push('/channels/me');

@@ -24,3 +24,15 @@ export async function register(name, phoneOrEmail, password) {
 export async function login(phoneOrEmail, password) {
     return apiRequest('users/login', 'POST', { phoneOrEmail, password });
 }
+
+export async function checkToken() {
+    const response = await fetch(`${API_URL}/auth/check-token`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+    return response.json();
+}
