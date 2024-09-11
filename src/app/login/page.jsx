@@ -17,7 +17,6 @@ export default function Login() {
   const submit = async () => {
     try {
       const response = await login(emailOrPhone, password);
-      console.log(response)
       if (response) {
         const userInfo = {
           name: response.userInfo.name,
