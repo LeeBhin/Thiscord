@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkToken } from "@/utils/api";
+import { logout } from '@/utils/api';
 
 export default function RootLayout({ children }) {
   const [userInfo, setUserInfo] = useState(null);
@@ -16,16 +17,18 @@ export default function RootLayout({ children }) {
 
   useEffect(() => {
     const verifyToken = async () => {
-      try {
-        await checkToken();
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        try {
+          await checkToken();
 
-        const storedUserInfo = localStorage.getItem('userInfo');
-        if (storedUserInfo) {
-          setUserInfo(JSON.parse(storedUserInfo));
+          const storedUserInfo = localStorage.getItem('userInfo');
+          if (storedUserInfo) {
+            setUserInfo(JSON.parse(storedUserInfo));
+          }
+        } catch (err) {
+          console.error(err);
+          router.push('/login');
         }
-      } catch (err) {
-        console.error('Error checking token:', err);
-        router.push('/login');
       }
     };
 
@@ -41,6 +44,10 @@ export default function RootLayout({ children }) {
         </body>
       </html>
     );
+  }
+
+  const logOut = () => {
+    logout();
   }
 
   return (
@@ -121,7 +128,7 @@ export default function RootLayout({ children }) {
               <Images.icon className={styles.profileImg} />
             </div>
             <div className={styles.name}>{userInfo?.name || ''}</div>
-            <Link href="/setting" className={styles.setting}>
+            <Link href="/setting" className={styles.setting} onClick={logOut}>
               <Images.setting />
             </Link>
           </div>

@@ -7,6 +7,7 @@ async function apiRequest(endpoint, method, body) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
+        credentials: 'include',
     });
 
     if (!response.ok) {
@@ -25,10 +26,17 @@ export async function login(phoneOrEmail, password) {
     return apiRequest('users/login', 'POST', { phoneOrEmail, password });
 }
 
+export function logout() {
+    return apiRequest('users/logout', 'POST');
+}
+
 export async function checkToken() {
     const response = await fetch(`${API_URL}/auth/check-token`, {
-        method: 'GET',
+        method: 'POST',
         credentials: 'include',
+        headers: {
+            'Accept': 'application/json',
+        },
     });
 
     if (response.status === 401) {
