@@ -31,7 +31,7 @@ export function logout() {
 }
 
 export async function checkToken() {
-    const response = await fetch(`${API_URL}/auth/check-token`, {
+    const response = await fetch(`${API_URL}/users/check-token`, {
         method: 'POST',
         credentials: 'include',
         headers: {
