@@ -8,12 +8,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkToken } from "@/utils/api";
-import { logout } from '@/utils/api';
+import { logout, load_friends } from '@/utils/api';
 
 export default function RootLayout({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const currentPath = usePathname();
   const router = useRouter();
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -34,6 +35,19 @@ export default function RootLayout({ children }) {
 
     verifyToken();
   }, [router, currentPath]);
+
+  useEffect(() => {
+    const loadFriends = async () => {
+      try {
+        const friends = await load_friends();
+        setFriends(friends);
+      } catch (error) {
+        console.error('Failed to load friends:', error);
+      }
+    };
+
+    loadFriends();
+  }, []);
 
   if (currentPath === '/login' || currentPath === '/register') {
     return (
@@ -113,13 +127,19 @@ export default function RootLayout({ children }) {
 
             <div className={styles.friends}>
 
-              <div className={`${styles.friendsLink} ${styles.friendProfile}`}>
-                <div className={styles.profileIcon} >
-                  <Images.icon className={styles.profileImg} />
-                </div>
-                <div className={styles.name}>이빈</div>
-              </div>
-
+              {friends.length > 0 ? (
+                friends.map((friend, index) => (
+                  <Link href={`/direct/${friend.name}`} key={index} className={`${styles.friendsLink} ${styles.friendProfile}`}>
+                    <div
+                      className={styles.profileIcon}
+                      style={{ backgroundColor: friend.iconColor }} // 동적으로 아이콘 색상 설정
+                    >
+                      <Images.icon className={styles.profileImg} /> {/* 아이콘 렌더링 */}
+                    </div>
+                    <div className={styles.name}>{friend.name}</div> {/* 이름을 동적으로 설정 */}
+                  </Link>
+                ))
+              ) : (<></>)}
             </div>
           </div>
 

@@ -88,4 +88,45 @@
     width: calc(100vw - 312px);
     height: calc(100vh - 48px);
     background-color: #313338;
+    padding: 10px 25px;
+}
+
+.friendsList {
+    margin-top: 10px;
+}
+
+.friend {
+    cursor: pointer;
+    gap: 12px;
+    padding: 12px 8px;
+    display: flex;
+    align-items: center;
+    border-top: solid 1px color-mix(in oklab, hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%, hsl(0 0% 0% / 0.48) 0%);
+}
+
+.profile {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    color: white;
+    width: 20px;
+    height: 20px;
+}
+
+.profileImg {
+    color: white;
+    width: 20px;
+    height: 20px;
+}
+
+.name {
+    font-size: 16px;
+    color: #f2f3f5;
+    font-weight: bold;
 }

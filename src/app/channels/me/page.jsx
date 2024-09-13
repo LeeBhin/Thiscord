@@ -3,9 +3,11 @@
 import Head from 'next/head';
 import styles from './friends.module.css';
 import Images from '@/Images';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { load_friends } from '@/utils/api';
 export default function Friends() {
   const [whichActive, setWichActive] = useState('all');
+  const [friends, setFriends] = useState([]);
 
   const handleActive = (target) => {
     if (target === 'all') {
@@ -16,6 +18,19 @@ export default function Friends() {
       setWichActive('recommand')
     }
   }
+
+  useEffect(() => {
+    const loadFriends = async () => {
+      try {
+        const friends = await load_friends();
+        setFriends(friends);
+      } catch (error) {
+        console.error('Failed to load friends:', error);
+      }
+    };
+
+    loadFriends();
+  }, []);
 
   return (
     <div className={styles.friends}>
@@ -57,6 +72,29 @@ export default function Friends() {
       </header >
 
       <div className={styles.body}>
+        <div className={styles.searchFriend}>
+          <input type="text" />
+        </div>
+
+        <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+
+        <div className={styles.friendsList}>
+          {friends.length > 0 ? (
+            friends.map((friend, index) => (
+              <div key={index} className={styles.friend}>
+                <div
+                  className={styles.profile}
+                  style={{ backgroundColor: friend.iconColor }}
+                >
+                  <Images.icon className={styles.icon} />
+                </div>
+                <div className={styles.name}>{friend.name}</div>
+              </div>
+            ))
+          ) : (
+            <p>친구가 없습니다.</p>
+          )}
+        </div>
 
       </div>
     </div >

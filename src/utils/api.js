@@ -1,17 +1,23 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-async function apiRequest(endpoint, method, body) {
-    const response = await fetch(`${API_URL}/${endpoint}`, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+async function apiRequest(endpoint, method, body = null) {
+    const options = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-    });
+    };
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(`${API_URL}/${endpoint}`, options);
 
     if (!response.ok) {
         const error = await response.json();
+        if (response.status === 401) {
+            throw new Error('Unauthorized');
+        }
         throw new Error(error.message || '영 좋지 않아요.');
     }
 
@@ -31,16 +37,9 @@ export function logout() {
 }
 
 export async function checkToken() {
-    const response = await fetch(`${API_URL}/users/check-token`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'Accept': 'application/json',
-        },
-    });
+    return apiRequest('users/check-token', 'POST');
+}
 
-    if (response.status === 401) {
-        throw new Error('Unauthorized');
-    }
-    return response.json();
+export async function load_friends() {
+    return apiRequest('friends/list', 'GET');
 }
