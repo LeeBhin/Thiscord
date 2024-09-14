@@ -6,6 +6,7 @@ import plus from '@/../../public/svgs/plus.svg';
 import icon from '@/../../public/svgs/icon.svg'
 import notFound from '@/../../public/images/404gif.gif'
 import setting from '@/../../public/svgs/setting.svg'
+import search from '@/../../public/svgs/search.svg'
 
 const Images = {
   background,
@@ -15,9 +16,9 @@ const Images = {
   plus,
   icon,
   notFound,
-  setting
+  search
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search
 };

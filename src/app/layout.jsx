@@ -46,7 +46,9 @@ export default function RootLayout({ children }) {
       }
     };
 
-    loadFriends();
+    if (currentPath != '/login' || currentPath != 'register') {
+      loadFriends();
+    }
   }, []);
 
   if (currentPath === '/login' || currentPath === '/register') {
@@ -67,7 +69,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <head>
-        <title>{currentPath === '/channels/me' ? 'Thiscord | 친구' : 'Thiscord'}</title>
+        <title>{currentPath === '/channels/me' ? '• Thiscord | 친구' : 'Thiscord'}</title>
       </head>
       <body className={styles.body}>
         <header className={styles.header}>

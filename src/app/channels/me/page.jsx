@@ -1,43 +1,37 @@
 "use client";
 
-import Head from 'next/head';
 import styles from './friends.module.css';
 import Images from '@/Images';
-import { useEffect, useState } from 'react';
-import { load_friends } from '@/utils/api';
+import { useState } from 'react';
+import All_Friends from './friend_pages/allFriend';
+import Pending from './friend_pages/pending';
+import Recommend from './friend_pages/recommend';
+import Add_Friend from './friend_pages/addFriend';
+
 export default function Friends() {
   const [whichActive, setWichActive] = useState('all');
-  const [friends, setFriends] = useState([]);
 
   const handleActive = (target) => {
-    if (target === 'all') {
-      setWichActive('all')
-    } else if (target === 'ready') {
-      setWichActive('ready')
-    } else {
-      setWichActive('recommand')
+    setWichActive(target);
+  };
+
+  const renderComponent = () => {
+    switch (whichActive) {
+      case 'all':
+        return <All_Friends />;
+      case 'pending':
+        return <Pending />;
+      case 'recommand':
+        return <Recommend />;
+      case 'add':
+        return <Add_Friend />;
+      default:
+        return <All_Friends />;
     }
-  }
-
-  useEffect(() => {
-    const loadFriends = async () => {
-      try {
-        const friends = await load_friends();
-        setFriends(friends);
-      } catch (error) {
-        console.error('Failed to load friends:', error);
-      }
-    };
-
-    loadFriends();
-  }, []);
+  };
 
   return (
     <div className={styles.friends}>
-      <Head>
-        <title>Thiscord | 친구</title>
-      </Head>
-
       <header className={styles.header}>
         <div className={styles.headerWrap}>
 
@@ -55,7 +49,7 @@ export default function Friends() {
               모두
             </div>
 
-            <div className={`${styles.ready}  ${whichActive === 'ready' ? styles.statusActive : ''}`} onClick={() => handleActive('ready')}>
+            <div className={`${styles.ready}  ${whichActive === 'pending' ? styles.statusActive : ''}`} onClick={() => handleActive('pending')}>
               대기 중
             </div>
 
@@ -64,7 +58,7 @@ export default function Friends() {
             </div>
           </div>
 
-          <div className={styles.addFriend}>
+          <div className={styles.addFriend} onClick={() => handleActive('add')}>
             친구 추가하기
           </div>
 
@@ -72,30 +66,7 @@ export default function Friends() {
       </header >
 
       <div className={styles.body}>
-        <div className={styles.searchFriend}>
-          <input type="text" />
-        </div>
-
-        <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
-
-        <div className={styles.friendsList}>
-          {friends.length > 0 ? (
-            friends.map((friend, index) => (
-              <div key={index} className={styles.friend}>
-                <div
-                  className={styles.profile}
-                  style={{ backgroundColor: friend.iconColor }}
-                >
-                  <Images.icon className={styles.icon} />
-                </div>
-                <div className={styles.name}>{friend.name}</div>
-              </div>
-            ))
-          ) : (
-            <p>친구가 없습니다.</p>
-          )}
-        </div>
-
+        {renderComponent()}
       </div>
     </div >
   );

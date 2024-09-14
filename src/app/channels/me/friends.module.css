@@ -88,7 +88,41 @@
     width: calc(100vw - 312px);
     height: calc(100vh - 48px);
     background-color: #313338;
-    padding: 10px 25px;
+    padding: 16px 30px;
+}
+
+.searchFriend {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchFriend input {
+    height: 34px;
+    width: 100%;
+    border-radius: 4px;
+    background-color: #201c24;
+    padding: 10px;
+    border: none;
+    font-size: 16px;
+    color: whitesmoke;
+}
+
+.searchIcon {
+    position: absolute;
+    right: 10px;
+    color: #b5bac1;
+}
+
+.searchFriend input::placeholder {
+    color: #93989e;
+}
+
+.countFriends {
+    padding: 23px 0 8px 0;
+    font-size: 12px;
+    color: #b5bac1;
+    font-weight: bold;
 }
 
 .friendsList {
@@ -98,10 +132,15 @@
 .friend {
     cursor: pointer;
     gap: 12px;
-    padding: 12px 8px;
+    padding: 15px 8px 15px 1px;
     display: flex;
     align-items: center;
     border-top: solid 1px color-mix(in oklab, hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%, hsl(0 0% 0% / 0.48) 0%);
+}
+
+.friend:hover {
+    background-color: #393c41;
+    border-radius: 10px;
 }
 
 .profile {
