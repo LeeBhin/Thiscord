@@ -58,7 +58,7 @@ export default function Friends() {
             </div>
           </div>
 
-          <div className={styles.addFriend} onClick={() => handleActive('add')}>
+          <div className={`${styles.addFriend}  ${whichActive === 'add' ? styles.addActive : ''}`} onClick={() => handleActive('add')}>
             친구 추가하기
           </div>
 

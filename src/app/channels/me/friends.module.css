@@ -55,6 +55,7 @@
     border-radius: 3px;
     height: 24px;
     line-height: 18px;
+    cursor: pointer;
 }
 
 .statusWrap>div:hover {
@@ -68,6 +69,7 @@
 .statusActive {
     background-color: #4e505899;
     color: white;
+    cursor: default !important;
 }
 
 .addFriend {
@@ -81,6 +83,12 @@
     line-height: 20px;
     margin-left: 12px;
     cursor: pointer;
+}
+
+.addActive {
+    background: none;
+    color: #2dc770;
+    cursor: default;
 }
 
 .body {
@@ -168,4 +176,81 @@
     font-size: 16px;
     color: #f2f3f5;
     font-weight: bold;
+}
+
+
+/* add friend */
+
+.title {
+    color: #f2f3f5;
+    font-size: 16px;
+    padding: 2px 0 9px 0;
+    font-weight: bold;
+}
+
+.subTitle {
+    color: #b5bac0;
+    font-size: 14px;
+}
+
+.inputWrap {
+    height: 50px;
+    width: 100%;
+    background-color: #1e1f22;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    align-items: center;
+}
+
+.inputWrap input {
+    padding: 10px;
+    flex: 1;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: color-mix(in oklab, hsl(210 calc(1 * 9.1%) 87.1% / 1) 100%, black 0%);
+    font-weight: bold;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+}
+
+.inputWrap input:focus {
+    border: solid 1px color-mix(in oklab, hsl(200 calc(1 * 100%) 49.4% / 1) 100%, black 0%);
+}
+
+.sendRequestBtn {
+    background-color: #5865f2;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+}
+
+.line {
+    position: absolute;
+    top: 203px;
+    left: 0;
+    width: 100%;
+    border-bottom: solid 1px color-mix(in oklab, hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%, hsl(0 0% 0% / 0.48) 0%);
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    font-size: 16px;
+    color: #949ba4;
+}
+
+.wumpus {
+    margin: 0 0 50px 0;
 }

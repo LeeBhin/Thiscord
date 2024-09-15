@@ -43,3 +43,7 @@ export async function checkToken() {
 export async function load_friends() {
     return apiRequest('friends/list', 'GET');
 }
+
+export async function add_friend(friendId) {
+    return apiRequest(`friends/request/${friendId}`, 'POST');
+}
