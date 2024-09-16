@@ -55,3 +55,7 @@ export async function pending_friends() {
 export async function delete_friend(friendId) {
     return apiRequest(`friends/delete/${friendId}`, 'DELETE');
 }
+
+export async function accept_friend(friendId) {
+    return apiRequest(`friends/accept/${friendId}`, 'PUT');
+}

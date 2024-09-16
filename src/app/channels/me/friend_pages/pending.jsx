@@ -3,7 +3,7 @@
 import Images from '@/Images'
 import styles from '../friends.module.css'
 import { useEffect, useState } from 'react';
-import { delete_friend, pending_friends } from '@/utils/api';
+import { accept_friend, delete_friend, pending_friends } from '@/utils/api';
 
 export default function Pending() {
     const [friends, setFriends] = useState([]);
@@ -20,6 +20,11 @@ export default function Pending() {
     useEffect(() => {
         pendingFriends();
     }, []);
+
+    const acceptFriend = async (friendName) => {
+        await accept_friend(friendName);
+        await pendingFriends();
+    };
 
     const deleteFriend = async (friendName) => {
         await delete_friend(friendName);
@@ -53,7 +58,7 @@ export default function Pending() {
                                 </div>
 
                                 <div className={styles.ox}>
-                                    {friend.name === friend.who ? (<div className={styles.accept} ><Images.accept /></div>) : (<></>)}
+                                    {friend.name === friend.who ? (<div className={styles.accept} onClick={() => acceptFriend(friend.name)}><Images.accept /></div>) : (<></>)}
                                     <div className={styles.deny} onClick={() => deleteFriend(friend.name)}><Images.deny /></div>
                                 </div>
                             </div>
