@@ -140,7 +140,7 @@
 .friend {
     cursor: pointer;
     gap: 12px;
-    padding: 15px 8px 15px 1px;
+    padding: 13px 8px 13px 1px;
     display: flex;
     align-items: center;
     border-top: solid 1px color-mix(in oklab, hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%, hsl(0 0% 0% / 0.48) 0%);
@@ -280,4 +280,57 @@
 
 .wumpus {
     margin: 0 0 50px 0;
+}
+
+/* pending */
+
+.profileWrap {
+    display: flex;
+    gap: 12px;
+}
+
+.nameWrap {
+    display: flex;
+    flex-direction: column;
+    line-height: 16px;
+}
+
+.pending {
+    font-size: 12px;
+    color: #b5bac1;
+}
+
+.friendPending {
+    cursor: pointer;
+    gap: 12px;
+    padding: 11px 8px 11px 1px;
+    display: flex;
+    align-items: center;
+    border-top: solid 1px color-mix(in oklab, hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%, hsl(0 0% 0% / 0.48) 0%);
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ox {
+    display: flex;
+    gap: 10px;
+}
+
+.ox div {
+    width: 36px;
+    height: 36px;
+    background-color: #2b2d31;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #b5bac1;
+}
+
+.ox .accept:hover {
+    color: #2dc770;
+}
+
+.ox .deny:hover {
+    color: #e85258;
 }

@@ -47,3 +47,7 @@ export async function load_friends() {
 export async function add_friend(friendId) {
     return apiRequest(`friends/request/${friendId}`, 'POST');
 }
+
+export async function pending_friends() {
+    return apiRequest(`friends/pendinglist`, 'GET');
+}

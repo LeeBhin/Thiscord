@@ -8,6 +8,8 @@ import notFound from '@/../../public/images/404gif.gif'
 import setting from '@/../../public/svgs/setting.svg'
 import search from '@/../../public/svgs/search.svg'
 import wumpus from '@/../../public/svgs/wumpus.svg'
+import accept from '@/../../public/svgs/accept.svg'
+import deny from '@/../../public/svgs/deny.svg'
 
 const Images = {
   background,
@@ -18,9 +20,11 @@ const Images = {
   icon,
   notFound,
   search,
-  wumpus
+  wumpus,
+  accept,
+  deny
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny
 };
