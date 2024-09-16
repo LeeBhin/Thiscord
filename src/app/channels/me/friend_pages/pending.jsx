@@ -3,23 +3,28 @@
 import Images from '@/Images'
 import styles from '../friends.module.css'
 import { useEffect, useState } from 'react';
-import { pending_friends } from '@/utils/api';
+import { delete_friend, pending_friends } from '@/utils/api';
 
 export default function Pending() {
     const [friends, setFriends] = useState([]);
-    useEffect(() => {
-        const pendingFriends = async () => {
-            try {
-                const friends = await pending_friends();
-                setFriends(friends);
-            } catch (error) {
-                console.error('Failed to load friends:', error);
-            }
-        };
 
+    const pendingFriends = async () => {
+        try {
+            const friends = await pending_friends();
+            setFriends(friends);
+        } catch (error) {
+            console.error('Failed to load friends:', error);
+        }
+    };
+
+    useEffect(() => {
         pendingFriends();
     }, []);
 
+    const deleteFriend = async (friendName) => {
+        await delete_friend(friendName);
+        await pendingFriends();
+    };
     return (
         <div>
             <div className={styles.searchFriend}>
@@ -49,7 +54,7 @@ export default function Pending() {
 
                                 <div className={styles.ox}>
                                     {friend.name === friend.who ? (<div className={styles.accept} ><Images.accept /></div>) : (<></>)}
-                                    <div className={styles.deny} ><Images.deny /></div>
+                                    <div className={styles.deny} onClick={() => deleteFriend(friend.name)}><Images.deny /></div>
                                 </div>
                             </div>
                         ))

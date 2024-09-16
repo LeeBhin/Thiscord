@@ -14,7 +14,12 @@ export default function Add_Friend() {
             setStatus(friends.message);
             setErr(false);
         } catch (error) {
-            setStatus(error.message);
+            const msg = error.message.toString();
+            if (msg.startsWith('Cannot')) {
+                setStatus("흠, 안 되는군요. 사용자명을 올바르게 입력했는지 확인하세요.");
+            } else {
+                setStatus(error.message);
+            }
             setErr(true);
         }
     };
