@@ -136,12 +136,12 @@ export default function RootLayout({ children }) {
                       className={styles.profileIcon}
                       style={{ backgroundColor: friend.iconColor }}
                     >
-                      <Images.icon className={styles.profileImg} /> {/* 아이콘 렌더링 */}
+                      <Images.icon className={styles.profileImg} />
                     </div>
-                    <div className={styles.name}>{friend.name}</div> {/* 이름을 동적으로 설정 */}
+                    <div className={styles.name}>{friend.name}</div>
                   </Link>
                 ))
-              ) : (<></>)}
+              ) : <></>}
             </div>
           </div>
 
