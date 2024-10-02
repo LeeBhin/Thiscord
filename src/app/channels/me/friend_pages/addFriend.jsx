@@ -33,7 +33,7 @@ export default function Add_Friend() {
     }
 
     return (
-        <div className={styles.addFriendBody}>
+        <div className={styles.bodyWrap}>
             <div className={styles.addHeader}>
                 <p className={styles.title}>친구 추가하기</p>
                 <p className={styles.subTitle}>Thiscord 사용자명을 사용하여 친구를 추가할 수 있어요.</p>

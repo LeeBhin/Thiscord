@@ -131,10 +131,10 @@ export default function RootLayout({ children }) {
 
               {friends.length > 0 ? (
                 friends.map((friend, index) => (
-                  <Link href={`/direct/${friend.name}`} key={index} className={`${styles.friendsLink} ${styles.friendProfile}`}>
+                  <Link href={`/channels/me/${friend.name}`} key={index} className={`${styles.friendsLink} ${styles.friendProfile}`}>
                     <div
                       className={styles.profileIcon}
-                      style={{ backgroundColor: friend.iconColor }} // 동적으로 아이콘 색상 설정
+                      style={{ backgroundColor: friend.iconColor }}
                     >
                       <Images.icon className={styles.profileImg} /> {/* 아이콘 렌더링 */}
                     </div>
