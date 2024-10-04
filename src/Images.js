@@ -10,6 +10,8 @@ import search from '@/../../public/svgs/search.svg'
 import wumpus from '@/../../public/svgs/wumpus.svg'
 import accept from '@/../../public/svgs/accept.svg'
 import deny from '@/../../public/svgs/deny.svg'
+import chat from '@/../../public/svgs/chat.svg'
+import threeDot from '@/../../public/svgs/threeDot.svg'
 
 const Images = {
   background,
@@ -22,9 +24,11 @@ const Images = {
   search,
   wumpus,
   accept,
-  deny
+  deny,
+  chat,
+  threeDot
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot
 };

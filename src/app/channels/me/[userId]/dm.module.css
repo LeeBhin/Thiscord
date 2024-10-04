@@ -49,9 +49,53 @@
 }
 
 .chats {
-  height: 100vh;
-  float: left;
+  overflow-y: scroll;
+  height: calc(100vh - 112px);
   width: calc(100vw - 312px);
+}
+
+.message {
+  margin-bottom: 26px;
+  padding: 3px 16px;
+}
+
+.message:hover {
+  background-color: #2e3035;
+}
+
+.chatIcon {
+  color: white;
+  width: 27px;
+  height: 27px;
+}
+
+.msgIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+}
+
+.msgInfos {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.msgInfo {
+  color: white;
+}
+
+.senderId {
+  font-size: 16px;
+}
+
+.timestamp {
+  font-size: 11px;
+  color: #949ba4;
+  margin: 0 8px;
 }
 
 .chatInputWrap {

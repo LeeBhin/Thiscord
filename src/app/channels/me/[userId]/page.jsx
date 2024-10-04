@@ -146,15 +146,28 @@ export default function DM({ params }) {
         {messages.map((msg) => (
           <div
             key={msg._id}
-            className={`chat-message ${
-              msg.senderId === receiverName ? "received" : "sent"
+            className={`${styles.message} ${
+              styles[msg.senderId === receiverName ? "received" : "sent"]
             }`}
           >
-            <div className="message-info">
-              <span className="sender-id">{msg.senderId}</span>
-              <span className="timestamp">{formatDateTime(msg.timestamp)}</span>
+            <div className={styles.msgInfos}>
+              <div
+                className={styles.msgIcon}
+                style={{
+                  backgroundColor:
+                    msg.senderId === receiverName ? receiverColor : myColor,
+                }}
+              >
+                <Images.icon className={styles.chatIcon} />
+              </div>
+              <div className={styles.msgInfo}>
+                <span className={styles.senderId}>{msg.senderId}</span>
+                <span className={styles.timestamp}>
+                  {formatDateTime(msg.timestamp)}
+                </span>
+                <div className={styles.msgContent}>{msg.message}</div>
+              </div>
             </div>
-            <div className="message-content">{msg.message}</div>
           </div>
         ))}
       </div>

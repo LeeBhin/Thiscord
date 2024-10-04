@@ -63,3 +63,7 @@ export async function accept_friend(friendId) {
 export async function load_chats(receiverName) {
     return apiRequest(`chat/history/${receiverName}`, 'GET');
 }
+
+export async function looad_chatrooms() {
+    return apiRequest(`chat/chatrooms`, 'GET');
+}

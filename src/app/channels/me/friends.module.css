@@ -172,11 +172,16 @@
   padding: 13px 8px 13px 10px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .friend:hover {
   background-color: #393c41;
   border-radius: 8px;
+}
+
+.friend:hover .btn {
+  background-color: #1e1f22;
 }
 
 .profile {
@@ -204,6 +209,29 @@
   font-size: 16px;
   color: #f2f3f5;
   font-weight: bold;
+}
+
+.btns {
+  display: flex;
+  gap: 11px;
+}
+
+.btn {
+  width: 36px;
+  height: 36px;
+  background-color: oklab(0.296332 -0.000731647 -0.00768477);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnIcon {
+  color: #b5bac1;
+}
+
+.btnIcon:hover {
+  color: #ced1d4;
 }
 
 /* add friend */
@@ -319,6 +347,8 @@
 .profileWrap {
   display: flex;
   gap: 12px;
+  display: flex;
+  align-items: center;
 }
 
 .nameWrap {

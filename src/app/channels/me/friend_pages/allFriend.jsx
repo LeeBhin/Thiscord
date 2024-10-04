@@ -4,9 +4,13 @@ import Images from "@/Images";
 import styles from "../friends.module.css";
 import { useEffect, useState } from "react";
 import { load_friends } from "@/utils/api";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function All_Friends() {
   const [friends, setFriends] = useState([]);
+  const router = useRouter();
+
   useEffect(() => {
     const loadFriends = async () => {
       try {
@@ -19,6 +23,10 @@ export default function All_Friends() {
 
     loadFriends();
   }, []);
+
+  const gotoDM = (user) => {
+    router.push(`/channels/me/${user}`);
+  };
 
   return (
     <div>
@@ -40,14 +48,36 @@ export default function All_Friends() {
           friends.map((friend, index) => (
             <div key={index}>
               <div className={styles.friendsLine} />
-              <div key={index} className={styles.friend}>
-                <div
-                  className={styles.profile}
-                  style={{ backgroundColor: friend.iconColor }}
-                >
-                  <Images.icon className={styles.icon} />
+              <div
+                onClick={() => gotoDM(friend.name)}
+                className={styles.friend}
+              >
+                <div className={styles.profileWrap}>
+                  <div
+                    className={styles.profile}
+                    style={{ backgroundColor: friend.iconColor }}
+                  >
+                    <Images.icon className={styles.icon} />
+                  </div>
+                  <div className={styles.name}>{friend.name}</div>
                 </div>
-                <div className={styles.name}>{friend.name}</div>
+
+                <div className={styles.btns}>
+                  <Link
+                    href={`/channels/me/${friend.name}`}
+                    className={styles.btn}
+                  >
+                    <Images.chat className={styles.btnIcon} />
+                  </Link>
+                  <div
+                    className={styles.btn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <Images.threeDot className={styles.btnIcon} />
+                  </div>
+                </div>
               </div>
             </div>
           ))
