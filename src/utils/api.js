@@ -59,3 +59,7 @@ export async function delete_friend(friendId) {
 export async function accept_friend(friendId) {
     return apiRequest(`friends/accept/${friendId}`, 'PUT');
 }
+
+export async function load_chats(receiverName) {
+    return apiRequest(`chat/history/${receiverName}`, 'GET');
+}
