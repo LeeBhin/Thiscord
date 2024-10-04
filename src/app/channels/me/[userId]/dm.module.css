@@ -49,6 +49,7 @@
 }
 
 .chats {
+  padding-top: 8px;
   overflow-y: scroll;
   height: calc(100vh - 112px);
   width: calc(100vw - 312px);
@@ -81,7 +82,7 @@
 .msgInfos {
   display: flex;
   gap: 15px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .msgInfo {
@@ -118,7 +119,22 @@
   background-color: #383a40;
   border: none;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 16px;
   padding-left: 15px;
   color: #dbdee1;
+}
+
+.chats::-webkit-scrollbar {
+  width: 8px;
+  height: 4px;
+}
+
+.chats::-webkit-scrollbar-track {
+  background: #2b2d31;
+}
+
+.chats::-webkit-scrollbar-thumb {
+  background-color: #1a1b1e;
+  border-radius: 100px;
+  background-clip: padding-box;
 }

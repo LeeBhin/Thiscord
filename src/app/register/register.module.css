@@ -1,217 +1,217 @@
 .loginForm {
-    width: 480px;
-    height: 700px;
-    background-color: #313338;
-    padding: 32px;
-    border-radius: 5px;
-    position: relative;
-    z-index: 1;
-    transition: height .4s ease-out;
+  width: 480px;
+  height: 700px;
+  background-color: #313338;
+  padding: 32px;
+  border-radius: 5px;
+  position: relative;
+  z-index: 1;
+  transition: height 0.4s ease-out;
 }
 
 .formHeightName {
-    height: 730px;
+  height: 730px;
 }
 
 .formHeightPW {
-    height: 720px;
+  height: 720px;
 }
 
 .welcome {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .inputWrap {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .input {
-    margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 
 .inputInfo {
-    transform: translateY(15px);
-    opacity: 0;
-    color: #dbe1e7;
-    font-size: 14px;
-    margin-top: -20px;
-    transition: opacity 0.2s ease, transform 0.4s ease;
-    position: absolute;
-    background-color: #313338;
+  transform: translateY(15px);
+  opacity: 0;
+  color: #dbe1e7;
+  font-size: 14px;
+  margin-top: -20px;
+  transition: opacity 0.2s ease, transform 0.4s ease;
+  position: absolute;
+  background-color: #313338;
 }
 
 .showInputInfo {
-    transform: translateY(0px);
-    opacity: 1;
+  transform: translateY(0px);
+  opacity: 1;
 }
 
 .selectorWrap {
-    position: absolute;
-    left: 1px;
-    width: 100%;
-    height: 217px;
-    overflow-y: scroll;
-    background-color: #2b2d31;
-    margin-top: -217px;
-    border-radius: 0 0 3px 3px;
-    box-shadow: 0 0 2px 1px #131313;
+  position: absolute;
+  left: 1px;
+  width: 100%;
+  height: 217px;
+  overflow-y: scroll;
+  background-color: #2b2d31;
+  margin-top: -217px;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 0 2px 1px #131313;
 }
 
 .selectElement {
-    color: #b5bac1;
-    padding: 10px;
-    width: 98%;
-    cursor: pointer;
+  color: #b5bac1;
+  padding: 10px;
+  width: 98%;
+  cursor: pointer;
 }
 
 .selectElement:hover {
-    background-color: #35373c;
+  background-color: #35373c;
 }
 
 .selectorWrap::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+  width: 4px;
+  height: 4px;
 }
 
 .selectorWrap::-webkit-scrollbar-track {
-    background: none;
+  background: none;
 }
 
 .selectorWrap::-webkit-scrollbar-thumb {
-    background-color: #1a1b1e;
-    border-radius: 100px;
-    background-clip: padding-box;
+  background-color: #1a1b1e;
+  border-radius: 100px;
+  background-clip: padding-box;
 }
 
 .birthWrap {
-    width: 100%;
-    justify-content: space-between;
-    display: flex;
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
 }
 
 .birth {
-    background-color: #1E1F22;
-    color: #989da3;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 3px;
-    border: none;
-    height: 40px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    cursor: default;
+  background-color: #1e1f22;
+  color: #989da3;
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 3px;
+  border: none;
+  height: 40px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  cursor: default;
 }
 
 .birth::placeholder {
-    color: #989da3;
+  color: #989da3;
 }
 
 .birthWrap .dropWrap:nth-of-type(odd) .birth {
-    max-width: 125px;
+  max-width: 125px;
 }
 
 .birthWrap .dropWrap:nth-of-type(even) .birth {
-    max-width: 144px;
+  max-width: 144px;
 }
 
 .dropWrap {
-    display: flex;
-    position: relative;
+  display: flex;
+  position: relative;
 }
 
 .dropBtn {
-    display: flex;
-    align-items: center;
-    position: relative;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .downSVG {
-    position: absolute;
-    font-size: 23px;
-    background-color: #1E1F22;
-    right: 8px;
-    color: #B5BAC1;
+  position: absolute;
+  font-size: 23px;
+  background-color: #1e1f22;
+  right: 8px;
+  color: #b5bac1;
 }
 
 .agreeWrap {
-    margin: 12px 0 3px;
+  margin: 12px 0 3px;
 }
 
 .agreeTxt {
-    color: #949ba4;
-    font-size: 12px;
+  color: #949ba4;
+  font-size: 12px;
 }
 
 .agreeInfo {
-    margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 
 .agree {
-    display: none;
+  display: none;
 }
 
 .customCheckbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    height: 32px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 32px;
 }
 
 .checkmark {
-    width: 30px;
-    height: 24px;
-    background: none;
-    border: solid 1px #949ba4;
-    border-radius: 5px;
-    margin-right: 7px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: 0.1s;
+  width: 30px;
+  height: 24px;
+  background: none;
+  border: solid 1px #949ba4;
+  border-radius: 5px;
+  margin-right: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.1s;
 }
 
-.agree:checked+.checkmark {
-    background-color: #5865f2;
+.agree:checked + .checkmark {
+  background-color: #5865f2;
 }
 
 .checkmark svg {
-    color: white;
-    position: absolute;
-    display: none;
-    width: 20px;
-    height: 20px;
-    font-weight: bold;
+  color: white;
+  position: absolute;
+  display: none;
+  width: 20px;
+  height: 20px;
+  font-weight: bold;
 }
 
-.agree:checked+.checkmark svg {
-    display: block;
+.agree:checked + .checkmark svg {
+  display: block;
 }
 
 .goPolicy {
-    font-size: 12px;
-    color: #02a8fc;
+  font-size: 12px;
+  color: #02a8fc;
 }
 
 @media (max-width: 490px) {
-    .loginForm {
-        width: 100vw;
-        height: 100vh;
-    }
+  .loginForm {
+    width: 100vw;
+    height: 100vh;
+  }
 
-    .birthWrap {
-        display: flex;
-        justify-content: space-between;
-    }
+  .birthWrap {
+    display: flex;
+    justify-content: space-between;
+  }
 
-    .birth {
-        width: 25vw;
-    }
+  .birth {
+    width: 25vw;
+  }
 
-    .checkmark {
-        width: 30px;
-        height: 20px;
-    }
+  .checkmark {
+    width: 30px;
+    height: 20px;
+  }
 
-    .checkmark svg {
-        width: 15px;
-    }
+  .checkmark svg {
+    width: 15px;
+  }
 }

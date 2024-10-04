@@ -7,7 +7,7 @@ import Images from "@/Images";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkToken, looad_chatrooms } from "@/utils/api";
+import { checkToken, load_chatrooms } from "@/utils/api";
 import { logout, load_friends } from "@/utils/api";
 
 export default function RootLayout({ children }) {
@@ -55,22 +55,20 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     const chatRooms = async () => {
       try {
-        const rooms = await looad_chatrooms();
+        const rooms = await load_chatrooms();
 
-        // lastMessageAt 기준으로 내림차순 정렬
         const sortedRooms = rooms.sort((a, b) => {
           return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
         });
 
         setChatrooms(sortedRooms);
-        console.log(sortedRooms);
       } catch (error) {
         console.error("Failed to load chatrooms:", error);
       }
     };
 
     chatRooms();
-  }, [chatrooms]);
+  }, []);
 
   if (currentPath === "/login" || currentPath === "/register") {
     return (

@@ -64,6 +64,6 @@ export async function load_chats(receiverName) {
     return apiRequest(`chat/history/${receiverName}`, 'GET');
 }
 
-export async function looad_chatrooms() {
+export async function load_chatrooms() {
     return apiRequest(`chat/chatrooms`, 'GET');
 }

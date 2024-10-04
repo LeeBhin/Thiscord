@@ -1,7 +1,7 @@
 "use client";
 
 import { load_chats, load_friends } from "@/utils/api";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import io from "socket.io-client";
 import styles from "./dm.module.css";
@@ -17,6 +17,7 @@ export default function DM({ params }) {
   const [myColor, setMyColor] = useState();
 
   const router = useRouter();
+  const currentPath = usePathname();
 
   const connectSocket = useCallback(() => {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
@@ -34,7 +35,6 @@ export default function DM({ params }) {
         timestamp: new Date().toISOString(),
       };
       setMessages((prevMessages) => [...prevMessages, formattedMessage]);
-      console.log(formattedMessage);
     });
 
     setSocket(newSocket);
@@ -46,23 +46,21 @@ export default function DM({ params }) {
     const storedmyColor = localStorage.getItem("userInfo");
     if (storedmyColor) {
       setMyColor(JSON.parse(storedmyColor).iconColor);
-      console.log(storedmyColor);
     }
-  }, [router]);
+  }, [router, currentPath]);
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
         const chats = await load_chats(decodeURIComponent(userId));
         setMessages(chats);
-        console.log(chats);
       } catch (err) {
         console.error("load chat err", err);
       }
     };
 
     fetchChats();
-  }, [userId]);
+  }, [userId, router, currentPath]);
 
   useEffect(() => {
     load_friends().then((friendsList) => {
@@ -77,7 +75,7 @@ export default function DM({ params }) {
         router.push("/");
       }
     });
-  }, []);
+  }, [router, currentPath]);
 
   useEffect(() => {
     const newSocket = connectSocket();
@@ -145,7 +143,7 @@ export default function DM({ params }) {
       <div className={styles.chats}>
         {messages.map((msg) => (
           <div
-            key={msg._id}
+            key={`${msg._id}-${msg.timestamp}`}
             className={`${styles.message} ${
               styles[msg.senderId === receiverName ? "received" : "sent"]
             }`}
