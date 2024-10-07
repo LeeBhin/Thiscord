@@ -8,6 +8,7 @@ import styles from "./dm.module.css";
 import Images from "@/Images";
 import { useDispatch } from "react-redux";
 import { triggerSignal } from "@/counterSlice";
+import React from "react";
 
 export default function DM({ params }) {
   const { userId } = params;
@@ -113,11 +114,6 @@ export default function DM({ params }) {
     }
   };
 
-  const scrollToBottom = () => {
-    const chatElement = document.querySelector(".chats");
-    chatElement.scrollTop = chatElement.scrollHeight;
-  };
-
   const formatDateTime = (timestamp) => {
     const date = new Date(timestamp);
 
@@ -136,6 +132,16 @@ export default function DM({ params }) {
     });
 
     return `${dateString} ${timeString}`;
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return `${year}년 ${month}월 ${day}일`;
   };
 
   const formatTime = (timestamp) => {
@@ -207,41 +213,59 @@ export default function DM({ params }) {
         {messages.map((msg, index) => {
           const sameSender =
             index > 0 && messages[index - 1].senderId === msg.senderId;
+          const sameDate =
+            index > 0 &&
+            formatDate(messages[index - 1].timestamp) ===
+              formatDate(msg.timestamp);
+          const firstMsg = index === 0;
 
           return (
-            <div
-              key={`${msg._id}-${msg.timestamp}`}
-              className={`${styles.message} ${
-                styles[msg.senderId === receiverName ? "received" : "sent"]
-              }`}
-            >
-              {!sameSender ? (
-                <div className={styles.msgInfos}>
-                  <div
-                    className={styles.msgIcon}
-                    style={{
-                      backgroundColor:
-                        msg.senderId === receiverName ? receiverColor : myColor,
-                    }}
-                  >
-                    <Images.icon className={styles.chatIcon} />
-                  </div>
-                  <div className={styles.msgInfo}>
-                    <span className={styles.senderId}>{msg.senderId}</span>
-                    <span className={styles.timestamp}>
-                      {formatDateTime(msg.timestamp)}
-                    </span>
-                    <div className={styles.msgContent}>{msg.message}</div>
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.singleMsg}>
-                  <span className={styles.singleMsgTime}>
-                    {formatTime(msg.timestamp)}
-                  </span>
-                  <div className={styles.singleMsgContent}>{msg.message}</div>
+            <div key={`${msg._id}-${msg.timestamp}`}>
+              {(firstMsg || !sameDate) && (
+                <div className={styles.divisionDate}>
+                  <div className={styles.dateLine} />
+                  <div className={styles.date}>{formatDate(msg.timestamp)}</div>
                 </div>
               )}
+
+              <div
+                className={`${styles.message} ${
+                  styles[msg.senderId === receiverName ? "received" : "sent"]
+                }`}
+              >
+                {firstMsg ||
+                (sameSender && !sameDate) ||
+                (!sameSender && !sameDate) ||
+                (!sameSender && sameDate) ? (
+                  <div className={styles.msgInfos}>
+                    <div
+                      className={styles.msgIcon}
+                      style={{
+                        backgroundColor:
+                          msg.senderId === receiverName
+                            ? receiverColor
+                            : myColor,
+                      }}
+                    >
+                      <Images.icon className={styles.chatIcon} />
+                    </div>
+                    <div className={styles.msgInfo}>
+                      <span className={styles.senderId}>{msg.senderId}</span>
+                      <span className={styles.timestamp}>
+                        {formatDateTime(msg.timestamp)}
+                      </span>
+                      <div className={styles.msgContent}>{msg.message}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.singleMsg}>
+                    <span className={styles.singleMsgTime}>
+                      {formatTime(msg.timestamp)}
+                    </span>
+                    <div className={styles.singleMsgContent}>{msg.message}</div>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}

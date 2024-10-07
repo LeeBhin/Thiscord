@@ -79,6 +79,7 @@
 .topTxt {
   color: #b5bac1;
   font-size: 16px;
+  margin-bottom: 20px;
 }
 
 .chats {
@@ -95,12 +96,37 @@
   width: calc(100vw - 312px);
 }
 
-.message {
-  padding: 3px 30px 0 16px;
+.divisionDate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 18px;
 }
 
-.message:has(.msgInfos):not(:first-child) {
-  margin-top: 26px;
+.dateLine {
+  width: 95%;
+  border-top: solid 1px #3f4147;
+}
+
+.date {
+  color: #b5bac1;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  background-color: #313338;
+  width: 108px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  padding: 2px 30px 2px 16px;
+}
+
+.message:has(.msgInfos) {
+  margin-top: 18px;
 }
 
 .message:hover {
