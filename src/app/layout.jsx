@@ -37,10 +37,6 @@ function InnerLayout({ children }) {
     });
 
     newSocket.on("message", (data) => {
-      const formattedMessage = {
-        ...data,
-        timestamp: new Date().toISOString(),
-      };
       dispatch(triggerSignal());
     });
 

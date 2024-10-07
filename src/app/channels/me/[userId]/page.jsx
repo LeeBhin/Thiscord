@@ -42,7 +42,6 @@ export default function DM({ params }) {
         timestamp: new Date().toISOString(),
       };
       setMessages((prevMessages) => [...prevMessages, formattedMessage]);
-      dispatch(triggerSignal());
     });
 
     setSocket(newSocket);
@@ -135,6 +134,21 @@ export default function DM({ params }) {
     return `${dateString} ${timeString}`;
   };
 
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+
+    const timeString = date
+      .toLocaleTimeString("ko-KR", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })
+      .replace("오전", "오전 ")
+      .replace("오후", "오후 ");
+
+    return `${timeString}`;
+  };
+
   return (
     <div className={styles.dmBody}>
       <header className={styles.header}>
@@ -152,33 +166,47 @@ export default function DM({ params }) {
       </header>
 
       <div className={styles.chats}>
-        {messages.map((msg) => (
-          <div
-            key={`${msg._id}-${msg.timestamp}`}
-            className={`${styles.message} ${
-              styles[msg.senderId === receiverName ? "received" : "sent"]
-            }`}
-          >
-            <div className={styles.msgInfos}>
-              <div
-                className={styles.msgIcon}
-                style={{
-                  backgroundColor:
-                    msg.senderId === receiverName ? receiverColor : myColor,
-                }}
-              >
-                <Images.icon className={styles.chatIcon} />
-              </div>
-              <div className={styles.msgInfo}>
-                <span className={styles.senderId}>{msg.senderId}</span>
-                <span className={styles.timestamp}>
-                  {formatDateTime(msg.timestamp)}
-                </span>
-                <div className={styles.msgContent}>{msg.message}</div>
-              </div>
+        {messages.map((msg, index) => {
+          const isSameSenderAsPrevious =
+            index > 0 && messages[index - 1].senderId === msg.senderId;
+
+          return (
+            <div
+              key={`${msg._id}-${msg.timestamp}`}
+              className={`${styles.message} ${
+                styles[msg.senderId === receiverName ? "received" : "sent"]
+              }`}
+            >
+              {!isSameSenderAsPrevious ? (
+                <div className={styles.msgInfos}>
+                  <div
+                    className={styles.msgIcon}
+                    style={{
+                      backgroundColor:
+                        msg.senderId === receiverName ? receiverColor : myColor,
+                    }}
+                  >
+                    <Images.icon className={styles.chatIcon} />
+                  </div>
+                  <div className={styles.msgInfo}>
+                    <span className={styles.senderId}>{msg.senderId}</span>
+                    <span className={styles.timestamp}>
+                      {formatDateTime(msg.timestamp)}
+                    </span>
+                    <div className={styles.msgContent}>{msg.message}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.singleMsg}>
+                  <span className={styles.singleMsgTime}>
+                    {formatTime(msg.timestamp)}
+                  </span>
+                  <div className={styles.singleMsgContent}>{msg.message}</div>
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className={styles.chatInputWrap}>
