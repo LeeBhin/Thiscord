@@ -129,14 +129,11 @@ export default function DM({ params }) {
       })
       .replace(/\./g, ".");
 
-    const timeString = date
-      .toLocaleTimeString("ko-KR", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })
-      .replace("오전", "오전 ")
-      .replace("오후", "오후 ");
+    const timeString = date.toLocaleTimeString("ko-KR", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
 
     return `${dateString} ${timeString}`;
   };
@@ -144,14 +141,11 @@ export default function DM({ params }) {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
 
-    const timeString = date
-      .toLocaleTimeString("ko-KR", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })
-      .replace("오전", "오전 ")
-      .replace("오후", "오후 ");
+    const timeString = date.toLocaleTimeString("ko-KR", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
 
     return `${timeString}`;
   };
@@ -197,6 +191,19 @@ export default function DM({ params }) {
       </header>
 
       <div className={styles.chats} ref={chatsRef}>
+        <div className={styles.top}>
+          <div
+            className={styles.topIconWrap}
+            style={{ backgroundColor: receiverColor }}
+          >
+            <Images.icon className={styles.topIcon} />
+          </div>
+          <h3 className={styles.topName}>{receiverName}</h3>
+          <div className={styles.topTxt}>
+            <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫 부분이에요.
+          </div>
+        </div>
+
         {messages.map((msg, index) => {
           const sameSender =
             index > 0 && messages[index - 1].senderId === msg.senderId;

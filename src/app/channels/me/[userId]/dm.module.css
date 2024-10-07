@@ -48,22 +48,58 @@
   height: 15px;
 }
 
+.top {
+  width: calc(100vw - 312px);
+  float: left;
+  padding: 5px 0 0 15px;
+}
+
+.topIconWrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.topIcon {
+  color: white;
+  width: 50px;
+  height: 50px;
+}
+
+.topName {
+  color: #dbdee1;
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.topTxt {
+  color: #b5bac1;
+  font-size: 16px;
+}
+
 .chats {
+  position: absolute;
+  right: 0;
+  bottom: 90px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
   padding-top: 8px;
+  overflow-x: hidden;
   overflow-y: scroll;
-  height: calc(100vh - 112px);
+  max-height: calc(100vh - 140px);
   width: calc(100vw - 312px);
 }
 
-.chats:first-child {
-  margin-top: -9px;
-}
-
 .message {
-  padding: 3px 16px;
+  padding: 3px 30px 0 16px;
 }
 
-.message:has(.msgInfos) {
+.message:has(.msgInfos):not(:first-child) {
   margin-top: 26px;
 }
 
@@ -78,6 +114,7 @@
 }
 
 .msgIcon {
+  min-width: 40px;
   width: 40px;
   height: 40px;
   display: flex;
@@ -98,7 +135,7 @@
 
 .singleMsg {
   display: flex;
-  gap: 9px;
+  gap: 8px;
   align-items: center;
   margin-left: -5px;
 }
@@ -108,9 +145,12 @@
 }
 
 .singleMsgTime {
-  font-size: 12px;
+  font-size: 11px;
+  word-spacing: -2px;
   opacity: 0;
   color: #949ba4;
+  min-width: 52px;
+  width: 52px;
 }
 
 .singleMsgContent {
@@ -132,9 +172,8 @@
   right: 0;
   bottom: 0;
   width: calc(100vw - 312px);
-  padding: 11px 15px;
-  height: 50px;
-  margin-bottom: 30px;
+  padding: 0 15px 30px;
+  background-color: #313338;
 }
 
 .chatInput {
