@@ -89,6 +89,10 @@
   color: white;
 }
 
+.msgContent {
+  color: white;
+}
+
 .senderId {
   font-size: 16px;
 }

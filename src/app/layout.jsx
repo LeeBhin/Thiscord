@@ -5,17 +5,57 @@ import styles from "./layout.module.css";
 import Link from "next/link";
 import Images from "@/Images";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkToken, load_chatrooms } from "@/utils/api";
 import { logout, load_friends } from "@/utils/api";
+import { Provider, useSelector } from "react-redux";
+import { store } from "@/store";
+import { useDispatch } from "react-redux";
+import { triggerSignal } from "@/counterSlice";
+import io from "socket.io-client";
 
-export default function RootLayout({ children }) {
-  const [userInfo, setUserInfo] = useState(null);
+function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
+  const [userInfo, setUserInfo] = useState(null);
   const [friends, setFriends] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const dispatch = useDispatch();
+
+  const signalReceived = useSelector((state) => state.counter.signalReceived);
+
+  const connectSocket = useCallback(() => {
+    const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+    });
+
+    newSocket.on("message", (data) => {
+      const formattedMessage = {
+        ...data,
+        timestamp: new Date().toISOString(),
+      };
+      dispatch(triggerSignal());
+    });
+
+    setSocket(newSocket);
+
+    return newSocket;
+  }, []);
+
+  useEffect(() => {
+    const newSocket = connectSocket();
+
+    return () => {
+      if (newSocket) newSocket.disconnect();
+    };
+  }, [connectSocket]);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -38,6 +78,14 @@ export default function RootLayout({ children }) {
   }, [router, currentPath]);
 
   useEffect(() => {
+    chatRooms();
+  }, [currentPath]);
+
+  useEffect(() => {
+    chatRooms();
+  }, [signalReceived]);
+
+  useEffect(() => {
     const loadFriends = async () => {
       try {
         const friends = await load_friends();
@@ -47,28 +95,23 @@ export default function RootLayout({ children }) {
       }
     };
 
-    if (currentPath != "/login" || currentPath != "register") {
+    if (currentPath !== "/login" && currentPath !== "/register") {
       loadFriends();
     }
-  }, []);
+  }, [currentPath]);
 
-  useEffect(() => {
-    const chatRooms = async () => {
-      try {
-        const rooms = await load_chatrooms();
+  const chatRooms = async () => {
+    try {
+      const rooms = await load_chatrooms();
 
-        const sortedRooms = rooms.sort((a, b) => {
-          return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
-        });
-
-        setChatrooms(sortedRooms);
-      } catch (error) {
-        console.error("Failed to load chatrooms:", error);
-      }
-    };
-
-    chatRooms();
-  }, []);
+      const sortedRooms = rooms.sort((a, b) => {
+        return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
+      });
+      setChatrooms(sortedRooms);
+    } catch (error) {
+      console.error("Failed to load chatrooms:", error);
+    }
+  };
 
   if (currentPath === "/login" || currentPath === "/register") {
     return (
@@ -103,7 +146,6 @@ export default function RootLayout({ children }) {
                 </div>
               </Link>
             </div>
-
             <div className={styles.barricade} />
           </div>
         </header>
@@ -128,7 +170,6 @@ export default function RootLayout({ children }) {
                 <Images.friends className={styles.icon} />
                 <span className={styles.iconTxt}>친구</span>
               </Link>
-
               <Link
                 href="/store"
                 className={`${styles.friendsLink} ${
@@ -138,7 +179,6 @@ export default function RootLayout({ children }) {
                 <Images.nitro className={styles.icon} />
                 <span className={styles.iconTxt}>Nitro</span>
               </Link>
-
               <Link
                 href="/shop"
                 className={`${styles.friendsLink} ${
@@ -195,5 +235,13 @@ export default function RootLayout({ children }) {
         {children}
       </body>
     </html>
+  );
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <Provider store={store}>
+      <InnerLayout>{children}</InnerLayout>
+    </Provider>
   );
 }

@@ -6,6 +6,8 @@ import { useEffect, useState, useCallback } from "react";
 import io from "socket.io-client";
 import styles from "./dm.module.css";
 import Images from "@/Images";
+import { useDispatch } from "react-redux";
+import { triggerSignal } from "@/counterSlice";
 
 export default function DM({ params }) {
   const { userId } = params;
@@ -18,6 +20,11 @@ export default function DM({ params }) {
 
   const router = useRouter();
   const currentPath = usePathname();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(triggerSignal());
+  }, []);
 
   const connectSocket = useCallback(() => {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
@@ -35,6 +42,7 @@ export default function DM({ params }) {
         timestamp: new Date().toISOString(),
       };
       setMessages((prevMessages) => [...prevMessages, formattedMessage]);
+      dispatch(triggerSignal());
     });
 
     setSocket(newSocket);
@@ -53,7 +61,9 @@ export default function DM({ params }) {
     const fetchChats = async () => {
       try {
         const chats = await load_chats(decodeURIComponent(userId));
-        setMessages(chats);
+        if (chats.length > 0) {
+          setMessages(chats);
+        }
       } catch (err) {
         console.error("load chat err", err);
       }
@@ -92,6 +102,7 @@ export default function DM({ params }) {
         message,
       });
       setMessage("");
+      dispatch(triggerSignal());
     }
   }, [message, socket, userId]);
 
