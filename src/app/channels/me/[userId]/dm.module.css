@@ -55,9 +55,16 @@
   width: calc(100vw - 312px);
 }
 
+.chats:first-child {
+  margin-top: -9px;
+}
+
 .message {
-  /* margin-bottom: 26px; */
   padding: 3px 16px;
+}
+
+.message:has(.msgInfos) {
+  margin-top: 26px;
 }
 
 .message:hover {
@@ -93,7 +100,6 @@
   display: flex;
   gap: 9px;
   align-items: center;
-  /* margin-top: -20px; */
   margin-left: -5px;
 }
 

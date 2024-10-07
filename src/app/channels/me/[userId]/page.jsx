@@ -2,7 +2,7 @@
 
 import { load_chats, load_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import io from "socket.io-client";
 import styles from "./dm.module.css";
 import Images from "@/Images";
@@ -17,10 +17,12 @@ export default function DM({ params }) {
   const [receiverColor, setReceiverColor] = useState();
   const [receiverName, setReceiverName] = useState();
   const [myColor, setMyColor] = useState();
+  const [isBottom, setIsBottom] = useState(true);
 
   const router = useRouter();
   const currentPath = usePathname();
   const dispatch = useDispatch();
+  const chatsRef = useRef(null);
 
   useEffect(() => {
     dispatch(triggerSignal());
@@ -111,6 +113,11 @@ export default function DM({ params }) {
     }
   };
 
+  const scrollToBottom = () => {
+    const chatElement = document.querySelector(".chats");
+    chatElement.scrollTop = chatElement.scrollHeight;
+  };
+
   const formatDateTime = (timestamp) => {
     const date = new Date(timestamp);
 
@@ -149,6 +156,30 @@ export default function DM({ params }) {
     return `${timeString}`;
   };
 
+  const handleScroll = () => {
+    const chatElement = chatsRef.current;
+    const isNearBottom =
+      chatElement.scrollHeight - chatElement.scrollTop <=
+      chatElement.clientHeight + 50;
+    setIsBottom(isNearBottom);
+  };
+
+  useEffect(() => {
+    const chatElement = chatsRef.current;
+    chatElement.addEventListener("scroll", handleScroll);
+
+    return () => {
+      chatElement.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const chatElement = chatsRef.current;
+    if (isBottom) {
+      chatElement.scrollTop = chatElement.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className={styles.dmBody}>
       <header className={styles.header}>
@@ -165,9 +196,9 @@ export default function DM({ params }) {
         </div>
       </header>
 
-      <div className={styles.chats}>
+      <div className={styles.chats} ref={chatsRef}>
         {messages.map((msg, index) => {
-          const isSameSenderAsPrevious =
+          const sameSender =
             index > 0 && messages[index - 1].senderId === msg.senderId;
 
           return (
@@ -177,7 +208,7 @@ export default function DM({ params }) {
                 styles[msg.senderId === receiverName ? "received" : "sent"]
               }`}
             >
-              {!isSameSenderAsPrevious ? (
+              {!sameSender ? (
                 <div className={styles.msgInfos}>
                   <div
                     className={styles.msgIcon}
