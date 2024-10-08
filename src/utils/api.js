@@ -68,6 +68,6 @@ export async function load_chatrooms() {
     return apiRequest(`chat/chatrooms`, 'GET');
 }
 
-export async function delete_msg(msgId, senderId, receiverName) {
-    return apiRequest(`chat/delete`, 'DELETE', { msgId, senderId, receiverName });
+export async function delete_msg(senderId, msgId, receiverName) {
+    return apiRequest(`chat/delete`, 'DELETE', { senderId, msgId, receiverName });
 }

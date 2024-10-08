@@ -21,6 +21,7 @@ export default function DM({ params }) {
   const [isBottom, setIsBottom] = useState(true);
   const [isPopup, setIsPopup] = useState(false);
   const [msgInfo, setMsgInfo] = useState();
+  const [copyContent, setCopyContent] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -204,12 +205,77 @@ export default function DM({ params }) {
 
   const openPopup = (senderId, msgId, copyDiv) => {
     setIsPopup(true);
-    setMsgInfo(senderId, msgId);
-    console.log(copyDiv);
+    const msgInfo = {
+      senderId: senderId,
+      msgId: msgId,
+    };
+    setMsgInfo(msgInfo);
+    setCopyContent(copyDiv);
   };
 
   return (
     <div className={styles.dmBody}>
+      {isPopup && (
+        <div className={styles.deletePopup}>
+          <div className={styles.back}>
+            <div className={styles.popup}>
+              <div className={styles.popWrap}>
+                <h3 className={styles.popTitle}>메시지 삭제하기</h3>
+                <p className={styles.popSubTitle}>
+                  정말 이 메시지를 삭제할까요?
+                </p>
+                <div className={styles.copyMsg}>
+                  <div className={styles.popupMsg}>
+                    <div className={styles.msgInfos}>
+                      <div
+                        className={styles.msgIcon}
+                        style={{
+                          backgroundColor: myColor,
+                        }}
+                      >
+                        <Images.icon className={styles.chatIcon} />
+                      </div>
+                      <div className={styles.msgInfo}>
+                        <span className={styles.senderId}>
+                          {copyContent.senderId}
+                        </span>
+                        <span className={styles.timestamp}>
+                          {copyContent.timestamp}
+                        </span>
+                        <div className={styles.msgContent}>
+                          {copyContent.message}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.popTxt}>
+                  <span className={styles.notice}>참고:</span>
+                  <span className={styles.noticeTxt}>
+                    <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인 창을
+                    건너뛰실 수 있어요.
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.popBtns}>
+                <div className={styles.popBtnsWrap}>
+                  <div
+                    className={styles.cancel}
+                    onClick={() => setIsPopup(false)}
+                  >
+                    취소
+                  </div>
+                  <div className={styles.confirm} onClick={() => deleteMsg()}>
+                    삭제
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className={styles.header}>
         <div className={styles.headerWrap}>
           <div className={styles.headerIconWrap}>
@@ -223,34 +289,6 @@ export default function DM({ params }) {
           </div>
         </div>
       </header>
-
-      {isPopup && (
-        <div className={styles.deletePopup}>
-          <div className={styles.back}>
-            <div className={styles.popup}>
-              <h3 className={styles.popTitle}>메시지 삭제하기</h3>
-              <h3 className={styles.popSubTitle}>
-                정말 이 메시지를 삭제할까요?
-              </h3>
-              <div className={styles.copyMsg}></div>
-              <div className={styles.popTxt}>
-                <span className={styles.notice}>참고:</span>
-                <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인 창을
-                건너뛰실 수 있어요.
-              </div>
-
-              <div className={styles.popBtns}>
-                <div className={styles.popBtnsWrap}>
-                  <div className={styles.cancel}>취소</div>
-                  <div className={styles.confirm} onClick={() => deleteMsg}>
-                    삭제
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className={styles.chats} ref={chatsRef}>
         <div className={styles.top}>
@@ -298,9 +336,12 @@ export default function DM({ params }) {
                     <div
                       className={styles.removeBtn}
                       onClick={(e) => {
-                        const copyDiv = e.currentTarget.closest(
-                          `.${styles.message}`
-                        );
+                        const copyDiv = {
+                          senderId: msg.senderId,
+                          timestamp: formatDateTime(msg.timestamp),
+                          message: msg.message,
+                          isedit: msg.isedit,
+                        };
                         openPopup(msg.senderId, msg._id, copyDiv);
                       }}
                     >
