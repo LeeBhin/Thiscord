@@ -1,6 +1,6 @@
 "use client";
 
-import { load_chats, load_friends } from "@/utils/api";
+import { delete_msg, load_chats, load_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import io from "socket.io-client";
@@ -19,6 +19,8 @@ export default function DM({ params }) {
   const [receiverName, setReceiverName] = useState();
   const [myColor, setMyColor] = useState();
   const [isBottom, setIsBottom] = useState(true);
+  const [isPopup, setIsPopup] = useState(false);
+  const [msgInfo, setMsgInfo] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -33,6 +35,7 @@ export default function DM({ params }) {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
+      reconnection: true,
     });
 
     newSocket.on("connect_error", (err) => {
@@ -190,6 +193,21 @@ export default function DM({ params }) {
     }
   }, [messages]);
 
+  const deleteMsg = () => {
+    delete_msg(msgInfo.senderId, msgInfo.msgId, receiverName)
+      .then(() => {})
+      .catch((error) => {
+        alert(error);
+      });
+    setIsPopup(false);
+  };
+
+  const openPopup = (senderId, msgId, copyDiv) => {
+    setIsPopup(true);
+    setMsgInfo(senderId, msgId);
+    console.log(copyDiv);
+  };
+
   return (
     <div className={styles.dmBody}>
       <header className={styles.header}>
@@ -205,6 +223,34 @@ export default function DM({ params }) {
           </div>
         </div>
       </header>
+
+      {isPopup && (
+        <div className={styles.deletePopup}>
+          <div className={styles.back}>
+            <div className={styles.popup}>
+              <h3 className={styles.popTitle}>메시지 삭제하기</h3>
+              <h3 className={styles.popSubTitle}>
+                정말 이 메시지를 삭제할까요?
+              </h3>
+              <div className={styles.copyMsg}></div>
+              <div className={styles.popTxt}>
+                <span className={styles.notice}>참고:</span>
+                <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인 창을
+                건너뛰실 수 있어요.
+              </div>
+
+              <div className={styles.popBtns}>
+                <div className={styles.popBtnsWrap}>
+                  <div className={styles.cancel}>취소</div>
+                  <div className={styles.confirm} onClick={() => deleteMsg}>
+                    삭제
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={styles.chats} ref={chatsRef}>
         <div className={styles.top}>
@@ -243,7 +289,7 @@ export default function DM({ params }) {
                   styles[msg.senderId === receiverName ? "received" : "sent"]
                 }`}
               >
-                {
+                {msg.senderId !== receiverName && (
                   <div className={styles.edit}>
                     <div className={styles.editBtn}>
                       <Images.edit className={styles.btnIcon} />
@@ -251,12 +297,17 @@ export default function DM({ params }) {
                     <div className={styles.editLine} />
                     <div
                       className={styles.removeBtn}
-                      onClick={delete_msg(msg._id)}
+                      onClick={(e) => {
+                        const copyDiv = e.currentTarget.closest(
+                          `.${styles.message}`
+                        );
+                        openPopup(msg.senderId, msg._id, copyDiv);
+                      }}
                     >
                       <Images.remove className={styles.btnIcon} />
                     </div>
                   </div>
-                }
+                )}
 
                 {firstMsg ||
                 (sameSender && !sameDate) ||
