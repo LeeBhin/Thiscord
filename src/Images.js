@@ -12,6 +12,8 @@ import accept from '@/../../public/svgs/accept.svg'
 import deny from '@/../../public/svgs/deny.svg'
 import chat from '@/../../public/svgs/chat.svg'
 import threeDot from '@/../../public/svgs/threeDot.svg'
+import edit from '@/../../public/svgs/edit.svg'
+import remove from '@/../../public/svgs/remove.svg'
 
 const Images = {
   background,
@@ -26,9 +28,11 @@ const Images = {
   accept,
   deny,
   chat,
-  threeDot
+  threeDot,
+  edit,
+  remove
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove
 };

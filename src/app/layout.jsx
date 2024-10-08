@@ -23,6 +23,7 @@ function InnerLayout({ children }) {
   const [chatrooms, setChatrooms] = useState([]);
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
+  const [title, setTitle] = useState("Thiscord");
 
   const signalReceived = useSelector((state) => state.counter.signalReceived);
 
@@ -124,12 +125,21 @@ function InnerLayout({ children }) {
     logout();
   };
 
+  useEffect(() => {
+    const path = decodeURIComponent(currentPath).split("/");
+    const title =
+      currentPath === "/channels/me"
+        ? "• Thiscord | 친구"
+        : currentPath.startsWith("/channels/me/")
+        ? `Thiscord | @${path[path.length - 1]}`
+        : "Thiscord";
+    setTitle(title);
+  }, [currentPath]);
+
   return (
     <html lang="ko">
       <head>
-        <title>
-          {currentPath === "/channels/me" ? "• Thiscord | 친구" : "Thiscord"}
-        </title>
+        <title>{title}</title>
       </head>
       <body className={styles.body}>
         <header className={styles.header}>

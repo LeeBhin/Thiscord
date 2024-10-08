@@ -243,6 +243,21 @@ export default function DM({ params }) {
                   styles[msg.senderId === receiverName ? "received" : "sent"]
                 }`}
               >
+                {
+                  <div className={styles.edit}>
+                    <div className={styles.editBtn}>
+                      <Images.edit className={styles.btnIcon} />
+                    </div>
+                    <div className={styles.editLine} />
+                    <div
+                      className={styles.removeBtn}
+                      onClick={delete_msg(msg._id)}
+                    >
+                      <Images.remove className={styles.btnIcon} />
+                    </div>
+                  </div>
+                }
+
                 {firstMsg ||
                 (sameSender && !sameDate) ||
                 (!sameSender && !sameDate) ||
