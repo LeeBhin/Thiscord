@@ -27,7 +27,7 @@ export default function DM({ params }) {
 
   useEffect(() => {
     dispatch(triggerSignal());
-  }, []);
+  }, [messages]);
 
   const connectSocket = useCallback(() => {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
@@ -116,14 +116,24 @@ export default function DM({ params }) {
 
   const formatDateTime = (timestamp) => {
     const date = new Date(timestamp);
+    const today = new Date();
 
-    const dateString = date
-      .toLocaleDateString("ko-KR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .replace(/\./g, ".");
+    const isToday = today.toDateString() === date.toDateString();
+
+    const isYesterday =
+      today.getTime() - date.getTime() < 1000 * 60 * 60 * 24 && !isToday;
+
+    const dateString = isToday
+      ? "오늘"
+      : isYesterday
+      ? "어제"
+      : date
+          .toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })
+          .replace(/\./g, ".");
 
     const timeString = date.toLocaleTimeString("ko-KR", {
       hour: "numeric",
