@@ -9,6 +9,7 @@ import Images from "@/Images";
 import { useDispatch } from "react-redux";
 import { triggerSignal } from "@/counterSlice";
 import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function DM({ params }) {
   const { userId } = params;
@@ -51,6 +52,10 @@ export default function DM({ params }) {
       setMessages((prevMessages) => [...prevMessages, formattedMessage]);
     });
 
+    newSocket.on("delete", () => {
+      fetchChats();
+    });
+
     setSocket(newSocket);
 
     return newSocket;
@@ -63,18 +68,18 @@ export default function DM({ params }) {
     }
   }, [router, currentPath]);
 
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const chats = await load_chats(decodeURIComponent(userId));
-        if (chats.length > 0) {
-          setMessages(chats);
-        }
-      } catch (err) {
-        console.error("load chat err", err);
+  const fetchChats = async () => {
+    try {
+      const chats = await load_chats(decodeURIComponent(userId));
+      if (chats.length > 0) {
+        setMessages(chats);
       }
-    };
+    } catch (err) {
+      console.error("load chat err", err);
+    }
+  };
 
+  useEffect(() => {
     fetchChats();
   }, [userId, router, currentPath]);
 
@@ -111,6 +116,15 @@ export default function DM({ params }) {
       dispatch(triggerSignal());
     }
   }, [message, socket, userId]);
+
+  const sendDelete = useCallback(() => {
+    if (socket) {
+      socket.emit("delete", {
+        receivedUser: decodeURIComponent(userId),
+      });
+      dispatch(triggerSignal());
+    }
+  }, [socket]);
 
   const handleEnter = (e) => {
     if (e.key === "Enter") {
@@ -200,7 +214,8 @@ export default function DM({ params }) {
       .catch((error) => {
         alert(error);
       });
-    setIsPopup(false);
+    closePopup();
+    sendDelete();
   };
 
   const openPopup = (senderId, msgId, copyDiv) => {
@@ -213,193 +228,227 @@ export default function DM({ params }) {
     setCopyContent(copyDiv);
   };
 
+  const closePopup = () => {
+    setIsPopup(false);
+  };
   return (
-    <div className={styles.dmBody}>
-      {isPopup && (
-        <div className={styles.deletePopup}>
-          <div className={styles.back}>
-            <div className={styles.popup}>
-              <div className={styles.popWrap}>
-                <h3 className={styles.popTitle}>메시지 삭제하기</h3>
-                <p className={styles.popSubTitle}>
-                  정말 이 메시지를 삭제할까요?
-                </p>
-                <div className={styles.copyMsg}>
-                  <div className={styles.popupMsg}>
+    <>
+      <div className={styles.dmBody}>
+        <AnimatePresence mode="wait">
+          {isPopup && (
+            <motion.div
+              key="delete-popup"
+              className={styles.deletePopup}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className={styles.back} onClick={() => setIsPopup(false)}>
+                <motion.div
+                  key="popup-content"
+                  className={styles.popup}
+                  initial={{ opacity: 0, scale: 0, x: "50%", y: "-50%" }}
+                  animate={{ opacity: 1, scale: 1, x: "50%", y: "-50%" }}
+                  exit={{ opacity: 0, scale: 0, x: "50%", y: "-50%" }}
+                  transition={{
+                    duration: 0.2,
+                    type: "spring",
+                    stiffness: 600,
+                    damping: 35,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles.popWrap}>
+                    <h3 className={styles.popTitle}>메시지 삭제하기</h3>
+                    <p className={styles.popSubTitle}>
+                      정말 이 메시지를 삭제할까요?
+                    </p>
+                    <div className={styles.copyMsg}>
+                      <div className={styles.popupMsg}>
+                        <div className={styles.msgInfos}>
+                          <div
+                            className={styles.msgIcon}
+                            style={{
+                              backgroundColor: myColor,
+                            }}
+                          >
+                            <Images.icon className={styles.chatIcon} />
+                          </div>
+                          <div className={styles.msgInfo}>
+                            <span className={styles.senderId}>
+                              {copyContent.senderId}
+                            </span>
+                            <span className={styles.timestamp}>
+                              {copyContent.timestamp}
+                            </span>
+                            <div className={styles.msgContent}>
+                              {copyContent.message}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.popTxt}>
+                      <span className={styles.notice}>참고:</span>
+                      <span className={styles.noticeTxt}>
+                        <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인
+                        창을 건너뛰실 수 있어요.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.popBtns}>
+                    <div className={styles.popBtnsWrap}>
+                      <div
+                        className={styles.cancel}
+                        onClick={() => closePopup()}
+                      >
+                        취소
+                      </div>
+                      <div
+                        className={styles.confirm}
+                        onClick={() => deleteMsg()}
+                      >
+                        삭제
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <header className={styles.header}>
+          <div className={styles.headerWrap}>
+            <div className={styles.headerIconWrap}>
+              <div
+                className={styles.headerIcon}
+                style={{ backgroundColor: receiverColor }}
+              >
+                <Images.icon className={styles.icon} />
+              </div>
+              {receiverName}
+            </div>
+          </div>
+        </header>
+
+        <div className={styles.chats} ref={chatsRef}>
+          <div className={styles.top}>
+            <div
+              className={styles.topIconWrap}
+              style={{ backgroundColor: receiverColor }}
+            >
+              <Images.icon className={styles.topIcon} />
+            </div>
+            <h3 className={styles.topName}>{receiverName}</h3>
+            <div className={styles.topTxt}>
+              <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫 부분이에요.
+            </div>
+          </div>
+
+          {messages.map((msg, index) => {
+            const sameSender =
+              index > 0 && messages[index - 1].senderId === msg.senderId;
+            const sameDate =
+              index > 0 &&
+              formatDate(messages[index - 1].timestamp) ===
+                formatDate(msg.timestamp);
+            const firstMsg = index === 0;
+
+            return (
+              <div key={`${msg._id}-${msg.timestamp}`}>
+                {(firstMsg || !sameDate) && (
+                  <div className={styles.divisionDate}>
+                    <div className={styles.dateLine} />
+                    <div className={styles.date}>
+                      {formatDate(msg.timestamp)}
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className={`${styles.message} ${
+                    styles[msg.senderId === receiverName ? "received" : "sent"]
+                  }`}
+                >
+                  {msg.senderId !== receiverName && (
+                    <div className={styles.edit}>
+                      <div className={styles.editBtn}>
+                        <Images.edit className={styles.btnIcon} />
+                      </div>
+                      <div className={styles.editLine} />
+                      <div
+                        className={styles.removeBtn}
+                        onClick={(e) => {
+                          const copyDiv = {
+                            senderId: msg.senderId,
+                            timestamp: formatDateTime(msg.timestamp),
+                            message: msg.message,
+                            isedit: msg.isedit,
+                          };
+                          openPopup(msg.senderId, msg._id, copyDiv);
+                        }}
+                      >
+                        <Images.remove className={styles.btnIcon} />
+                      </div>
+                    </div>
+                  )}
+
+                  {firstMsg ||
+                  (sameSender && !sameDate) ||
+                  (!sameSender && !sameDate) ||
+                  (!sameSender && sameDate) ? (
                     <div className={styles.msgInfos}>
                       <div
                         className={styles.msgIcon}
                         style={{
-                          backgroundColor: myColor,
+                          backgroundColor:
+                            msg.senderId === receiverName
+                              ? receiverColor
+                              : myColor,
                         }}
                       >
                         <Images.icon className={styles.chatIcon} />
                       </div>
                       <div className={styles.msgInfo}>
-                        <span className={styles.senderId}>
-                          {copyContent.senderId}
-                        </span>
+                        <span className={styles.senderId}>{msg.senderId}</span>
                         <span className={styles.timestamp}>
-                          {copyContent.timestamp}
+                          {formatDateTime(msg.timestamp)}
                         </span>
-                        <div className={styles.msgContent}>
-                          {copyContent.message}
-                        </div>
+                        <div className={styles.msgContent}>{msg.message}</div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div className={styles.popTxt}>
-                  <span className={styles.notice}>참고:</span>
-                  <span className={styles.noticeTxt}>
-                    <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인 창을
-                    건너뛰실 수 있어요.
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.popBtns}>
-                <div className={styles.popBtnsWrap}>
-                  <div
-                    className={styles.cancel}
-                    onClick={() => setIsPopup(false)}
-                  >
-                    취소
-                  </div>
-                  <div className={styles.confirm} onClick={() => deleteMsg()}>
-                    삭제
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <header className={styles.header}>
-        <div className={styles.headerWrap}>
-          <div className={styles.headerIconWrap}>
-            <div
-              className={styles.headerIcon}
-              style={{ backgroundColor: receiverColor }}
-            >
-              <Images.icon className={styles.icon} />
-            </div>
-            {receiverName}
-          </div>
-        </div>
-      </header>
-
-      <div className={styles.chats} ref={chatsRef}>
-        <div className={styles.top}>
-          <div
-            className={styles.topIconWrap}
-            style={{ backgroundColor: receiverColor }}
-          >
-            <Images.icon className={styles.topIcon} />
-          </div>
-          <h3 className={styles.topName}>{receiverName}</h3>
-          <div className={styles.topTxt}>
-            <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫 부분이에요.
-          </div>
-        </div>
-
-        {messages.map((msg, index) => {
-          const sameSender =
-            index > 0 && messages[index - 1].senderId === msg.senderId;
-          const sameDate =
-            index > 0 &&
-            formatDate(messages[index - 1].timestamp) ===
-              formatDate(msg.timestamp);
-          const firstMsg = index === 0;
-
-          return (
-            <div key={`${msg._id}-${msg.timestamp}`}>
-              {(firstMsg || !sameDate) && (
-                <div className={styles.divisionDate}>
-                  <div className={styles.dateLine} />
-                  <div className={styles.date}>{formatDate(msg.timestamp)}</div>
-                </div>
-              )}
-
-              <div
-                className={`${styles.message} ${
-                  styles[msg.senderId === receiverName ? "received" : "sent"]
-                }`}
-              >
-                {msg.senderId !== receiverName && (
-                  <div className={styles.edit}>
-                    <div className={styles.editBtn}>
-                      <Images.edit className={styles.btnIcon} />
-                    </div>
-                    <div className={styles.editLine} />
-                    <div
-                      className={styles.removeBtn}
-                      onClick={(e) => {
-                        const copyDiv = {
-                          senderId: msg.senderId,
-                          timestamp: formatDateTime(msg.timestamp),
-                          message: msg.message,
-                          isedit: msg.isedit,
-                        };
-                        openPopup(msg.senderId, msg._id, copyDiv);
-                      }}
-                    >
-                      <Images.remove className={styles.btnIcon} />
-                    </div>
-                  </div>
-                )}
-
-                {firstMsg ||
-                (sameSender && !sameDate) ||
-                (!sameSender && !sameDate) ||
-                (!sameSender && sameDate) ? (
-                  <div className={styles.msgInfos}>
-                    <div
-                      className={styles.msgIcon}
-                      style={{
-                        backgroundColor:
-                          msg.senderId === receiverName
-                            ? receiverColor
-                            : myColor,
-                      }}
-                    >
-                      <Images.icon className={styles.chatIcon} />
-                    </div>
-                    <div className={styles.msgInfo}>
-                      <span className={styles.senderId}>{msg.senderId}</span>
-                      <span className={styles.timestamp}>
-                        {formatDateTime(msg.timestamp)}
+                  ) : (
+                    <div className={styles.singleMsg}>
+                      <span className={styles.singleMsgTime}>
+                        {formatTime(msg.timestamp)}
                       </span>
-                      <div className={styles.msgContent}>{msg.message}</div>
+                      <div className={styles.singleMsgContent}>
+                        {msg.message}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className={styles.singleMsg}>
-                    <span className={styles.singleMsgTime}>
-                      {formatTime(msg.timestamp)}
-                    </span>
-                    <div className={styles.singleMsgContent}>{msg.message}</div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <div className={styles.chatInputWrap}>
-        <div className={styles.chatInput}>
-          <input
-            type="text"
-            placeholder={`@${receiverName}에 메시지 보내기`}
-            className={styles.input}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleEnter}
-          />
+        <div className={styles.chatInputWrap}>
+          <div className={styles.chatInput}>
+            <input
+              type="text"
+              placeholder={`@${receiverName}에 메시지 보내기`}
+              className={styles.input}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleEnter}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
