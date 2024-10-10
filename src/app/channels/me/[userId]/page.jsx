@@ -12,7 +12,7 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function DM({ params }) {
-  const { userId } = params;
+  const userId = decodeURIComponent(params.userId).replace("@", "");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -28,6 +28,12 @@ export default function DM({ params }) {
   const currentPath = usePathname();
   const dispatch = useDispatch();
   const chatsRef = useRef(null);
+
+  useEffect(() => {
+    if (!currentPath.startsWith("/channels/me/@")) {
+      router.push(`/channels/me/@${userId}`);
+    }
+  });
 
   useEffect(() => {
     dispatch(triggerSignal());
@@ -208,23 +214,33 @@ export default function DM({ params }) {
     }
   }, [messages]);
 
-  const deleteMsg = () => {
-    delete_msg(msgInfo.senderId, msgInfo.msgId, receiverName)
-      .then(() => {})
-      .catch((error) => {
-        alert(error);
+  const deleteMsg = (msgInfoP) => {
+    if (msgInfoP) {
+      delete_msg(msgInfoP.senderId, msgInfoP.msgId, receiverName).then(() => {
+        fetchChats();
       });
+    } else {
+      delete_msg(msgInfo.senderId, msgInfo.msgId, receiverName).then(() => {
+        fetchChats();
+      });
+    }
     closePopup();
     sendDelete();
   };
 
-  const openPopup = (senderId, msgId, copyDiv) => {
-    setIsPopup(true);
+  const openPopup = (senderId, msgId, copyDiv, e) => {
     const msgInfo = {
       senderId: senderId,
       msgId: msgId,
     };
     setMsgInfo(msgInfo);
+
+    if (e.shiftKey) {
+      deleteMsg(msgInfo);
+      return;
+    }
+
+    setIsPopup(true);
     setCopyContent(copyDiv);
   };
 
@@ -388,7 +404,7 @@ export default function DM({ params }) {
                             message: msg.message,
                             isedit: msg.isedit,
                           };
-                          openPopup(msg.senderId, msg._id, copyDiv);
+                          openPopup(msg.senderId, msg._id, copyDiv, e);
                         }}
                       >
                         <Images.remove className={styles.btnIcon} />

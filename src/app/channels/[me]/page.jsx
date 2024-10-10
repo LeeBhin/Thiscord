@@ -8,15 +8,23 @@ import Pending from "./friend_pages/pending";
 import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
   const [counting, setCounting] = useState(0);
-
+  const currentPath = usePathname();
+  const router = useRouter();
   const pendingCount = async () => {
     const friends = await pending_friends();
     setCounting(friends.length);
   };
+
+  useEffect(() => {
+    if (currentPath !== "/channels/@me") {
+      router.push("/channels/@me");
+    }
+  });
 
   useEffect(() => {
     pendingCount();

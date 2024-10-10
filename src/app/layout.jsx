@@ -56,7 +56,7 @@ function InnerLayout({ children }) {
   }, [connectSocket]);
 
   useEffect(() => {
-    if (window.location.pathname.startsWith("/channels/me/") && socket) {
+    if (window.location.pathname.startsWith("/channels/@me/") && socket) {
       socket.disconnect();
       setSocket(null);
     }
@@ -125,10 +125,10 @@ function InnerLayout({ children }) {
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
     const title =
-      currentPath === "/channels/me"
+      currentPath === "/channels/@me"
         ? "• Thiscord | 친구"
-        : currentPath.startsWith("/channels/me/")
-        ? `Thiscord | @${path[path.length - 1]}`
+        : currentPath.startsWith("/channels/me/@")
+        ? `Thiscord | ${path[path.length - 1]}`
         : "Thiscord";
     setTitle(title);
   }, [currentPath]);
@@ -171,7 +171,7 @@ function InnerLayout({ children }) {
               <div className={styles.friendsWrap}>
                 <div className={styles.topNav}>
                   <Link
-                    href="/channels/me"
+                    href="/channels/@me"
                     className={`${styles.friendsLink} ${
                       currentPath === "/channels/me"
                         ? styles.friendsLinkActive
@@ -210,7 +210,7 @@ function InnerLayout({ children }) {
                   {chatrooms.length > 0 ? (
                     chatrooms.map((friend, index) => (
                       <Link
-                        href={`/channels/me/${friend.participantName}`}
+                        href={`/channels/me/@${friend.participantName}`}
                         key={index}
                         className={`${styles.friendsLink} ${styles.friendProfile}`}
                       >

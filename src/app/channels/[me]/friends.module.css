@@ -1,0 +1,414 @@
+.header {
+  height: 48px;
+  box-shadow: 0 1px 0 hsl(0 calc(1 * 0%) 0.8% / 0.2),
+    0 1.5px 0 hsl(240 calc(1 * 7.7%) 2.5% / 0.05),
+    0 2px 0 hsl(0 calc(1 * 0%) 0.8% / 0.05);
+  background-color: #313338;
+  position: relative;
+}
+
+.headerWrap {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px;
+}
+
+.frinedsTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 1px 10px 8px;
+  font-size: 16px;
+  color: #f2f3f5;
+  font-weight: bold;
+}
+
+.friendSvg {
+  color: #80848e;
+  width: 24px;
+  height: 24px;
+}
+
+.friendsTxt {
+  height: 24px;
+  line-height: 21px;
+}
+
+.barricade {
+  width: 1px;
+  height: 24px;
+  background-color: #4e50587a;
+  border-radius: 100px;
+  margin-right: 1px;
+}
+
+.statusWrap {
+  display: flex;
+  gap: 15px;
+  width: auto;
+  color: #b5bac1;
+  font-size: 16px;
+}
+
+.statusWrap > div {
+  padding: 2px 8px;
+  border-radius: 3px;
+  height: 24px;
+  line-height: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusWrap > div:hover {
+  background-color: #393c41;
+}
+
+.statusWrap > div:active {
+  background-color: #404147;
+}
+
+.statusActive {
+  background-color: #4e505899;
+  color: white;
+  cursor: default !important;
+}
+
+.addFriend {
+  width: 119px;
+  height: 24px;
+  border-radius: 4px;
+  background-color: #248046;
+  font-size: 16px;
+  color: white;
+  padding: 2px 8px;
+  line-height: 20px;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.addActive {
+  background: none;
+  color: #2dc770;
+  cursor: default;
+}
+
+.body {
+  float: left;
+  width: calc(100vw - 312px);
+  height: calc(100vh - 48px);
+  background-color: #313338;
+  /* padding: 16px 30px; */
+}
+
+.bodyWrap {
+  float: left;
+  width: calc(100vw - 312px);
+  height: calc(100vh - 48px);
+  background-color: #313338;
+  padding: 16px 30px;
+}
+
+.searchFriend {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchFriend input {
+  height: 34px;
+  width: 100%;
+  border-radius: 4px;
+  background-color: #201c24;
+  padding: 10px;
+  border: none;
+  font-size: 16px;
+  color: whitesmoke;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 10px;
+  color: #b5bac1;
+}
+
+.searchFriend input::placeholder {
+  color: #93989e;
+}
+
+.countFriends {
+  padding: 23px 0 8px 0;
+  font-size: 12px;
+  color: #b5bac1;
+  font-weight: bold;
+}
+
+.friendsList {
+  top: 140px;
+  left: 320px;
+  position: absolute;
+  width: 77%;
+  margin: 13px;
+}
+
+.friendsLine {
+  position: absolute;
+  width: 98%;
+  left: 10px;
+  border-top: solid 1px
+    color-mix(
+      in oklab,
+      hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%,
+      hsl(0 0% 0% / 0.48) 0%
+    );
+}
+
+.friend {
+  cursor: pointer;
+  gap: 12px;
+  padding: 13px 8px 13px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.friend:hover {
+  background-color: #393c41;
+  border-radius: 8px;
+}
+
+.friend:hover .btn {
+  background-color: #1e1f22;
+}
+
+.profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+.profileImg {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+.name {
+  font-size: 16px;
+  color: #f2f3f5;
+  font-weight: bold;
+}
+
+.btns {
+  display: flex;
+  gap: 11px;
+}
+
+.btn {
+  width: 36px;
+  height: 36px;
+  background-color: oklab(0.296332 -0.000731647 -0.00768477);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnIcon {
+  color: #b5bac1;
+}
+
+.btnIcon:hover {
+  color: #ced1d4;
+}
+
+/* add friend */
+
+.title {
+  color: #f2f3f5;
+  font-size: 16px;
+  padding: 2px 0 9px 0;
+  font-weight: bold;
+}
+
+.subTitle {
+  color: #b5bac0;
+  font-size: 14px;
+}
+
+.inputWrap {
+  height: 50px;
+  width: 100%;
+  background-color: #1e1f22;
+  border-radius: 8px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  align-items: center;
+}
+
+.inputWrap input {
+  padding: 10px;
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #e3ebee;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.inputWrap input:focus {
+  border: solid 1px #007acc;
+}
+
+.inputErr {
+  border: solid 1px #fa777c !important;
+}
+
+.inputOk {
+  border: solid 1px #2dc770 !important;
+}
+
+.sendRequestBtn {
+  background-color: #5865f2;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+}
+
+.resultMSG {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.resultMSG2 {
+  font-size: 14px;
+  margin-top: 8px;
+  color: transparent;
+}
+
+.resultErr {
+  color: #fa777c;
+}
+
+.resultOk {
+  color: #2dc770;
+}
+
+.line {
+  position: absolute;
+  top: 230px;
+  left: 0;
+  width: 100%;
+  border-bottom: solid 1px
+    color-mix(
+      in oklab,
+      hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%,
+      hsl(0 0% 0% / 0.48) 0%
+    );
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #949ba4;
+}
+
+.wumpus {
+  margin: 0 0 50px 0;
+}
+
+/* pending */
+
+.profileWrap {
+  display: flex;
+  gap: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.nameWrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 16px;
+}
+
+.pending {
+  font-size: 12px;
+  color: #b5bac1;
+}
+
+.pendingCount {
+  width: 16px;
+  height: 16px;
+  background-color: #f23f42;
+  border-radius: 100%;
+  position: relative;
+}
+
+.counting {
+  position: absolute;
+  top: 44%;
+  transform: translate(55%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.friendPending {
+  cursor: pointer;
+  gap: 12px;
+  padding: 11px 8px 11px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ox {
+  display: flex;
+  gap: 10px;
+}
+
+.ox div {
+  width: 36px;
+  height: 36px;
+  background-color: #2b2d31;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #b5bac1;
+}
+
+.ox .accept:hover {
+  color: #2dc770;
+}
+
+.ox .deny:hover {
+  color: #e85258;
+}

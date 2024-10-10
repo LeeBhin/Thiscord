@@ -4,7 +4,7 @@ const nextConfig = {
         return [
             {
                 source: '/',
-                destination: '/channels/me',
+                destination: '/channels/@me',
                 permanent: true,
             },
         ];
