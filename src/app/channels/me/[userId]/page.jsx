@@ -252,7 +252,7 @@ export default function DM({ params }) {
   };
 
   const handleEdit = (e) => {
-    setEditValue(e.target.innerText);
+    setEditValue(e.target.textContext);
   };
 
   const editBtnClick = (msg) => {
@@ -464,6 +464,7 @@ export default function DM({ params }) {
                               contentEditable={true}
                               className={styles.editInput}
                               onInput={(e) => handleEdit(e)}
+                              suppressContentEditableWarning={true}
                             >
                               {editValue}
                             </div>
@@ -496,6 +497,7 @@ export default function DM({ params }) {
                             contentEditable={true}
                             className={styles.editInput}
                             onInput={(e) => handleEdit(e)}
+                            suppressContentEditableWarning={true}
                           >
                             {editValue}
                           </div>
