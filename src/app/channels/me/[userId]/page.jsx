@@ -23,6 +23,9 @@ export default function DM({ params }) {
   const [isPopup, setIsPopup] = useState(false);
   const [msgInfo, setMsgInfo] = useState();
   const [copyContent, setCopyContent] = useState();
+  const [isEdit, setIsEdit] = useState(false);
+  const [editValue, setEditValue] = useState();
+  const [editMsg, setEditMsg] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -247,6 +250,11 @@ export default function DM({ params }) {
   const closePopup = () => {
     setIsPopup(false);
   };
+
+  const handleEdit = (e) => {
+    setEditValue(e.target.value);
+  };
+
   return (
     <>
       <div className={styles.dmBody}>
@@ -388,10 +396,21 @@ export default function DM({ params }) {
                   className={`${styles.message} ${
                     styles[msg.senderId === receiverName ? "received" : "sent"]
                   }`}
+                  style={{
+                    backgroundColor:
+                      isEdit && msg._id === editMsg ? "#2e3035" : "",
+                  }}
                 >
                   {msg.senderId !== receiverName && (
                     <div className={styles.edit}>
-                      <div className={styles.editBtn}>
+                      <div
+                        className={styles.editBtn}
+                        onClick={() => {
+                          setEditValue(msg.message);
+                          setIsEdit(true);
+                          setEditMsg(msg._id);
+                        }}
+                      >
                         <Images.edit className={styles.btnIcon} />
                       </div>
                       <div className={styles.editLine} />
@@ -433,17 +452,53 @@ export default function DM({ params }) {
                         <span className={styles.timestamp}>
                           {formatDateTime(msg.timestamp)}
                         </span>
-                        <div className={styles.msgContent}>{msg.message}</div>
+
+                        {isEdit && msg._id === editMsg ? (
+                          <div className={styles.editWrap}>
+                            <div
+                              contentEditable={true}
+                              className={styles.editInput}
+                            />
+                            <div className={styles.editAction}>
+                              ESC 키로 <span className={styles.esc}>취소</span>
+                              <span className={styles.dot}> • </span>Enter 키로{" "}
+                              <span className={styles.enter}>저장</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={styles.msgContent}>{msg.message}</div>
+                        )}
                       </div>
                     </div>
                   ) : (
                     <div className={styles.singleMsg}>
-                      <span className={styles.singleMsgTime}>
+                      <span
+                        className={styles.singleMsgTime}
+                        style={{
+                          marginBottom:
+                            isEdit && msg._id === editMsg ? "40px" : "",
+                        }}
+                      >
                         {formatTime(msg.timestamp)}
                       </span>
-                      <div className={styles.singleMsgContent}>
-                        {msg.message}
-                      </div>
+
+                      {isEdit && msg._id === editMsg ? (
+                        <div className={styles.editWrap}>
+                          <div
+                            contentEditable={true}
+                            className={styles.editInput}
+                          />
+                          <div className={styles.editAction}>
+                            ESC 키로 <span className={styles.esc}>취소</span>
+                            <span className={styles.dot}> • </span>Enter 키로{" "}
+                            <span className={styles.enter}>저장</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={styles.singleMsgContent}>
+                          {msg.message}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

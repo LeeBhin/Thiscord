@@ -152,7 +152,7 @@
 
 .confirm {
   background-color: #da373c;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .confirm:hover {
@@ -332,10 +332,12 @@
   display: flex;
   gap: 15px;
   align-items: center;
+  width: 100%;
 }
 
 .msgInfo {
-  color: white;
+  color: #dbdee1;
+  width: 100%;
 }
 
 .singleMsg {
@@ -343,6 +345,7 @@
   gap: 8px;
   align-items: center;
   margin-left: -5px;
+  width: 100%;
 }
 
 .message:hover .singleMsgTime {
@@ -359,7 +362,7 @@
 }
 
 .singleMsgContent {
-  color: white;
+  color: #dbdee1;
 }
 
 .senderId {
@@ -370,6 +373,44 @@
   font-size: 11px;
   color: #949ba4;
   margin: 0 8px;
+}
+
+.editWrap {
+  margin: 5px 0;
+  width: 100%;
+}
+
+.editInput {
+  outline: none;
+  margin: 2px 0 2px;
+  background-color: #383a40;
+  border-radius: 8px;
+  padding: 11px 10px 11px 15px;
+  border: solid 1px #2e3035;
+  color: #dbdee1;
+  min-height: 44px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.editAction {
+  font-size: 12px;
+  color: #dbdee1;
+}
+
+.esc,
+.enter {
+  color: #00a8fc;
+  cursor: pointer;
+}
+
+.esc:hover,
+.enter:hover {
+  text-decoration: underline;
+}
+
+.dot {
+  font-size: 10px;
 }
 
 .chatInputWrap {
