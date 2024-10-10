@@ -343,7 +343,7 @@
 .singleMsg {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
   margin-left: -5px;
   width: 100%;
 }
@@ -359,10 +359,12 @@
   color: #949ba4;
   min-width: 52px;
   width: 52px;
+  margin-top: 3px;
 }
 
 .singleMsgContent {
   color: #dbdee1;
+  margin-bottom: 1px;
 }
 
 .senderId {

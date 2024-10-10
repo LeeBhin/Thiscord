@@ -252,7 +252,13 @@ export default function DM({ params }) {
   };
 
   const handleEdit = (e) => {
-    setEditValue(e.target.value);
+    setEditValue(e.target.innerText);
+  };
+
+  const editBtnClick = (msg) => {
+    setEditValue(msg.message);
+    setIsEdit(true);
+    setEditMsg(msg._id);
   };
 
   return (
@@ -401,35 +407,34 @@ export default function DM({ params }) {
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
                   }}
                 >
-                  {msg.senderId !== receiverName && (
-                    <div className={styles.edit}>
-                      <div
-                        className={styles.editBtn}
-                        onClick={() => {
-                          setEditValue(msg.message);
-                          setIsEdit(true);
-                          setEditMsg(msg._id);
-                        }}
-                      >
-                        <Images.edit className={styles.btnIcon} />
+                  {msg.senderId !== receiverName &&
+                    (!isEdit || msg._id !== editMsg) && (
+                      <div className={styles.edit}>
+                        <div
+                          className={styles.editBtn}
+                          onClick={() => {
+                            editBtnClick(msg);
+                          }}
+                        >
+                          <Images.edit className={styles.btnIcon} />
+                        </div>
+                        <div className={styles.editLine} />
+                        <div
+                          className={styles.removeBtn}
+                          onClick={(e) => {
+                            const copyDiv = {
+                              senderId: msg.senderId,
+                              timestamp: formatDateTime(msg.timestamp),
+                              message: msg.message,
+                              isedit: msg.isedit,
+                            };
+                            openPopup(msg.senderId, msg._id, copyDiv, e);
+                          }}
+                        >
+                          <Images.remove className={styles.btnIcon} />
+                        </div>
                       </div>
-                      <div className={styles.editLine} />
-                      <div
-                        className={styles.removeBtn}
-                        onClick={(e) => {
-                          const copyDiv = {
-                            senderId: msg.senderId,
-                            timestamp: formatDateTime(msg.timestamp),
-                            message: msg.message,
-                            isedit: msg.isedit,
-                          };
-                          openPopup(msg.senderId, msg._id, copyDiv, e);
-                        }}
-                      >
-                        <Images.remove className={styles.btnIcon} />
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {firstMsg ||
                   (sameSender && !sameDate) ||
@@ -458,7 +463,10 @@ export default function DM({ params }) {
                             <div
                               contentEditable={true}
                               className={styles.editInput}
-                            />
+                              onInput={(e) => handleEdit(e)}
+                            >
+                              {editValue}
+                            </div>
                             <div className={styles.editAction}>
                               ESC 키로 <span className={styles.esc}>취소</span>
                               <span className={styles.dot}> • </span>Enter 키로{" "}
@@ -475,8 +483,8 @@ export default function DM({ params }) {
                       <span
                         className={styles.singleMsgTime}
                         style={{
-                          marginBottom:
-                            isEdit && msg._id === editMsg ? "40px" : "",
+                          marginTop:
+                            isEdit && msg._id === editMsg ? "10px" : "",
                         }}
                       >
                         {formatTime(msg.timestamp)}
@@ -487,7 +495,10 @@ export default function DM({ params }) {
                           <div
                             contentEditable={true}
                             className={styles.editInput}
-                          />
+                            onInput={(e) => handleEdit(e)}
+                          >
+                            {editValue}
+                          </div>
                           <div className={styles.editAction}>
                             ESC 키로 <span className={styles.esc}>취소</span>
                             <span className={styles.dot}> • </span>Enter 키로{" "}
