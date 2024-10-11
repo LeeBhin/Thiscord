@@ -71,3 +71,7 @@ export async function load_chatrooms() {
 export async function delete_msg(senderId, msgId, receiverName) {
     return apiRequest(`chat/delete`, 'DELETE', { senderId, msgId, receiverName });
 }
+
+export async function edit_msg(senderId, msgId, receiverName, newMsg) {
+    return apiRequest(`chat/edit`, 'PATCH', { senderId, msgId, receiverName, newMsg });
+}

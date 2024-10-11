@@ -1,6 +1,6 @@
 "use client";
 
-import { delete_msg, load_chats, load_friends } from "@/utils/api";
+import { delete_msg, edit_msg, load_chats, load_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import io from "socket.io-client";
@@ -31,6 +31,7 @@ export default function DM({ params }) {
   const currentPath = usePathname();
   const dispatch = useDispatch();
   const chatsRef = useRef(null);
+  const editRef = useRef(null);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -251,14 +252,32 @@ export default function DM({ params }) {
     setIsPopup(false);
   };
 
-  const handleEdit = (e) => {
-    setEditValue(e.target.textContext);
+  const areaHeight = () => {
+    const target = editRef.current;
+    setEditValue(target.value);
+    target.style.height = "auto";
+    target.style.height = `${target.scrollHeight}px`;
+  };
+
+  const handleEditKey = (senderId, msgId, e) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
+    }
+    if (e.key === "Enter") {
+      edit_msg(senderId, msgId, receiverName, editValue);
+      fetchChats();
+      setIsEdit(false);
+      return;
+    }
   };
 
   const editBtnClick = (msg) => {
     setEditValue(msg.message);
     setIsEdit(true);
     setEditMsg(msg._id);
+    setTimeout(() => {
+      areaHeight();
+    });
   };
 
   return (
@@ -460,14 +479,16 @@ export default function DM({ params }) {
 
                         {isEdit && msg._id === editMsg ? (
                           <div className={styles.editWrap}>
-                            <div
-                              contentEditable={true}
+                            <textarea
+                              value={editValue}
                               className={styles.editInput}
-                              onInput={(e) => handleEdit(e)}
-                              suppressContentEditableWarning={true}
-                            >
-                              {editValue}
-                            </div>
+                              onChange={areaHeight}
+                              onKeyDown={(e) =>
+                                handleEditKey(msg.senderId, msg._id, e)
+                              }
+                              ref={editRef}
+                              rows={1}
+                            />
                             <div className={styles.editAction}>
                               ESC 키로 <span className={styles.esc}>취소</span>
                               <span className={styles.dot}> • </span>Enter 키로{" "}
