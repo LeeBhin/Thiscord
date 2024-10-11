@@ -13,7 +13,6 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
-  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
   const [receiverColor, setReceiverColor] = useState();
@@ -24,7 +23,6 @@ export default function DM({ params }) {
   const [msgInfo, setMsgInfo] = useState();
   const [copyContent, setCopyContent] = useState();
   const [isEdit, setIsEdit] = useState(false);
-  const [editValue, setEditValue] = useState();
   const [editMsg, setEditMsg] = useState();
   const [isConnected, setIsConnected] = useState(false);
 
@@ -140,7 +138,7 @@ export default function DM({ params }) {
       if (msg && socket && msg.trim() !== "") {
         socket.emit("message", {
           receivedUser: decodeURIComponent(userId),
-          message: msg,
+          message: msg.trim(),
         });
         inputRef.current.value = "";
         chatAreaHeight();
@@ -292,7 +290,6 @@ export default function DM({ params }) {
 
   const areaHeight = () => {
     const target = editRef.current;
-    setEditValue(target.value);
     target.style.height = "auto";
     target.style.height = `${target.scrollHeight}px`;
   };
@@ -310,10 +307,6 @@ export default function DM({ params }) {
   };
 
   const handleEditKey = async (senderId, msgId, e, msg) => {
-    if (e.key === "Enter" && msg === editValue) {
-      setIsEdit(false);
-      return;
-    }
     if (e.key === "Escape") {
       setIsEdit(false);
       return;
@@ -328,8 +321,8 @@ export default function DM({ params }) {
   };
 
   const editMsgKey = (senderId, msgId, msg) => {
-    if (msg !== editValue) {
-      edit_msg(senderId, msgId, receiverName, editValue);
+    if (msg !== editRef.current.value.trim()) {
+      edit_msg(senderId, msgId, receiverName, editRef.current.value.trim());
       sendEdit();
       fetchChats();
       setIsEdit(false);
@@ -339,10 +332,10 @@ export default function DM({ params }) {
   };
 
   const editBtnClick = (msg) => {
-    setEditValue(msg.message);
     setIsEdit(true);
     setEditMsg(msg._id);
     setTimeout(() => {
+      editRef.current.value = msg.message;
       areaHeight();
     });
   };
@@ -545,7 +538,6 @@ export default function DM({ params }) {
                         {isEdit && msg._id === editMsg ? (
                           <div className={styles.editWrap}>
                             <textarea
-                              value={editValue}
                               className={styles.editInput}
                               onChange={areaHeight}
                               onKeyDown={(e) => {
@@ -602,7 +594,6 @@ export default function DM({ params }) {
                       {isEdit && msg._id === editMsg ? (
                         <div className={styles.editWrap}>
                           <textarea
-                            value={editValue}
                             className={styles.editInput}
                             onChange={areaHeight}
                             onKeyDown={(e) => {
