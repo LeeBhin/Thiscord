@@ -33,6 +33,9 @@ export default function DM({ params }) {
   const dispatch = useDispatch();
   const chatsRef = useRef(null);
   const editRef = useRef(null);
+  const inputRef = useRef(null);
+  const chatWrapRef = useRef(null);
+  const noNameRef = useRef(null);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -51,7 +54,7 @@ export default function DM({ params }) {
       transports: ["websocket", "polling"],
       withCredentials: true,
       reconnection: true,
-      forceNew: false,
+      forceNew: true,
     });
 
     newSocket.on("connect", () => {
@@ -62,16 +65,12 @@ export default function DM({ params }) {
       setIsConnected(false);
     });
 
-    newSocket.on("connect_error", (err) => {
-      setIsConnected(false);
-    });
-
     newSocket.on("message", (data) => {
-      const formattedMessage = {
-        ...data,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prevMessages) => [...prevMessages, formattedMessage]);
+      // const formattedMessage = {
+      //   ...data,
+      //   timestamp: new Date().toISOString(),
+      // };
+      fetchChats();
     });
 
     newSocket.on("delete", () => {
@@ -79,9 +78,8 @@ export default function DM({ params }) {
     });
 
     setSocket(newSocket);
-
     return newSocket;
-  }, [isConnected]);
+  });
 
   useEffect(() => {
     const newSocket = connectSocket();
@@ -92,7 +90,7 @@ export default function DM({ params }) {
         setIsConnected(false);
       }
     };
-  }, [connectSocket]);
+  }, []);
 
   useEffect(() => {
     if (!isConnected) {
@@ -137,16 +135,20 @@ export default function DM({ params }) {
     });
   }, [router, currentPath]);
 
-  const sendMessage = useCallback(() => {
-    if (message && socket) {
-      socket.emit("message", {
-        receivedUser: decodeURIComponent(userId),
-        message,
-      });
-      setMessage("");
-      dispatch(triggerSignal());
-    }
-  }, [message, socket, userId]);
+  const sendMessage = useCallback(
+    (msg) => {
+      if (msg && socket && msg.trim() !== "") {
+        socket.emit("message", {
+          receivedUser: decodeURIComponent(userId),
+          message: msg,
+        });
+        inputRef.current.value = "";
+        chatAreaHeight();
+        dispatch(triggerSignal());
+      }
+    },
+    [socket, userId]
+  );
 
   const sendDelete = useCallback(() => {
     if (socket) {
@@ -167,8 +169,12 @@ export default function DM({ params }) {
   }, [socket]);
 
   const handleEnter = (e) => {
-    if (e.key === "Enter") {
-      sendMessage();
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(e.target.value);
+      setTimeout(() => {
+        fetchChats();
+      }, 10);
       const chatElement = chatsRef.current;
       chatElement.scrollTop = chatElement.scrollHeight;
     }
@@ -291,6 +297,18 @@ export default function DM({ params }) {
     target.style.height = `${target.scrollHeight}px`;
   };
 
+  const chatAreaHeight = () => {
+    const target = inputRef.current;
+    const targetWrap = chatWrapRef.current;
+    const noname = noNameRef.current;
+
+    target.style.height = "auto";
+    target.style.height = `${target.scrollHeight}px`;
+    targetWrap.style.height = "auto";
+    targetWrap.style.height = `${targetWrap.scrollHeight}px`;
+    noname.style.marginBottom = `${targetWrap.scrollHeight - 80}px`;
+  };
+
   const handleEditKey = async (senderId, msgId, e, msg) => {
     if (e.key === "Enter" && msg === editValue) {
       setIsEdit(false);
@@ -303,12 +321,20 @@ export default function DM({ params }) {
     if (e.key === "Enter" && e.shiftKey) {
       return;
     }
-    if (e.key === "Enter" && msg !== editValue) {
+    if (e.key === "Enter") {
+      editMsgKey(senderId, msgId, msg);
+      return;
+    }
+  };
+
+  const editMsgKey = (senderId, msgId, msg) => {
+    if (msg !== editValue) {
       edit_msg(senderId, msgId, receiverName, editValue);
       sendEdit();
       fetchChats();
       setIsEdit(false);
-      return;
+    } else {
+      setIsEdit(false);
     }
   };
 
@@ -437,7 +463,6 @@ export default function DM({ params }) {
               <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫 부분이에요.
             </div>
           </div>
-
           {messages.map((msg, index) => {
             const sameSender =
               index > 0 && messages[index - 1].senderId === msg.senderId;
@@ -457,7 +482,6 @@ export default function DM({ params }) {
                     </div>
                   </div>
                 )}
-
                 <div
                   className={`${styles.message} ${
                     styles[msg.senderId === receiverName ? "received" : "sent"]
@@ -536,9 +560,22 @@ export default function DM({ params }) {
                               rows={1}
                             />
                             <div className={styles.editAction}>
-                              ESC 키로 <span className={styles.esc}>취소</span>
+                              ESC 키로{" "}
+                              <span
+                                className={styles.esc}
+                                onClick={() => setIsEdit(false)}
+                              >
+                                취소
+                              </span>
                               <span className={styles.dot}> • </span>Enter 키로{" "}
-                              <span className={styles.enter}>저장</span>
+                              <span
+                                className={styles.enter}
+                                onClick={() =>
+                                  editMsgKey(msg.senderId, msg._id, msg.message)
+                                }
+                              >
+                                저장
+                              </span>
                             </div>
                           </div>
                         ) : (
@@ -580,9 +617,22 @@ export default function DM({ params }) {
                             rows={1}
                           />
                           <div className={styles.editAction}>
-                            ESC 키로 <span className={styles.esc}>취소</span>
+                            ESC 키로{" "}
+                            <span
+                              className={styles.esc}
+                              onClick={() => setIsEdit(false)}
+                            >
+                              취소
+                            </span>
                             <span className={styles.dot}> • </span>Enter 키로{" "}
-                            <span className={styles.enter}>저장</span>
+                            <span
+                              className={styles.enter}
+                              onClick={() =>
+                                editMsgKey(msg.senderId, msg._id, msg.message)
+                              }
+                            >
+                              저장
+                            </span>
                           </div>
                         </div>
                       ) : (
@@ -599,18 +649,25 @@ export default function DM({ params }) {
               </div>
             );
           })}
-        </div>
-
-        <div className={styles.chatInputWrap}>
-          <div className={styles.chatInput}>
-            <input
-              type="text"
-              placeholder={`@${receiverName}에 메시지 보내기`}
-              className={styles.input}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleEnter}
-            />
+          <div className={styles.noName} ref={noNameRef} />
+          <div className={styles.chatInputWrap} ref={chatWrapRef}>
+            <div className={styles.chatInput}>
+              <textarea
+                type="text"
+                rows={1}
+                placeholder={`@${receiverName}에 메시지 보내기`}
+                className={styles.input}
+                onChange={() => {
+                  chatAreaHeight();
+                  if (isBottom) {
+                    const chatElement = chatsRef.current;
+                    chatElement.scrollTop = chatElement.scrollHeight;
+                  }
+                }}
+                ref={inputRef}
+                onKeyDown={handleEnter}
+              />
+            </div>
           </div>
         </div>
       </div>
