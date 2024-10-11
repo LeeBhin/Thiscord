@@ -359,13 +359,15 @@
   color: #949ba4;
   min-width: 52px;
   width: 52px;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .singleMsgContent {
   color: #dbdee1;
-  margin-bottom: 1px;
   white-space: pre-wrap;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: flex-end;
 }
 
 .senderId {
@@ -397,7 +399,6 @@
   resize: none;
   box-sizing: border-box;
   font-family: "malgun gothic";
-  /* line-height: 16px; */
 }
 
 .editInput::-webkit-scrollbar {
@@ -422,6 +423,18 @@
 
 .dot {
   font-size: 10px;
+}
+
+.msgContent {
+  white-space: pre-wrap;
+  display: flex;
+  align-items: flex-end;
+}
+
+.isEdit {
+  color: #949ba4;
+  font-size: 11px;
+  margin: 0 0 1px 3px;
 }
 
 .chatInputWrap {
@@ -461,8 +474,4 @@
   background-color: #1a1b1e;
   border-radius: 100px;
   background-clip: padding-box;
-}
-
-.msgContent {
-  white-space: pre-wrap;
 }

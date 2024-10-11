@@ -26,6 +26,7 @@ export default function DM({ params }) {
   const [isEdit, setIsEdit] = useState(false);
   const [editValue, setEditValue] = useState();
   const [editMsg, setEditMsg] = useState();
+  const [isConnected, setIsConnected] = useState(false);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -44,14 +45,25 @@ export default function DM({ params }) {
   }, [messages]);
 
   const connectSocket = useCallback(() => {
+    if (isConnected) return;
+
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
       reconnection: true,
+      forceNew: false,
+    });
+
+    newSocket.on("connect", () => {
+      setIsConnected(true);
+    });
+
+    newSocket.on("disconnect", () => {
+      setIsConnected(false);
     });
 
     newSocket.on("connect_error", (err) => {
-      console.error("Connection error:", err);
+      setIsConnected(false);
     });
 
     newSocket.on("message", (data) => {
@@ -69,7 +81,24 @@ export default function DM({ params }) {
     setSocket(newSocket);
 
     return newSocket;
-  }, []);
+  }, [isConnected]);
+
+  useEffect(() => {
+    const newSocket = connectSocket();
+
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+        setIsConnected(false);
+      }
+    };
+  }, [connectSocket]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      connectSocket();
+    }
+  }, [isConnected, connectSocket]);
 
   useEffect(() => {
     const storedmyColor = localStorage.getItem("userInfo");
@@ -108,14 +137,6 @@ export default function DM({ params }) {
     });
   }, [router, currentPath]);
 
-  useEffect(() => {
-    const newSocket = connectSocket();
-
-    return () => {
-      if (newSocket) newSocket.disconnect();
-    };
-  }, [connectSocket]);
-
   const sendMessage = useCallback(() => {
     if (message && socket) {
       socket.emit("message", {
@@ -136,9 +157,20 @@ export default function DM({ params }) {
     }
   }, [socket]);
 
+  const sendEdit = useCallback(() => {
+    if (socket) {
+      socket.emit("delete", {
+        receivedUser: decodeURIComponent(userId),
+      });
+      dispatch(triggerSignal());
+    }
+  }, [socket]);
+
   const handleEnter = (e) => {
     if (e.key === "Enter") {
       sendMessage();
+      const chatElement = chatsRef.current;
+      chatElement.scrollTop = chatElement.scrollHeight;
     }
   };
 
@@ -259,12 +291,21 @@ export default function DM({ params }) {
     target.style.height = `${target.scrollHeight}px`;
   };
 
-  const handleEditKey = (senderId, msgId, e) => {
+  const handleEditKey = async (senderId, msgId, e, msg) => {
+    if (e.key === "Enter" && msg === editValue) {
+      setIsEdit(false);
+      return;
+    }
+    if (e.key === "Escape") {
+      setIsEdit(false);
+      return;
+    }
     if (e.key === "Enter" && e.shiftKey) {
       return;
     }
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && msg !== msg) {
       edit_msg(senderId, msgId, receiverName, editValue);
+      sendEdit();
       fetchChats();
       setIsEdit(false);
       return;
@@ -483,9 +524,14 @@ export default function DM({ params }) {
                               value={editValue}
                               className={styles.editInput}
                               onChange={areaHeight}
-                              onKeyDown={(e) =>
-                                handleEditKey(msg.senderId, msg._id, e)
-                              }
+                              onKeyDown={(e) => {
+                                handleEditKey(
+                                  msg.senderId,
+                                  msg._id,
+                                  e,
+                                  msg.message
+                                );
+                              }}
                               ref={editRef}
                               rows={1}
                             />
@@ -496,7 +542,12 @@ export default function DM({ params }) {
                             </div>
                           </div>
                         ) : (
-                          <div className={styles.msgContent}>{msg.message}</div>
+                          <div className={styles.msgContent}>
+                            {msg.message}
+                            {msg.isEdit && (
+                              <div className={styles.isEdit}>(수정됨)</div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -511,17 +562,23 @@ export default function DM({ params }) {
                       >
                         {formatTime(msg.timestamp)}
                       </span>
-
                       {isEdit && msg._id === editMsg ? (
                         <div className={styles.editWrap}>
-                          <div
-                            contentEditable={true}
+                          <textarea
+                            value={editValue}
                             className={styles.editInput}
-                            onInput={(e) => handleEdit(e)}
-                            suppressContentEditableWarning={true}
-                          >
-                            {editValue}
-                          </div>
+                            onChange={areaHeight}
+                            onKeyDown={(e) =>
+                              handleEditKey(
+                                msg.senderId,
+                                msg._id,
+                                e,
+                                msg.message
+                              )
+                            }
+                            ref={editRef}
+                            rows={1}
+                          />
                           <div className={styles.editAction}>
                             ESC 키로 <span className={styles.esc}>취소</span>
                             <span className={styles.dot}> • </span>Enter 키로{" "}
@@ -531,6 +588,9 @@ export default function DM({ params }) {
                       ) : (
                         <div className={styles.singleMsgContent}>
                           {msg.message}
+                          {msg.isEdit && (
+                            <div className={styles.isEdit}>(수정됨)</div>
+                          )}
                         </div>
                       )}
                     </div>
