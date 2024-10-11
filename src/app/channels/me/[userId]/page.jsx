@@ -303,9 +303,7 @@ export default function DM({ params }) {
     if (e.key === "Enter" && e.shiftKey) {
       return;
     }
-    if (e.key === "Enter" && msg !== editValue
-      
-    ) {
+    if (e.key === "Enter" && msg !== editValue) {
       edit_msg(senderId, msgId, receiverName, editValue);
       sendEdit();
       fetchChats();
@@ -570,14 +568,14 @@ export default function DM({ params }) {
                             value={editValue}
                             className={styles.editInput}
                             onChange={areaHeight}
-                            onKeyDown={(e) =>
+                            onKeyDown={(e) => {
                               handleEditKey(
                                 msg.senderId,
                                 msg._id,
                                 e,
                                 msg.message
-                              )
-                            }
+                              );
+                            }}
                             ref={editRef}
                             rows={1}
                           />
