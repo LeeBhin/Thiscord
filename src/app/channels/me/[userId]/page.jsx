@@ -303,7 +303,9 @@ export default function DM({ params }) {
     if (e.key === "Enter" && e.shiftKey) {
       return;
     }
-    if (e.key === "Enter" && msg !== msg) {
+    if (e.key === "Enter" && msg !== editValue
+      
+    ) {
       edit_msg(senderId, msgId, receiverName, editValue);
       sendEdit();
       fetchChats();
