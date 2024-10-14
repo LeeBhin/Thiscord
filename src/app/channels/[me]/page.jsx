@@ -9,7 +9,6 @@ import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
-import { subscribeUser } from "@/utils/notifications";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
@@ -53,62 +52,6 @@ export default function Friends() {
         return <All_Friends />;
     }
   };
-
-  const requestNotificationPermission = async () => {
-    if (typeof window !== "undefined") {
-      const isLoggedIn = localStorage.getItem("userInfo") !== null;
-
-      if (isLoggedIn) {
-        if (
-          typeof window !== "undefined" &&
-          "Notification" in window &&
-          Notification.permission !== "granted"
-        ) {
-          try {
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-              console.log("Notification permission granted.");
-              registerServiceWorker();
-            }
-          } catch (error) {
-            console.error("Error requesting notification permission", error);
-          }
-        }
-      } else {
-        console.log(
-          "User is not logged in. Notification permission not requested."
-        );
-      }
-    }
-  };
-
-  const registerServiceWorker = async () => {
-    if ("serviceWorker" in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.register(
-          "/service-worker.js"
-        );
-        console.log("Service Worker가 등록되었습니다.", registration);
-
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          await subscribeUser();
-        } else {
-          console.log("Notification permission denied.");
-        }
-      } catch (error) {
-        console.error("Service Worker 등록 중 오류 발생:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    requestNotificationPermission();
-  }, []);
-
-  setInterval(() => {
-    registerServiceWorker();
-  }, 10000);
 
   return (
     <div className={styles.friends}>
