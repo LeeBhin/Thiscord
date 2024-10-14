@@ -150,7 +150,7 @@
   top: 140px;
   left: 320px;
   position: absolute;
-  width: 77%;
+  width: calc(100vw - 355px);
   margin: 13px;
 }
 
