@@ -1,0 +1,154 @@
+.wrap {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+}
+
+.header {
+  background-color: #2b2d31;
+  height: 100%;
+  flex: 0.33;
+}
+
+.body {
+  background-color: #313338;
+  height: 100%;
+  flex: 0.67;
+}
+
+.logOut {
+  width: 180px;
+  height: 32px;
+  font-size: 16px;
+  color: #b5bac1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  float: right;
+  margin: 60px 15px 0 0;
+  cursor: pointer;
+}
+
+.logOut:hover {
+  background-color: #393c41;
+  border-radius: 4px;
+}
+
+.accountWrap {
+  margin: 60px 0 0 40px;
+}
+
+.title {
+  font-size: 20px;
+  color: #f2f3f5;
+  margin: 0 0 20px 0;
+}
+
+.card {
+  width: 660px;
+  height: 200px;
+  background-color: #3ca45c;
+  position: relative;
+  border-radius: 8px;
+}
+
+.cardBtm {
+  width: 100%;
+  height: 90px;
+  background-color: #1e1f22;
+  position: absolute;
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profileWrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 45px 13px;
+}
+
+.profile {
+  min-width: 80px;
+  min-height: 80px;
+  border: solid 6px #1e1f22;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3ca45c;
+}
+
+.icon {
+  width: 45px;
+  height: 45px;
+  color: white;
+}
+
+.name {
+  color: #f2f3f5;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.changeName {
+  background-color: #5865f2;
+  padding: 2px 16px;
+  color: white;
+  font-size: 14px;
+  width: 180px;
+  height: 32px;
+  text-align: center;
+  line-height: 27px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin: 0 15px 27px;
+}
+
+.changeName:hover {
+  background-color: #4752c4;
+}
+
+.rmWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #b5bac1;
+  margin-top: 40px;
+}
+
+.rmTitle {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.rmSubtitle {
+  font-size: 14px;
+}
+
+.rmAccount {
+  background-color: #da373c;
+  color: white;
+  font-size: 14px;
+  padding: 2px 16px;
+  width: 125px;
+  height: 30px;
+  text-align: center;
+  line-height: 25px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s ease;
+  margin-top: 13px;
+}
+
+.rmAccount:hover {
+  background-color: #a12828;
+}

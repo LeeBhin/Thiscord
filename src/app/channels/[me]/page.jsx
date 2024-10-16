@@ -20,7 +20,7 @@ export default function Friends() {
   const [socket, setSocket] = useState(null);
 
   const connectSocket = useCallback(() => {
-    if (isConnected) return;
+    if (isConnected || currentPath.startsWith("/channels/me/")) return;
 
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ["websocket", "polling"],
@@ -62,7 +62,7 @@ export default function Friends() {
         setIsConnected(false);
       }
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -79,7 +79,7 @@ export default function Friends() {
     if (currentPath !== "/channels/@me") {
       router.push("/channels/@me");
     }
-  });
+  }, [currentPath]);
 
   useEffect(() => {
     pendingCount();

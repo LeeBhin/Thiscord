@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkToken, load_chatrooms } from "@/utils/api";
-import { logout, load_friends } from "@/utils/api";
+import { load_friends } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
 import { store } from "@/store";
 import { useDispatch } from "react-redux";
@@ -123,10 +123,6 @@ function InnerLayout({ children }) {
     }
   };
 
-  const logOut = () => {
-    logout();
-  };
-
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
     const title =
@@ -138,7 +134,10 @@ function InnerLayout({ children }) {
     setTitle(title);
   }, [currentPath]);
 
-  const isAuthPath = currentPath === "/login" || currentPath === "/register";
+  const isAuthPath =
+    currentPath === "/login" ||
+    currentPath === "/register" ||
+    currentPath === "/setting";
 
   return (
     <html lang="ko">
@@ -244,11 +243,7 @@ function InnerLayout({ children }) {
                   <Images.icon className={styles.profileImg} />
                 </div>
                 <div className={styles.name}>{userInfo?.name || ""}</div>
-                <Link
-                  href="/setting"
-                  className={styles.setting}
-                  onClick={logOut}
-                >
+                <Link href="/setting" className={styles.setting}>
                   <Images.setting />
                 </Link>
               </div>
