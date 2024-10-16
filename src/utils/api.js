@@ -75,3 +75,7 @@ export async function delete_msg(senderId, msgId, receiverName) {
 export async function edit_msg(senderId, msgId, receiverName, newMsg) {
     return apiRequest(`chat/edit`, 'PATCH', { senderId, msgId, receiverName, newMsg });
 }
+
+export async function update_name(newName) {
+    return apiRequest('users/update-name', 'PATCH', { newName })
+}

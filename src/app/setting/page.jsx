@@ -2,16 +2,46 @@
 
 import Images from "@/Images";
 import styles from "./setting.module.css";
-import { logout } from "@/utils/api";
-import { useEffect, useState } from "react";
+import { logout, update_name } from "@/utils/api";
+import { useEffect, useRef, useState } from "react";
 
 export default function Setting() {
+  const [userInfo, setUserInfo] = useState();
+  const [isEdit, setIsEdit] = useState(false);
   const [name, setName] = useState();
 
   useEffect(() => {
-    const myName = JSON.parse(localStorage.getItem("userInfo"));
-    setName(myName.name);
-  });
+    const userinfo = localStorage.getItem("userInfo");
+    setUserInfo(JSON.parse(userinfo));
+  }, []);
+
+  const changeName = () => {
+    setIsEdit(true);
+    setName(userInfo?.name);
+  };
+
+  const handleChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      newName();
+    }
+  };
+
+  const newName = () => {
+    update_name(name);
+    setIsEdit(false);
+
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    userInfo.name = name;
+
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    location.reload();
+  };
 
   return (
     <div className={styles.wrap}>
@@ -32,15 +62,52 @@ export default function Setting() {
         <div className={styles.accountWrap}>
           <h2 className={styles.title}>내 계정</h2>
 
-          <div className={styles.card}>
+          <div
+            className={styles.card}
+            style={{ backgroundColor: userInfo?.iconColor }}
+          >
             <div className={styles.cardBtm}>
               <div className={styles.profileWrap}>
-                <div className={styles.profile}>
+                <div
+                  className={styles.profile}
+                  style={{ backgroundColor: userInfo?.iconColor }}
+                >
                   <Images.icon className={styles.icon} />
                 </div>
-                <div className={styles.name}>{name}</div>
+                {isEdit ? (
+                  <div className={styles.edit}>
+                    <input
+                      className={styles.nameInput}
+                      value={name}
+                      onChange={(e) => handleChange(e)}
+                      onKeyDown={handleEnter}
+                    />
+                    <div className={styles.editAction}>
+                      ESC 키로{" "}
+                      <span
+                        className={styles.esc}
+                        onClick={() => setIsEdit(false)}
+                      >
+                        취소
+                      </span>
+                      <span className={styles.dot}> • </span>Enter 키로{" "}
+                      <span
+                        className={styles.enter}
+                        onClick={() => {
+                          newName();
+                        }}
+                      >
+                        저장
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.name}>{userInfo?.name}</div>
+                )}
               </div>
-              <div className={styles.changeName}>사용자 이름 변경</div>
+              <div className={styles.changeName} onClick={() => changeName()}>
+                사용자 이름 변경
+              </div>
             </div>
           </div>
 

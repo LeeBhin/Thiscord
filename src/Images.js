@@ -15,6 +15,7 @@ import threeDot from '@/../../public/svgs/threeDot.svg'
 import edit from '@/../../public/svgs/edit.svg'
 import remove from '@/../../public/svgs/remove.svg'
 import logout from '@/../../public/svgs/logout.svg'
+import esc from '@/../../public/svgs/esc.svg'
 
 const Images = {
   background,
@@ -31,10 +32,11 @@ const Images = {
   chat,
   threeDot,
   edit,
-  remove
-  , logout
+  remove,
+  logout,
+  esc
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove, logout
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove, logout, esc
 };
