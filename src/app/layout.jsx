@@ -71,6 +71,8 @@ function InnerLayout({ children }) {
           const storedUserInfo = localStorage.getItem("userInfo");
           if (storedUserInfo) {
             setUserInfo(JSON.parse(storedUserInfo));
+          } else {
+            router.push("/login");
           }
         } catch (err) {
           console.error(err);
@@ -92,6 +94,9 @@ function InnerLayout({ children }) {
 
   useEffect(() => {
     const loadFriends = async () => {
+      if (!localStorage.getItem("userInfo")) {
+        return;
+      }
       try {
         const friends = await load_friends();
         setFriends(friends);
@@ -173,7 +178,7 @@ function InnerLayout({ children }) {
                   <Link
                     href="/channels/@me"
                     className={`${styles.friendsLink} ${
-                      currentPath === "/channels/me"
+                      currentPath === "/channels/@me"
                         ? styles.friendsLinkActive
                         : ""
                     }`}

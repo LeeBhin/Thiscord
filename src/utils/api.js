@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-async function apiRequest(endpoint, method, body = null) {
+export async function apiRequest(endpoint, method, body = null) {
     const options = {
         method,
         headers: { 'Content-Type': 'application/json' },

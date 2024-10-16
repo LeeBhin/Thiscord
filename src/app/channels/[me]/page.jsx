@@ -9,12 +9,16 @@ import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
   const [counting, setCounting] = useState(0);
   const currentPath = usePathname();
   const router = useRouter();
+
+  const signalReceived = useSelector((state) => state.counter.signalReceived);
+
   const pendingCount = async () => {
     const friends = await pending_friends();
     setCounting(friends.length);
@@ -28,7 +32,7 @@ export default function Friends() {
 
   useEffect(() => {
     pendingCount();
-  });
+  }, [signalReceived]);
 
   const handleActive = (target) => {
     setWichActive(target);
