@@ -2,22 +2,73 @@
 
 import styles from "./friends.module.css";
 import Images from "@/Images";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import All_Friends from "./friend_pages/allFriend";
 import Pending from "./friend_pages/pending";
 import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
   const [counting, setCounting] = useState(0);
   const currentPath = usePathname();
   const router = useRouter();
+  const [isConnected, setIsConnected] = useState();
+  const [socket, setSocket] = useState(null);
 
-  const signalReceived = useSelector((state) => state.counter.signalReceived);
+  const connectSocket = useCallback(() => {
+    if (isConnected) return;
+
+    const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
+      reconnection: true,
+      forceNew: true,
+    });
+
+    newSocket.on("connect", () => {
+      setIsConnected(true);
+    });
+
+    newSocket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    newSocket.on("friendReq", () => {
+      pendingCount();
+    });
+
+    newSocket.on("friendRes", () => {
+      pendingCount();
+    });
+
+    setSocket(newSocket);
+    return newSocket;
+  });
+
+  const sendFriendReq = () => {
+    socket.emit("friendReq", {});
+  };
+
+  useEffect(() => {
+    const newSocket = connectSocket();
+
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+        setIsConnected(false);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      connectSocket();
+    }
+  }, [isConnected, connectSocket]);
 
   const pendingCount = async () => {
     const friends = await pending_friends();
@@ -32,7 +83,7 @@ export default function Friends() {
 
   useEffect(() => {
     pendingCount();
-  }, [signalReceived]);
+  });
 
   const handleActive = (target) => {
     setWichActive(target);
@@ -42,16 +93,24 @@ export default function Friends() {
     pendingCount();
   };
 
+  const friendsSign = () => {};
+
   const renderComponent = () => {
     switch (whichActive) {
       case "all":
-        return <All_Friends />;
+        return <All_Friends friendsSign={friendsSign} />;
       case "pending":
-        return <Pending pendingCount={setCounting} refresh={refresh} />;
+        return (
+          <Pending
+            pendingCount={setCounting}
+            refresh={refresh}
+            sendFriendReq={sendFriendReq}
+          />
+        );
       case "recommand":
         return <Recommend />;
       case "add":
-        return <Add_Friend />;
+        return <Add_Friend sendFriendReq={sendFriendReq} />;
       default:
         return <All_Friends />;
     }

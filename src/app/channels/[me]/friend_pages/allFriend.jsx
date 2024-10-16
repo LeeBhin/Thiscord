@@ -7,7 +7,7 @@ import { load_friends } from "@/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function All_Friends() {
+export default function All_Friends({ friendsSign }) {
   const [friends, setFriends] = useState([]);
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function All_Friends() {
     };
 
     loadFriends();
-  }, []);
+  }, [friendsSign]);
 
   const gotoDM = (user) => {
     router.push(`/channels/me/${user}`);

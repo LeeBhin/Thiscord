@@ -5,7 +5,7 @@ import styles from "../friends.module.css";
 import { useEffect, useState } from "react";
 import { accept_friend, delete_friend, pending_friends } from "@/utils/api";
 
-export default function Pending({ refresh }) {
+export default function Pending({ refresh, sendFriendReq }) {
   const [friends, setFriends] = useState([]);
 
   const pendingFriends = async () => {
@@ -15,18 +15,20 @@ export default function Pending({ refresh }) {
 
   useEffect(() => {
     pendingFriends();
-  }, []);
+  }, [refresh]);
 
   const acceptFriend = async (friendName) => {
     await accept_friend(friendName);
     await pendingFriends();
     refresh();
+    sendFriendReq();
   };
 
   const deleteFriend = async (friendName) => {
     await delete_friend(friendName);
     await pendingFriends();
     refresh();
+    sendFriendReq();
   };
   return (
     <div>
