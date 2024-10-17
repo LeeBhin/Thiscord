@@ -1,16 +1,20 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import styles from './login.module.css';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { login } from '@/utils/api';
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import styles from "./login.module.css";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { login } from "@/utils/api";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserInfo } from "@/counterSlice";
 
 export default function Login() {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState(false);
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.counter);
 
   const router = useRouter();
 
@@ -18,19 +22,20 @@ export default function Login() {
     try {
       const response = await login(emailOrPhone, password);
       if (response) {
-        const userInfo = {
-          name: response.userInfo.name,
-          iconColor: response.userInfo.iconColor
-        }
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-        router.push('/channels/me');
+        dispatch(
+          setUserInfo({
+            name: response.userInfo.name,
+            iconColor: response.userInfo.iconColor,
+          })
+        );
+        router.push("/channels/me");
       }
     } catch (err) {
-      alert(err)
-      console.error('Login error:', err);
-      setErr(true)
+      alert(err);
+      console.error("Login error:", err);
+      setErr(true);
     }
-  }
+  };
 
   return (
     <div className={styles.background}>
@@ -40,7 +45,7 @@ export default function Login() {
         initial={{ opacity: 0, y: -60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: .2,
+          duration: 0.2,
           type: "spring",
           stiffness: 600,
           damping: 30,
@@ -57,11 +62,15 @@ export default function Login() {
               <div className={styles.idWrap}>
                 {!err ? (
                   <p className={styles.inputTxt}>
-                    이메일 또는 전화번호 <span className={styles.required}>*</span>
+                    이메일 또는 전화번호{" "}
+                    <span className={styles.required}>*</span>
                   </p>
                 ) : (
                   <p className={styles.inputErrTxt}>
-                    이메일 또는 전화번호 - <span className={styles.inputErrSubTxt}>유효하지 않은 아이디 또는 비밀번호입니다.</span>
+                    이메일 또는 전화번호 -{" "}
+                    <span className={styles.inputErrSubTxt}>
+                      유효하지 않은 아이디 또는 비밀번호입니다.
+                    </span>
                   </p>
                 )}
                 <input
@@ -81,7 +90,10 @@ export default function Login() {
                   </p>
                 ) : (
                   <p className={styles.inputErrTxt}>
-                    비밀번호 - <span className={styles.inputErrSubTxt}>유효하지 않은 아이디 또는 비밀번호입니다.</span>
+                    비밀번호 -{" "}
+                    <span className={styles.inputErrSubTxt}>
+                      유효하지 않은 아이디 또는 비밀번호입니다.
+                    </span>
                   </p>
                 )}
                 <input
@@ -95,12 +107,21 @@ export default function Login() {
             </div>
           </div>
 
-          <Link href="/register" className={styles.goRegister}>비밀번호를 잊으셨나요?</Link>
+          <Link href="/register" className={styles.goRegister}>
+            비밀번호를 잊으셨나요?
+          </Link>
 
-          <button className={styles.submit} onClick={submit}>로그인</button>
-          <p className={styles.needAccount}>계정이 필요한가요? <Link href="/register" className={styles.goRegister}>가입하기</Link></p>
+          <button className={styles.submit} onClick={submit}>
+            로그인
+          </button>
+          <p className={styles.needAccount}>
+            계정이 필요한가요?{" "}
+            <Link href="/register" className={styles.goRegister}>
+              가입하기
+            </Link>
+          </p>
         </div>
       </motion.div>
-    </div >
+    </div>
   );
 }

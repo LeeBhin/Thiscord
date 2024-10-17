@@ -10,6 +10,7 @@ import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { io } from "socket.io-client";
+import { useSelector } from "react-redux";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
@@ -18,6 +19,8 @@ export default function Friends() {
   const router = useRouter();
   const [isConnected, setIsConnected] = useState();
   const [socket, setSocket] = useState(null);
+
+  const { signalReceived } = useSelector((state) => state.counter);
 
   const connectSocket = useCallback(() => {
     if (isConnected || currentPath.startsWith("/channels/me/")) return;

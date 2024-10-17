@@ -7,25 +7,29 @@ import Images from "@/Images";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkToken, load_chatrooms } from "@/utils/api";
+import { checkToken, load_chatrooms, my_info } from "@/utils/api";
 import { load_friends } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
-import { store } from "@/store";
+import store from "@/store";
 import { useDispatch } from "react-redux";
-import { triggerSignal } from "@/counterSlice";
+import { setUserInfo, triggerSignal } from "@/counterSlice";
 import io from "socket.io-client";
 
 function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState(null);
+  // const [userInfo, setUserInfo] = useState(null);
   const [friends, setFriends] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
   const [title, setTitle] = useState("Thiscord");
 
-  const signalReceived = useSelector((state) => state.counter.signalReceived);
+  const { signalReceived, userInfo } = useSelector((state) => state.counter);
+
+  const handleUserInfoUpdate = (name, iconColor) => {
+    dispatch(setUserInfo({ name, iconColor }));
+  };
 
   const connectSocket = useCallback(() => {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
@@ -67,21 +71,21 @@ function InnerLayout({ children }) {
       if (currentPath !== "/login" && currentPath !== "/register") {
         try {
           await checkToken();
-
-          const storedUserInfo = localStorage.getItem("userInfo");
-          if (storedUserInfo) {
-            setUserInfo(JSON.parse(storedUserInfo));
-          } else {
-            router.push("/login");
-          }
         } catch (err) {
-          console.error(err);
           router.push("/login");
         }
       }
     };
 
     verifyToken();
+  }, [router, currentPath]);
+
+  useEffect(() => {
+    const getInfo = async () => {
+      const info = await my_info();
+      handleUserInfoUpdate(info.name, info.iconColor);
+    };
+    getInfo();
   }, [router, currentPath]);
 
   useEffect(() => {
@@ -94,7 +98,7 @@ function InnerLayout({ children }) {
 
   useEffect(() => {
     const loadFriends = async () => {
-      if (!localStorage.getItem("userInfo")) {
+      if (!userInfo) {
         return;
       }
       try {

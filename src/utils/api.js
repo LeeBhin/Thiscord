@@ -79,3 +79,7 @@ export async function edit_msg(senderId, msgId, receiverName, newMsg) {
 export async function update_name(newName) {
     return apiRequest('users/update-name', 'PATCH', { newName })
 }
+
+export async function my_info() {
+    return apiRequest('users/myinfo', 'GET',)
+}
