@@ -2,17 +2,28 @@
 
 import Images from "@/Images";
 import styles from "./setting.module.css";
-import { logout, update_name } from "@/utils/api";
+import { logout, my_info, update_name } from "@/utils/api";
 import { useEffect, useRef, useState } from "react";
+import { setUserInfo } from "@/counterSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Setting() {
-  const [userInfo, setUserInfo] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [name, setName] = useState();
+  const dispatch = useDispatch();
+
+  const { userInfo } = useSelector((state) => state.counter);
+
+  const handleUserInfoUpdate = (name, iconColor) => {
+    dispatch(setUserInfo({ name, iconColor }));
+  };
 
   useEffect(() => {
-    const userinfo = localStorage.getItem("userInfo");
-    setUserInfo(JSON.parse(userinfo));
+    const getInfo = async () => {
+      const info = await my_info();
+      handleUserInfoUpdate(info.name, info.iconColor);
+    };
+    getInfo();
   }, []);
 
   const changeName = () => {
@@ -35,12 +46,7 @@ export default function Setting() {
     update_name(name);
     setIsEdit(false);
 
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-    userInfo.name = name;
-
-    localStorage.setItem("userInfo", JSON.stringify(userInfo));
-    location.reload();
+    handleUserInfoUpdate(name, userInfo?.iconColor);
   };
 
   return (

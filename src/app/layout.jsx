@@ -18,7 +18,6 @@ import io from "socket.io-client";
 function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
-  // const [userInfo, setUserInfo] = useState(null);
   const [friends, setFriends] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
   const [socket, setSocket] = useState(null);
