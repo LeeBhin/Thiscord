@@ -1,12 +1,18 @@
 "use client";
 
-import { delete_msg, edit_msg, load_chats, load_friends } from "@/utils/api";
+import {
+  delete_msg,
+  edit_msg,
+  load_chats,
+  load_friends,
+  my_info,
+} from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import io from "socket.io-client";
 import styles from "./dm.module.css";
 import Images from "@/Images";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { triggerSignal } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,7 +23,6 @@ export default function DM({ params }) {
   const [socket, setSocket] = useState(null);
   const [receiverColor, setReceiverColor] = useState();
   const [receiverName, setReceiverName] = useState();
-  const [myColor, setMyColor] = useState();
   const [isBottom, setIsBottom] = useState(true);
   const [isPopup, setIsPopup] = useState(false);
   const [msgInfo, setMsgInfo] = useState();
@@ -25,6 +30,8 @@ export default function DM({ params }) {
   const [isEdit, setIsEdit] = useState(false);
   const [editMsg, setEditMsg] = useState();
   const [isConnected, setIsConnected] = useState(false);
+  const [myId, setMyId] = useState();
+  const [myName, setMyName] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -34,6 +41,7 @@ export default function DM({ params }) {
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
   const noNameRef = useRef(null);
+  const { userInfo } = useSelector((state) => state.counter);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -41,9 +49,15 @@ export default function DM({ params }) {
     }
   });
 
+  useEffect(() => {}, [messages]);
+
   useEffect(() => {
-    dispatch(triggerSignal());
-  }, [messages]);
+    const getInfo = async () => {
+      const info = await my_info();
+      setMyName(info.name);
+    };
+    getInfo();
+  }, []);
 
   const connectSocket = useCallback(() => {
     if (isConnected) return;
@@ -95,23 +109,17 @@ export default function DM({ params }) {
       connectSocket();
     }
   }, [isConnected, connectSocket]);
-
-  useEffect(() => {
-    const storedmyColor = localStorage.getItem("userInfo");
-    if (storedmyColor) {
-      setMyColor(JSON.parse(storedmyColor).iconColor);
-    }
-  }, [router, currentPath]);
-
   const fetchChats = async () => {
     try {
-      const chats = await load_chats(decodeURIComponent(userId));
-      if (chats.length > 0) {
-        setMessages(chats);
+      const chatData = await load_chats(decodeURIComponent(userId));
+
+      if (chatData.messages && chatData.messages.length > 0) {
+        setMessages(chatData.messages);
+        setMyId(chatData.senderId);
+      } else {
+        setMessages([]);
       }
-    } catch (err) {
-      console.error("load chat err", err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -340,6 +348,14 @@ export default function DM({ params }) {
     });
   };
 
+  const displayName = (senderId) => {
+    if (senderId === myId) {
+      return myName;
+    } else {
+      return receiverName;
+    }
+  };
+
   return (
     <>
       <div className={styles.dmBody}>
@@ -379,14 +395,17 @@ export default function DM({ params }) {
                           <div
                             className={styles.msgIcon}
                             style={{
-                              backgroundColor: myColor,
+                              backgroundColor:
+                                copyContent.senderId === myId
+                                  ? userInfo.iconColor
+                                  : receiverColor,
                             }}
                           >
                             <Images.icon className={styles.chatIcon} />
                           </div>
                           <div className={styles.msgInfo}>
                             <span className={styles.senderId}>
-                              {copyContent.senderId}
+                              {displayName(copyContent.senderId)}
                             </span>
                             <span className={styles.timestamp}>
                               {copyContent.timestamp}
@@ -477,14 +496,14 @@ export default function DM({ params }) {
                 )}
                 <div
                   className={`${styles.message} ${
-                    styles[msg.senderId === receiverName ? "received" : "sent"]
+                    styles[msg.senderId !== myId ? "received" : "sent"]
                   }`}
                   style={{
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
                   }}
                 >
-                  {msg.senderId !== receiverName &&
+                  {msg.senderId === myId &&
                     (!isEdit || msg._id !== editMsg) && (
                       <div className={styles.edit}>
                         <div
@@ -522,15 +541,17 @@ export default function DM({ params }) {
                         className={styles.msgIcon}
                         style={{
                           backgroundColor:
-                            msg.senderId === receiverName
+                            msg.senderId !== myId
                               ? receiverColor
-                              : myColor,
+                              : userInfo.iconColor,
                         }}
                       >
                         <Images.icon className={styles.chatIcon} />
                       </div>
                       <div className={styles.msgInfo}>
-                        <span className={styles.senderId}>{msg.senderId}</span>
+                        <span className={styles.senderId}>
+                          {displayName(msg.senderId)}
+                        </span>
                         <span className={styles.timestamp}>
                           {formatDateTime(msg.timestamp)}
                         </span>

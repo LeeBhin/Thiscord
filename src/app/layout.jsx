@@ -66,13 +66,14 @@ function InnerLayout({ children }) {
   }, [socket]);
 
   useEffect(() => {
+    if (currentPath === "/login" || currentPath === "/register") {
+      return;
+    }
     const verifyToken = async () => {
-      if (currentPath !== "/login" && currentPath !== "/register") {
-        try {
-          await checkToken();
-        } catch (err) {
-          router.push("/login");
-        }
+      try {
+        await checkToken();
+      } catch (err) {
+        router.push("/login");
       }
     };
 
@@ -80,6 +81,9 @@ function InnerLayout({ children }) {
   }, [router, currentPath]);
 
   useEffect(() => {
+    if (currentPath === "/login" || currentPath === "/register") {
+      return;
+    }
     const getInfo = async () => {
       const info = await my_info();
       handleUserInfoUpdate(info.name, info.iconColor);
@@ -114,6 +118,9 @@ function InnerLayout({ children }) {
   }, [currentPath]);
 
   const chatRooms = async () => {
+    if (currentPath === "/login" || currentPath === "/register") {
+      return;
+    }
     try {
       const rooms = await load_chatrooms();
 
