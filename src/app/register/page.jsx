@@ -199,7 +199,7 @@ export default function Register() {
                 <label className={rgstrSt.customCheckbox}>
                   <input type="checkbox" className={rgstrSt.agree} />
                   <span className={rgstrSt.checkmark}><GoCheck /></span>
-                  <p className={rgstrSt.agreeTxt}>(선택사항) Thiscord 소식, 도움말, 스펨을 이메일로 보내주세요. 언제든지 취소하실 수 있어요.</p>
+                  <p className={rgstrSt.agreeTxt}>(선택사항) Thiscord 소식, 도움말, 스펨을 이메일로 보내주세요. 언제든지 취소하실 수 없어요.</p>
                 </label>
               </div>
 

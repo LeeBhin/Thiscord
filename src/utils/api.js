@@ -83,3 +83,7 @@ export async function update_name(newName) {
 export async function my_info() {
     return apiRequest('users/myinfo', 'GET',)
 }
+
+export async function delete_user(password) {
+    return apiRequest('users/delete/delete-user', 'PATCH', { password })
+}
