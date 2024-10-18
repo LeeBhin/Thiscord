@@ -1,227 +1,233 @@
 .header {
-    background-color: #1e1f22;
-    width: 72px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    float: left;
-    position: relative;
-    z-index: 1;
+  background-color: #1e1f22;
+  width: 72px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  float: left;
+  position: relative;
+  z-index: 1;
 }
 
 .headerWrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .channelWrap {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .channelBar {
-    position: absolute;
-    transform: translateX(-5px);
-    width: 9px;
-    height: 30px;
-    background-color: #f2f3f5;
-    border-radius: 20px;
-    clip-path: inset(0 0 0 50%);
+  position: absolute;
+  transform: translateX(-5px);
+  width: 9px;
+  height: 30px;
+  background-color: #f2f3f5;
+  border-radius: 20px;
+  clip-path: inset(0 0 0 50%);
 }
 
 .channel:hover .channelBar {
-    transform: translateX(-5px) scale(0);
+  transform: translateX(-5px) scale(0);
 }
 
 .channel {
-    width: 48px;
-    height: 48px;
-    border-radius: 100%;
-    background-color: #313338;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: 0.25s ease;
+  width: 48px;
+  height: 48px;
+  border-radius: 100%;
+  background-color: #313338;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.25s ease;
 }
 
 .channel:hover {
-    border-radius: 15px;
-    background-color: #5865F2;
+  border-radius: 15px;
+  background-color: #5865f2;
 }
 
 .direct {
-    margin: 12px 12px 8px 12px;
+  margin: 12px 12px 8px 12px;
 }
 
 .serverImg {
-    width: 30px;
-    height: 30px;
-    color: white;
+  width: 30px;
+  height: 30px;
+  color: white;
 }
 
 .barricade {
-    width: 32px;
-    height: 2px;
-    background-color: #4e50587a;
-    border-radius: 100px;
+  width: 32px;
+  height: 2px;
+  background-color: #4e50587a;
+  border-radius: 100px;
 }
 
 .friendsHeader {
-    float: left;
-    width: 240px;
-    height: 100vh;
-    background-color: #2b2d31;
-    position: relative;
-    z-index: 1;
+  float: left;
+  width: 240px;
+  height: 100vh;
+  background-color: #2b2d31;
+  position: relative;
+  z-index: 1;
 }
 
 .searchDiv {
-    width: 100%;
-    height: 48px;
-    box-shadow: 0 1px 0 hsl(0 calc(1 * 0%) 0.8% / 0.2), 0 1.5px 0 hsl(240 calc(1 * 7.7%) 2.5% / 0.05), 0 2px 0 hsl(0 calc(1 * 0%) 0.8% / 0.05);
-    padding: 10px;
+  width: 100%;
+  height: 48px;
+  box-shadow: 0 1px 0 hsl(0 calc(1 * 0%) 0.8% / 0.2),
+    0 1.5px 0 hsl(240 calc(1 * 7.7%) 2.5% / 0.05),
+    0 2px 0 hsl(0 calc(1 * 0%) 0.8% / 0.05);
+  padding: 10px;
 }
 
 .searchChat {
-    width: 220px;
-    height: 28px;
-    font-size: 14px;
-    background-color: #1e1f22;
-    border: none;
-    padding: 0 6px;
-    border-radius: 4px;
-    cursor: pointer;
+  width: 220px;
+  height: 28px;
+  font-size: 14px;
+  background-color: #1e1f22;
+  border: none;
+  padding: 0 6px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .searchChat::placeholder {
-    color: #7ba3a5;
-    letter-spacing: -0.23px;
+  color: #7ba3a5;
+  letter-spacing: -0.23px;
 }
 
 .friendsWrap {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .topNav {
-    width: 100%;
-    height: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 9px 10px;
-    gap: 2px;
-    margin-bottom: 8px;
+  width: 100%;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 9px 10px;
+  gap: 2px;
+  margin-bottom: 8px;
 }
 
 .friendsLink {
-    display: block;
-    width: 224px;
-    height: 42px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 12px;
-    color: #949ba4;
-    border-radius: 4px;
-    gap: 16px;
-    line-height: 42px;
+  display: block;
+  width: 224px;
+  height: 42px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px;
+  color: #949ba4;
+  border-radius: 4px;
+  gap: 16px;
+  line-height: 42px;
 }
 
 .friendsLink:hover {
-    background-color: #35373c;
-    color: #dbdee1;
+  background-color: #35373c;
+  color: #dbdee1;
 }
 
 .friendsLink:active,
 .friendsLinkActive {
-    background-color: #404249;
-    color: white;
+  background-color: #404249;
+  color: white;
 }
 
 .directTxtWrap {
-    width: 205px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #949ba4;
-    display: flex;
-    justify-content: space-between;
+  width: 205px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #949ba4;
+  display: flex;
+  justify-content: space-between;
 }
 
 .directTxtWrap p:hover {
-    color: #dbdee1;
+  color: #dbdee1;
 }
 
 .plus {
-    cursor: pointer;
-    margin-right: 4px;
+  cursor: pointer;
+  margin-right: 4px;
 }
 
 .friends {
-    padding-top: 7px;
-    height: 70%;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  padding-top: 7px;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.friendActive {
+  background-color: #404249;
 }
 
 .friendProfile {
-    cursor: pointer;
-    gap: 12px;
-    padding: 12px 8px;
+  cursor: pointer;
+  gap: 12px;
+  padding: 12px 8px;
 }
 
 .profileIcon {
-    width: 32px;
-    height: 32px;
-    border-radius: 100%;
-    background-color: #5865F2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+  background-color: #5865f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .profileImg {
-    color: white;
-    width: 20px;
-    height: 20px;
+  color: white;
+  width: 20px;
+  height: 20px;
 }
 
 .name {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .myInfo {
-    position: absolute;
-    bottom: 0;
-    background-color: #232428;
-    width: 100%;
-    height: 53px;
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    color: white;
-    font-weight: bold;
-    gap: 8px;
+  position: absolute;
+  bottom: 0;
+  background-color: #232428;
+  width: 100%;
+  height: 53px;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+  gap: 8px;
 }
 
 .myInfo .name {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .setting {
-    position: absolute;
-    right: 14px;
-    transition: .5s ease;
-    padding-top: 5px;
+  position: absolute;
+  right: 14px;
+  transition: 0.5s ease;
+  padding-top: 5px;
 }
 
 .setting:hover {
-    transition: 1s;
-    transform: rotate(180deg) translateY(-1px);
+  transition: 1s;
+  transform: rotate(180deg) translateY(-1px);
 }

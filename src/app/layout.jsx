@@ -287,7 +287,14 @@ function InnerLayout({ children }) {
                       <div
                         key={index}
                         onClick={() => dmLink(friend)}
-                        className={`${styles.friendsLink} ${styles.friendProfile}`}
+                        className={`${styles.friendsLink} ${
+                          styles.friendProfile
+                        } ${
+                          decodeURIComponent(currentPath) ===
+                          `/channels/me/@${friend.participantName}`
+                            ? styles.friendActive
+                            : ""
+                        }`}
                       >
                         <div
                           className={styles.profileIcon}
