@@ -6,15 +6,15 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { login } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setUserInfo } from "@/counterSlice";
+import { loginSignal } from "@/counterSlice";
 
 export default function Login() {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState(false);
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.counter);
 
   const router = useRouter();
 
@@ -28,6 +28,7 @@ export default function Login() {
             iconColor: response.userInfo.iconColor,
           })
         );
+        dispatch(loginSignal());
         router.push("/channels/me");
       }
     } catch (err) {

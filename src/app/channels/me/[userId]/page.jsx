@@ -17,7 +17,6 @@ import {
   chatEditSignal,
   chatRemoveSignal,
   chatSignal,
-  triggerSignal,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -127,6 +126,7 @@ export default function DM({ params }) {
 
   const sendMessage = (msg) => {
     if (msg && msg.trim() !== "") {
+      console.log('sendmessage')
       inputRef.current.value = "";
       chatAreaHeight();
       dispatch(chatSignal({ message: msg, receivedUser: receiverName }));
@@ -135,6 +135,7 @@ export default function DM({ params }) {
 
   useEffect(() => {
     loadChat();
+    console.log('singalmereceived')
   }, [signalMeReceived]);
 
   const sendDelete = () => {
@@ -150,7 +151,7 @@ export default function DM({ params }) {
       e.preventDefault();
       sendMessage(e.target.value);
       setTimeout(() => {
-        fetchChats();
+        loadChat();
       }, 10);
       const chatElement = chatsRef.current;
       chatElement.scrollTop = chatElement.scrollHeight;
@@ -169,8 +170,8 @@ export default function DM({ params }) {
     const dateString = isToday
       ? "오늘"
       : isYesterday
-      ? "어제"
-      : date
+        ? "어제"
+        : date
           .toLocaleDateString("ko-KR", {
             year: "numeric",
             month: "2-digit",
@@ -236,11 +237,11 @@ export default function DM({ params }) {
   const deleteMsg = (msgInfoP) => {
     if (msgInfoP) {
       delete_msg(msgInfoP.senderId, msgInfoP.msgId, receiverName).then(() => {
-        fetchChats();
+        loadChat();
       });
     } else {
       delete_msg(msgInfo.senderId, msgInfo.msgId, receiverName).then(() => {
-        fetchChats();
+        loadChat();
       });
     }
     closePopup();
@@ -303,7 +304,7 @@ export default function DM({ params }) {
     if (msg !== editRef.current.value.trim()) {
       edit_msg(senderId, msgId, receiverName, editRef.current.value.trim());
       sendEdit();
-      fetchChats();
+      loadChat();
       setIsEdit(false);
     } else {
       setIsEdit(false);
@@ -500,7 +501,7 @@ export default function DM({ params }) {
             const sameDate =
               index > 0 &&
               formatDate(messages[index - 1].timestamp) ===
-                formatDate(msg.timestamp);
+              formatDate(msg.timestamp);
             const firstMsg = index === 0;
 
             return (
@@ -514,9 +515,8 @@ export default function DM({ params }) {
                   </div>
                 )}
                 <div
-                  className={`${styles.message} ${
-                    styles[msg.senderId !== myId ? "received" : "sent"]
-                  }`}
+                  className={`${styles.message} ${styles[msg.senderId !== myId ? "received" : "sent"]
+                    }`}
                   style={{
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
@@ -557,9 +557,9 @@ export default function DM({ params }) {
                     )}
 
                   {firstMsg ||
-                  (sameSender && !sameDate) ||
-                  (!sameSender && !sameDate) ||
-                  (!sameSender && sameDate) ? (
+                    (sameSender && !sameDate) ||
+                    (!sameSender && !sameDate) ||
+                    (!sameSender && sameDate) ? (
                     <div className={styles.msgInfos}>
                       <div
                         className={styles.msgIcon}

@@ -38,6 +38,7 @@ function InnerLayout({ children }) {
     chatMessage,
     chatEdit,
     chatRemove,
+    loginReceived
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor) => {
@@ -51,11 +52,12 @@ function InnerLayout({ children }) {
       reconnection: true,
     });
 
-    newSocket.on("connect_error", (err) => {
-      console.error("Connection error:", err);
+    newSocket.on("connect", () => {
+      console.log('ccs')
     });
 
     newSocket.on("message", () => {
+      console.log('socket message 받음')
       dispatch(signalToMe());
       chatRooms();
     });
@@ -74,12 +76,31 @@ function InnerLayout({ children }) {
   }, []);
 
   useEffect(() => {
+    if (currentPath === "/login" || currentPath === "/register") return;
+
     const newSocket = connectSocket();
 
     return () => {
       if (newSocket) newSocket.disconnect();
     };
   }, [connectSocket]);
+
+  useEffect(() => {
+    const checkAuthAndConnect = async () => {
+      try {
+        await my_info();
+        const newSocket = connectSocket();
+
+        return () => {
+          if (newSocket) newSocket.disconnect();
+        };
+      } catch (err) {
+        return;
+      }
+    };
+
+    checkAuthAndConnect();
+  }, [loginReceived]);
 
   useEffect(() => {
     if (window.location.pathname.startsWith("/channels/@me/") && socket) {
@@ -89,9 +110,8 @@ function InnerLayout({ children }) {
   }, [socket]);
 
   useEffect(() => {
-    if (currentPath === "/login" || currentPath === "/register") {
-      return;
-    }
+    if (currentPath === "/login" || currentPath === "/register") return;
+
     const verifyToken = async () => {
       try {
         await checkToken();
@@ -125,6 +145,7 @@ function InnerLayout({ children }) {
   useEffect(() => {
     chatRooms();
     if (socket) {
+      console.log('chatsingalreceived')
       socket.emit("message", {
         message: chatMessage.message,
         receivedUser: chatMessage.receivedUser,
@@ -150,23 +171,23 @@ function InnerLayout({ children }) {
     }
   }, [chatEditReceived, chatEdit]);
 
-  useEffect(() => {
-    const loadFriends = async () => {
-      if (!userInfo) {
-        return;
-      }
-      try {
-        const friends = await load_friends();
-        setFriends(friends);
-      } catch (error) {
-        console.error("Failed to load friends:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const loadFriends = async () => {
+  //     if (!userInfo) {
+  //       return;
+  //     }
+  //     try {
+  //       const friends = await load_friends();
+  //       setFriends(friends);
+  //     } catch (error) {
+  //       console.error("Failed to load friends:", error);
+  //     }
+  //   };
 
-    if (currentPath !== "/login" && currentPath !== "/register") {
-      loadFriends();
-    }
-  }, [currentPath]);
+  //   if (currentPath !== "/login" && currentPath !== "/register") {
+  //     loadFriends();
+  //   }
+  // }, [currentPath]);
 
   const chatRooms = async () => {
     if (currentPath === "/login" || currentPath === "/register") {
@@ -190,8 +211,8 @@ function InnerLayout({ children }) {
       currentPath === "/channels/@me"
         ? "• Thiscord | 친구"
         : currentPath.startsWith("/channels/me/@")
-        ? `Thiscord | ${path[path.length - 1]}`
-        : "Thiscord";
+          ? `Thiscord | ${path[path.length - 1]}`
+          : "Thiscord";
     setTitle(title);
   }, [currentPath]);
 
@@ -247,29 +268,26 @@ function InnerLayout({ children }) {
                 <div className={styles.topNav}>
                   <Link
                     href="/channels/@me"
-                    className={`${styles.friendsLink} ${
-                      currentPath === "/channels/@me"
-                        ? styles.friendsLinkActive
-                        : ""
-                    }`}
+                    className={`${styles.friendsLink} ${currentPath === "/channels/@me"
+                      ? styles.friendsLinkActive
+                      : ""
+                      }`}
                   >
                     <Images.friends className={styles.icon} />
                     <span className={styles.iconTxt}>친구</span>
                   </Link>
                   <Link
                     href="/store"
-                    className={`${styles.friendsLink} ${
-                      currentPath === "/store" ? styles.friendsLinkActive : ""
-                    }`}
+                    className={`${styles.friendsLink} ${currentPath === "/store" ? styles.friendsLinkActive : ""
+                      }`}
                   >
                     <Images.nitro className={styles.icon} />
                     <span className={styles.iconTxt}>Nitro</span>
                   </Link>
                   <Link
                     href="/shop"
-                    className={`${styles.friendsLink} ${
-                      currentPath === "/shop" ? styles.friendsLinkActive : ""
-                    }`}
+                    className={`${styles.friendsLink} ${currentPath === "/shop" ? styles.friendsLinkActive : ""
+                      }`}
                   >
                     <Images.shop className={styles.icon} />
                     <span className={styles.iconTxt}>상점</span>
@@ -287,14 +305,12 @@ function InnerLayout({ children }) {
                       <div
                         key={index}
                         onClick={() => dmLink(friend)}
-                        className={`${styles.friendsLink} ${
-                          styles.friendProfile
-                        } ${
-                          decodeURIComponent(currentPath) ===
-                          `/channels/me/@${friend.participantName}`
+                        className={`${styles.friendsLink} ${styles.friendProfile
+                          } ${decodeURIComponent(currentPath) ===
+                            `/channels/me/@${friend.participantName}`
                             ? styles.friendsLinkActive
                             : ""
-                        }`}
+                          }`}
                       >
                         <div
                           className={styles.profileIcon}

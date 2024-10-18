@@ -4,6 +4,7 @@ export const counterSlice = createSlice({
   name: 'counter',
   initialState: {
     signalReceived: false,
+    loginReceived: false,
     signalMeReceived: false,
     chatSignalReceived: false,
     chatRemoveReceived: false,
@@ -23,6 +24,9 @@ export const counterSlice = createSlice({
   reducers: {
     triggerSignal: (state) => {
       state.signalReceived = !state.signalReceived;
+    },
+    loginSignal: (state) => {
+      state.loginReceived = !state.loginReceived;
     },
     signalToMe: (state) => {
       state.signalMeReceived = !state.signalMeReceived;
@@ -50,5 +54,5 @@ export const counterSlice = createSlice({
   },
 });
 
-export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal } = counterSlice.actions;
+export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal, loginSignal } = counterSlice.actions;
 export default counterSlice.reducer;
