@@ -59,6 +59,8 @@ const SkeletonMessage = memo(() => {
   );
 });
 
+SkeletonMessage.displayName = 'SkeletonMessage';
+
 export default function Skeleton() {
   return (
     <div className={styles["sk-skeleton"]}>
