@@ -172,10 +172,6 @@
   gap: 2px;
 }
 
-.friendActive {
-  background-color: #404249;
-}
-
 .friendProfile {
   cursor: pointer;
   gap: 12px;

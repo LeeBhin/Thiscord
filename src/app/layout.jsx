@@ -292,7 +292,7 @@ function InnerLayout({ children }) {
                         } ${
                           decodeURIComponent(currentPath) ===
                           `/channels/me/@${friend.participantName}`
-                            ? styles.friendActive
+                            ? styles.friendsLinkActive
                             : ""
                         }`}
                       >
