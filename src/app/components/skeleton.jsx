@@ -59,7 +59,7 @@ const SkeletonMessage = memo(() => {
   );
 });
 
-SkeletonMessage.displayName = 'SkeletonMessage';
+SkeletonMessage.displayName = "SkeletonMessage";
 
 export default function Skeleton() {
   return (

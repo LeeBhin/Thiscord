@@ -470,7 +470,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {/* {isLoading && <Skeleton />} */}
+        {isLoading && <Skeleton />}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
