@@ -49,7 +49,9 @@ export default function DM({ params }) {
     }
   });
 
-  useEffect(() => {}, [messages]);
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
 
   useEffect(() => {
     const getInfo = async () => {
@@ -109,6 +111,7 @@ export default function DM({ params }) {
       connectSocket();
     }
   }, [isConnected, connectSocket]);
+
   const fetchChats = async () => {
     try {
       const chatData = await load_chats(decodeURIComponent(userId));
@@ -356,6 +359,14 @@ export default function DM({ params }) {
     }
   };
 
+  const isWithinOneWeek = (timestamp) => {
+    const currentTime = new Date();
+    const messageTime = new Date(timestamp);
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+
+    return currentTime - messageTime < oneWeek;
+  };
+
   return (
     <>
       <div className={styles.dmBody}>
@@ -472,7 +483,17 @@ export default function DM({ params }) {
             </div>
             <h3 className={styles.topName}>{receiverName}</h3>
             <div className={styles.topTxt}>
-              <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫 부분이에요.
+              {isWithinOneWeek(messages[0]?.timestamp) ? (
+                <div>
+                  <b>{receiverName}</b>님과의 전설적인 대화가 지금 막
+                  시작되었어요.
+                </div>
+              ) : (
+                <div>
+                  <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫
+                  부분이에요.
+                </div>
+              )}
             </div>
           </div>
           {messages.map((msg, index) => {
