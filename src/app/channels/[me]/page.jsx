@@ -9,66 +9,23 @@ import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
 import { pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
-import { io } from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
+import { triggerSignal } from "@/counterSlice";
 
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
   const [counting, setCounting] = useState(0);
   const currentPath = usePathname();
   const router = useRouter();
-  const [isConnected, setIsConnected] = useState();
-  const [socket, setSocket] = useState(null);
 
-  const connectSocket = useCallback(() => {
-    if (isConnected || currentPath.startsWith("/channels/me/")) return;
-
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-      reconnection: true,
-      forceNew: true,
-    });
-
-    newSocket.on("connect", () => {
-      setIsConnected(true);
-    });
-
-    newSocket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    newSocket.on("friendReq", () => {
-      pendingCount();
-    });
-
-    newSocket.on("friendRes", () => {
-      pendingCount();
-    });
-
-    setSocket(newSocket);
-    return newSocket;
-  });
+  const dispatch = useDispatch();
+  const signalMeReceived = useSelector(
+    (state) => state.counter.signalMeReceived
+  );
 
   const sendFriendReq = () => {
-    socket.emit("friendReq", {});
+    dispatch(triggerSignal());
   };
-
-  useEffect(() => {
-    const newSocket = connectSocket();
-
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-        setIsConnected(false);
-      }
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (!isConnected) {
-      connectSocket();
-    }
-  }, [isConnected, connectSocket]);
 
   const pendingCount = async () => {
     const friends = await pending_friends();
@@ -83,7 +40,7 @@ export default function Friends() {
 
   useEffect(() => {
     pendingCount();
-  });
+  }, [signalMeReceived]);
 
   const handleActive = (target) => {
     setWichActive(target);

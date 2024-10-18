@@ -12,7 +12,13 @@ import { load_friends } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
 import store from "@/store";
 import { useDispatch } from "react-redux";
-import { setReceiverInfo, setUserInfo, triggerSignal } from "@/counterSlice";
+import {
+  chatRemoveSignal,
+  setReceiverInfo,
+  setUserInfo,
+  signalToMe,
+  chatEditReceived,
+} from "@/counterSlice";
 import io from "socket.io-client";
 
 function InnerLayout({ children }) {
@@ -25,7 +31,14 @@ function InnerLayout({ children }) {
   const [title, setTitle] = useState("Thiscord");
   const [user, setUser] = useState();
 
-  const { signalReceived, userInfo } = useSelector((state) => state.counter);
+  const {
+    signalReceived,
+    chatSignalReceived,
+    userInfo,
+    chatMessage,
+    chatEdit,
+    chatRemove,
+  } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor) => {
     dispatch(setUserInfo({ name, iconColor }));
@@ -42,8 +55,16 @@ function InnerLayout({ children }) {
       console.error("Connection error:", err);
     });
 
-    newSocket.on("message", (data) => {
-      dispatch(triggerSignal());
+    newSocket.on("message", () => {
+      dispatch(signalToMe());
+    });
+
+    newSocket.on("delete", () => {
+      dispatch(signalToMe());
+    });
+
+    newSocket.on("friendRes", () => {
+      dispatch(signalToMe());
     });
 
     setSocket(newSocket);
@@ -95,11 +116,38 @@ function InnerLayout({ children }) {
 
   useEffect(() => {
     chatRooms();
-  }, [currentPath]);
+    if (socket) {
+      socket.emit("friendReq", {});
+    }
+  }, [signalReceived, currentPath]);
 
   useEffect(() => {
     chatRooms();
-  }, [signalReceived]);
+    if (socket) {
+      socket.emit("message", {
+        message: chatMessage.message,
+        receivedUser: chatMessage.receivedUser,
+      });
+    }
+  }, [chatSignalReceived]);
+
+  useEffect(() => {
+    chatRooms();
+    if (socket) {
+      socket.emit("delete", {
+        receivedUser: chatRemove.receivedUser,
+      });
+    }
+  }, [chatRemoveSignal, chatRemove]);
+
+  useEffect(() => {
+    chatRooms();
+    if (socket) {
+      socket.emit("delete", {
+        receivedUser: chatEdit.receivedUser,
+      });
+    }
+  }, [chatEditReceived, chatEdit]);
 
   useEffect(() => {
     const loadFriends = async () => {

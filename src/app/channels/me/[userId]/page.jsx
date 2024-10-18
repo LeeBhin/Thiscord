@@ -10,11 +10,15 @@ import {
 } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
-import io from "socket.io-client";
 import styles from "./dm.module.css";
 import Images from "@/Images";
 import { useDispatch, useSelector } from "react-redux";
-import { triggerSignal } from "@/counterSlice";
+import {
+  chatEditSignal,
+  chatRemoveSignal,
+  chatSignal,
+  triggerSignal,
+} from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Skeleton from "@/app/components/skeleton";
@@ -22,7 +26,6 @@ import Skeleton from "@/app/components/skeleton";
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
   const [messages, setMessages] = useState([]);
-  const [socket, setSocket] = useState(null);
   const [receiverColor, setReceiverColor] = useState();
   const [receiverName, setReceiverName] = useState();
   const [isBottom, setIsBottom] = useState(true);
@@ -31,7 +34,6 @@ export default function DM({ params }) {
   const [copyContent, setCopyContent] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [editMsg, setEditMsg] = useState();
-  const [isConnected, setIsConnected] = useState(false);
   const [myId, setMyId] = useState();
   const [myName, setMyName] = useState();
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +46,9 @@ export default function DM({ params }) {
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
   const noNameRef = useRef(null);
-  const { userInfo, receiverInfo } = useSelector((state) => state.counter);
+  const { userInfo, receiverInfo, signalMeReceived } = useSelector(
+    (state) => state.counter
+  );
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -60,56 +64,10 @@ export default function DM({ params }) {
     getInfo();
   }, []);
 
-  const connectSocket = useCallback(() => {
-    if (isConnected) return;
-
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-      reconnection: true,
-      forceNew: true,
-    });
-
-    newSocket.on("connect", () => {
-      setIsConnected(true);
-    });
-
-    newSocket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    newSocket.on("message", (data) => {
-      // const formattedMessage = {
-      //   ...data,
-      //   timestamp: new Date().toISOString(),
-      // };
-      fetchChats();
-    });
-
-    newSocket.on("delete", () => {
-      fetchChats();
-    });
-
-    setSocket(newSocket);
-    return newSocket;
-  });
-
-  useEffect(() => {
-    const newSocket = connectSocket();
-
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-        setIsConnected(false);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isConnected) {
-      connectSocket();
-    }
-  }, [isConnected, connectSocket]);
+  const loadChat = async () => {
+    const chatData = await load_chats(decodeURIComponent(userId));
+    setMessages(chatData.messages);
+  };
 
   const fetchChats = async () => {
     try {
@@ -124,7 +82,6 @@ export default function DM({ params }) {
           .find((msg) => msg.isRead[chatData.senderId] === true);
 
         if (lastReadMessage) {
-          console.log(lastReadMessage.message);
           setTimeout(() => {
             const messageElement = document.getElementById(lastReadMessage._id);
             if (messageElement) {
@@ -168,38 +125,25 @@ export default function DM({ params }) {
     });
   }, [router, currentPath]);
 
-  const sendMessage = useCallback(
-    (msg) => {
-      if (msg && socket && msg.trim() !== "") {
-        socket.emit("message", {
-          receivedUser: decodeURIComponent(userId),
-          message: msg.trim(),
-        });
-        inputRef.current.value = "";
-        chatAreaHeight();
-        dispatch(triggerSignal());
-      }
-    },
-    [socket, userId]
-  );
-
-  const sendDelete = useCallback(() => {
-    if (socket) {
-      socket.emit("delete", {
-        receivedUser: decodeURIComponent(userId),
-      });
-      dispatch(triggerSignal());
+  const sendMessage = (msg) => {
+    if (msg && msg.trim() !== "") {
+      inputRef.current.value = "";
+      chatAreaHeight();
+      dispatch(chatSignal({ message: msg, receivedUser: receiverName }));
     }
-  }, [socket]);
+  };
 
-  const sendEdit = useCallback(() => {
-    if (socket) {
-      socket.emit("delete", {
-        receivedUser: decodeURIComponent(userId),
-      });
-      dispatch(triggerSignal());
-    }
-  }, [socket]);
+  useEffect(() => {
+    loadChat();
+  }, [signalMeReceived]);
+
+  const sendDelete = () => {
+    dispatch(chatRemoveSignal({ receivedUser: receiverName }));
+  };
+
+  const sendEdit = () => {
+    dispatch(chatEditSignal({ receivedUser: receiverName }));
+  };
 
   const handleEnter = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -406,7 +350,6 @@ export default function DM({ params }) {
               entry.target.getAttribute("data-msginfo")
             );
             handleVisibleMessage(msgId, isRead);
-            console.log(entry);
           }
         });
       },
@@ -527,7 +470,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {isLoading && <Skeleton />}
+        {/* {isLoading && <Skeleton />} */}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
