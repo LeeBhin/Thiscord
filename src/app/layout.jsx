@@ -57,6 +57,7 @@ function InnerLayout({ children }) {
 
     newSocket.on("message", () => {
       dispatch(signalToMe());
+      chatRooms();
     });
 
     newSocket.on("delete", () => {
