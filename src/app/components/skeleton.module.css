@@ -1,0 +1,54 @@
+.skeleton {
+  height: calc(100vh - 140px);
+  width: calc(100vw - 312px);
+  position: absolute;
+  z-index: 1;
+  background-color: #313338;
+  right: 0;
+}
+
+.message {
+  display: flex;
+  gap: 20px;
+}
+
+.profile,
+.name,
+.content {
+  border-radius: 50px;
+}
+
+.profile {
+  background-color: #3f4146;
+  width: 40px;
+  height: 40px;
+}
+
+.infoWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.name {
+  background-color: #515457;
+  width: 130px;
+  height: 17px;
+}
+
+.contentWrap {
+  display: flex;
+  gap: 6px;
+}
+
+.content {
+  background-color: #3a3d42;
+  width: 60px;
+  height: 20px;
+}
+
+.pic {
+  width: 200px;
+  height: 100px;
+  background-color: #36383d;
+}

@@ -6,6 +6,7 @@ import {
   load_chats,
   load_friends,
   my_info,
+  read_chat,
 } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -16,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { triggerSignal } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Skeleton from "@/app/components/skeleton";
 
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
@@ -32,6 +34,7 @@ export default function DM({ params }) {
   const [isConnected, setIsConnected] = useState(false);
   const [myId, setMyId] = useState();
   const [myName, setMyName] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -41,17 +44,13 @@ export default function DM({ params }) {
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
   const noNameRef = useRef(null);
-  const { userInfo } = useSelector((state) => state.counter);
+  const { userInfo, receiverInfo } = useSelector((state) => state.counter);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
       router.push(`/channels/me/@${userId}`);
     }
   });
-
-  useEffect(() => {
-    console.log(messages);
-  }, [messages]);
 
   useEffect(() => {
     const getInfo = async () => {
@@ -119,13 +118,38 @@ export default function DM({ params }) {
       if (chatData.messages && chatData.messages.length > 0) {
         setMessages(chatData.messages);
         setMyId(chatData.senderId);
+
+        const lastReadMessage = [...chatData.messages]
+          .reverse()
+          .find((msg) => msg.isRead[chatData.senderId] === true);
+
+        if (lastReadMessage) {
+          console.log(lastReadMessage.message);
+          setTimeout(() => {
+            const messageElement = document.getElementById(lastReadMessage._id);
+            if (messageElement) {
+              messageElement.scrollIntoView({
+                behavior: "auto",
+                block: "end",
+              });
+            }
+          }, 1);
+        }
       } else {
         setMessages([]);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Error fetching chats:", err);
+    }
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3);
   };
 
   useEffect(() => {
+    if (chatsRef.current) {
+      chatsRef.current.scrollTop = 0;
+    }
     fetchChats();
   }, [userId, router, currentPath]);
 
@@ -367,6 +391,34 @@ export default function DM({ params }) {
     return currentTime - messageTime < oneWeek;
   };
 
+  const handleVisibleMessage = (msgId, isRead) => {
+    if (isRead && isRead[myId] === false) {
+      read_chat(msgId, receiverName);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const { msgId, isRead } = JSON.parse(
+              entry.target.getAttribute("data-msginfo")
+            );
+            handleVisibleMessage(msgId, isRead);
+            console.log(entry);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    const chatElements = chatsRef.current.querySelectorAll(
+      `.${styles.message}`
+    );
+    chatElements.forEach((message) => observer.observe(message));
+  }, []);
+
   return (
     <>
       <div className={styles.dmBody}>
@@ -464,15 +516,18 @@ export default function DM({ params }) {
             <div className={styles.headerIconWrap}>
               <div
                 className={styles.headerIcon}
-                style={{ backgroundColor: receiverColor }}
+                style={{
+                  backgroundColor: receiverInfo?.iconColor || receiverColor,
+                }}
               >
                 <Images.icon className={styles.icon} />
               </div>
-              {receiverName}
+              {receiverInfo?.name || receiverName}
             </div>
           </div>
         </header>
 
+        {isLoading && <Skeleton />}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
@@ -506,7 +561,7 @@ export default function DM({ params }) {
             const firstMsg = index === 0;
 
             return (
-              <div key={`${msg._id}-${msg.timestamp}`}>
+              <div key={`${msg._id}`} id={msg._id}>
                 {(firstMsg || !sameDate) && (
                   <div className={styles.divisionDate}>
                     <div className={styles.dateLine} />
@@ -523,6 +578,11 @@ export default function DM({ params }) {
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
                   }}
+                  data-msginfo={JSON.stringify({
+                    msgId: msg._id,
+                    senderId: msg.senderId,
+                    isRead: msg.isRead,
+                  })}
                 >
                   {msg.senderId === myId &&
                     (!isEdit || msg._id !== editMsg) && (

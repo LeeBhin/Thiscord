@@ -87,3 +87,7 @@ export async function my_info() {
 export async function delete_user(password) {
     return apiRequest('users/delete/delete-user', 'PATCH', { password })
 }
+
+export async function read_chat(msgId, receiverName) {
+    return apiRequest('chat/messages/read', 'PATCH', { msgId, receiverName })
+}

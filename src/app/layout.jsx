@@ -12,7 +12,7 @@ import { load_friends } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
 import store from "@/store";
 import { useDispatch } from "react-redux";
-import { setUserInfo, triggerSignal } from "@/counterSlice";
+import { setReceiverInfo, setUserInfo, triggerSignal } from "@/counterSlice";
 import io from "socket.io-client";
 
 function InnerLayout({ children }) {
@@ -23,6 +23,7 @@ function InnerLayout({ children }) {
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
   const [title, setTitle] = useState("Thiscord");
+  const [user, setUser] = useState();
 
   const { signalReceived, userInfo } = useSelector((state) => state.counter);
 
@@ -87,6 +88,7 @@ function InnerLayout({ children }) {
     const getInfo = async () => {
       const info = await my_info();
       handleUserInfoUpdate(info.name, info.iconColor);
+      setUser(info);
     };
     getInfo();
   }, [router, currentPath]);
@@ -148,6 +150,16 @@ function InnerLayout({ children }) {
     currentPath === "/login" ||
     currentPath === "/register" ||
     currentPath === "/setting";
+
+  const dmLink = (friend) => {
+    dispatch(
+      setReceiverInfo({
+        name: friend.participantName,
+        iconColor: friend.iconColor,
+      })
+    );
+    router.push(`/channels/me/@${friend.participantName}`);
+  };
 
   return (
     <html lang="ko">
@@ -223,9 +235,9 @@ function InnerLayout({ children }) {
                 <div className={styles.friends}>
                   {chatrooms.length > 0 ? (
                     chatrooms.map((friend, index) => (
-                      <Link
-                        href={`/channels/me/@${friend.participantName}`}
+                      <div
                         key={index}
+                        onClick={() => dmLink(friend)}
                         className={`${styles.friendsLink} ${styles.friendProfile}`}
                       >
                         <div
@@ -237,7 +249,7 @@ function InnerLayout({ children }) {
                         <div className={styles.name}>
                           {friend.participantName}
                         </div>
-                      </Link>
+                      </div>
                     ))
                   ) : (
                     <></>
@@ -248,11 +260,11 @@ function InnerLayout({ children }) {
               <div className={styles.myInfo}>
                 <div
                   className={styles.profileIcon}
-                  style={{ backgroundColor: userInfo?.iconColor }}
+                  style={{ backgroundColor: user?.iconColor }}
                 >
                   <Images.icon className={styles.profileImg} />
                 </div>
-                <div className={styles.name}>{userInfo?.name || ""}</div>
+                <div className={styles.name}>{user?.name}</div>
                 <Link href="/setting" className={styles.setting}>
                   <Images.setting />
                 </Link>
