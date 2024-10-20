@@ -17,7 +17,6 @@ import {
   setReceiverInfo,
   setUserInfo,
   signalToMe,
-  chatEditReceived,
 } from "@/counterSlice";
 import io from "socket.io-client";
 
@@ -38,7 +37,9 @@ function InnerLayout({ children }) {
     chatMessage,
     chatEdit,
     chatRemove,
-    loginReceived
+    loginReceived,
+    chatEditReceived,
+
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor) => {
@@ -53,11 +54,9 @@ function InnerLayout({ children }) {
     });
 
     newSocket.on("connect", () => {
-      console.log('ccs')
     });
 
     newSocket.on("message", () => {
-      console.log('socket message 받음')
       dispatch(signalToMe());
       chatRooms();
     });
@@ -145,7 +144,6 @@ function InnerLayout({ children }) {
   useEffect(() => {
     chatRooms();
     if (socket) {
-      console.log('chatsingalreceived')
       socket.emit("message", {
         message: chatMessage.message,
         receivedUser: chatMessage.receivedUser,

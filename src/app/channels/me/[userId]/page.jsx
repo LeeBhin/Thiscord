@@ -36,6 +36,7 @@ export default function DM({ params }) {
   const [myId, setMyId] = useState();
   const [myName, setMyName] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [newMsg, setNewMsg] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -81,6 +82,14 @@ export default function DM({ params }) {
           .find((msg) => msg.isRead[chatData.senderId] === true);
 
         if (lastReadMessage) {
+          const newMessage = chatData.messages
+            .filter((msg) => msg.timestamp > lastReadMessage.timestamp && !msg.isRead[chatData.senderId])
+            .find(msg => !msg.isRead[chatData.senderId]);
+
+          if (newMessage) {
+            setNewMsg(newMessage._id);
+          }
+
           setTimeout(() => {
             const messageElement = document.getElementById(lastReadMessage._id);
             if (messageElement) {
@@ -90,6 +99,8 @@ export default function DM({ params }) {
               });
             }
           }, 1);
+        } else {
+          setMessages([]);
         }
       } else {
         setMessages([]);
@@ -126,7 +137,6 @@ export default function DM({ params }) {
 
   const sendMessage = (msg) => {
     if (msg && msg.trim() !== "") {
-      console.log('sendmessage')
       inputRef.current.value = "";
       chatAreaHeight();
       dispatch(chatSignal({ message: msg, receivedUser: receiverName }));
@@ -135,7 +145,6 @@ export default function DM({ params }) {
 
   useEffect(() => {
     loadChat();
-    console.log('singalmereceived')
   }, [signalMeReceived]);
 
   const sendDelete = () => {
@@ -339,6 +348,8 @@ export default function DM({ params }) {
   const handleVisibleMessage = (msgId, isRead) => {
     if (isRead && isRead[myId] === false) {
       read_chat(msgId, receiverName);
+      console.log(msgId)
+      setNewMsg(null)
     }
   };
 
@@ -361,7 +372,7 @@ export default function DM({ params }) {
       `.${styles.message}`
     );
     chatElements.forEach((message) => observer.observe(message));
-  }, []);
+  }, [messages]);
 
   return (
     <>
@@ -514,6 +525,9 @@ export default function DM({ params }) {
                     </div>
                   </div>
                 )}
+                {newMsg && msg._id === newMsg ? (
+                  <Images.newMsg>new</Images.newMsg>
+                ) : (<></>)}
                 <div
                   className={`${styles.message} ${styles[msg.senderId !== myId ? "received" : "sent"]
                     }`}
