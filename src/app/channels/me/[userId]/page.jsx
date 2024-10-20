@@ -346,10 +346,9 @@ export default function DM({ params }) {
   };
 
   const handleVisibleMessage = (msgId, isRead) => {
+    console.log(isRead)
     if (isRead && isRead[myId] === false) {
       read_chat(msgId, receiverName);
-      console.log(msgId)
-      setNewMsg(null)
     }
   };
 
@@ -372,7 +371,7 @@ export default function DM({ params }) {
       `.${styles.message}`
     );
     chatElements.forEach((message) => observer.observe(message));
-  }, [messages]);
+  }, []);
 
   return (
     <>
@@ -538,7 +537,7 @@ export default function DM({ params }) {
                   data-msginfo={JSON.stringify({
                     msgId: msg._id,
                     senderId: msg.senderId,
-                    isRead: msg.isRead,
+                    isRead: msg.isRead
                   })}
                 >
                   {msg.senderId === myId &&
