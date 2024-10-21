@@ -197,14 +197,14 @@
 .chats {
   position: absolute;
   right: 0;
-  bottom: 90px;
+  bottom: 46px;
   display: flex;
   flex-direction: column;
   height: auto;
   padding-top: 8px;
   overflow-x: hidden;
   overflow-y: scroll;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 95px);
   width: calc(100vw - 312px);
 }
 
@@ -213,6 +213,7 @@
   justify-content: center;
   align-items: center;
   margin-top: 18px;
+  padding: 0 15px;
 }
 
 .dateLine {
@@ -231,7 +232,40 @@
   margin-bottom: 2px;
 }
 
-.msg {
+.newSignWrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 15px;
+}
+
+.newLine {
+  width: calc(100vw - 350px);
+  border-top: solid 1px #f13e41;
+}
+
+.newSign {
+  display: flex;
+  align-items: center;
+}
+
+.newIcon {
+  color: #f13e41;
+}
+
+.newIconTxt {
+  background-color: #f13e41;
+  color: white;
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 0 4px 4px 0;
+  height: 13px;
+  width: 28px;
+  padding-left: 1px;
+  line-height: 13px;
+}
+
+.iconTxt .msg {
   position: relative;
 }
 
@@ -441,6 +475,7 @@
 }
 
 .noName {
+  min-height: 53px;
   position: relative;
 }
 
@@ -452,6 +487,7 @@
   padding: 0 15px 30px;
   background-color: #313338;
   max-height: 550px;
+  z-index: 2;
 }
 
 .chatInput {
@@ -468,7 +504,6 @@
   padding: 10px 14px;
   color: #dbdee1;
   margin-bottom: 30px;
-
   outline: none;
   resize: none;
   font-family: "malgun gothic";
@@ -499,13 +534,13 @@
 /* skeleton */
 
 .sk-skeleton {
-  height: calc(100vh - 130px);
+  height: calc(100vh - 120px);
   width: calc(100vw - 312px);
   position: absolute;
   z-index: 1;
   background-color: #313338;
   right: 0;
-  top: 50px;
+  top: 49px;
   overflow: hidden;
 }
 

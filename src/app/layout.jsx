@@ -39,7 +39,6 @@ function InnerLayout({ children }) {
     chatRemove,
     loginReceived,
     chatEditReceived,
-
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor) => {
@@ -53,8 +52,7 @@ function InnerLayout({ children }) {
       reconnection: true,
     });
 
-    newSocket.on("connect", () => {
-    });
+    newSocket.on("connect", () => {});
 
     newSocket.on("message", () => {
       dispatch(signalToMe());
@@ -139,7 +137,7 @@ function InnerLayout({ children }) {
     if (socket) {
       socket.emit("friendReq", {});
     }
-  }, [signalReceived, currentPath]);
+  }, [signalReceived]);
 
   useEffect(() => {
     chatRooms();
@@ -209,8 +207,8 @@ function InnerLayout({ children }) {
       currentPath === "/channels/@me"
         ? "• Thiscord | 친구"
         : currentPath.startsWith("/channels/me/@")
-          ? `Thiscord | ${path[path.length - 1]}`
-          : "Thiscord";
+        ? `Thiscord | ${path[path.length - 1]}`
+        : "Thiscord";
     setTitle(title);
   }, [currentPath]);
 
@@ -266,26 +264,29 @@ function InnerLayout({ children }) {
                 <div className={styles.topNav}>
                   <Link
                     href="/channels/@me"
-                    className={`${styles.friendsLink} ${currentPath === "/channels/@me"
-                      ? styles.friendsLinkActive
-                      : ""
-                      }`}
+                    className={`${styles.friendsLink} ${
+                      currentPath === "/channels/@me"
+                        ? styles.friendsLinkActive
+                        : ""
+                    }`}
                   >
                     <Images.friends className={styles.icon} />
                     <span className={styles.iconTxt}>친구</span>
                   </Link>
                   <Link
                     href="/store"
-                    className={`${styles.friendsLink} ${currentPath === "/store" ? styles.friendsLinkActive : ""
-                      }`}
+                    className={`${styles.friendsLink} ${
+                      currentPath === "/store" ? styles.friendsLinkActive : ""
+                    }`}
                   >
                     <Images.nitro className={styles.icon} />
                     <span className={styles.iconTxt}>Nitro</span>
                   </Link>
                   <Link
                     href="/shop"
-                    className={`${styles.friendsLink} ${currentPath === "/shop" ? styles.friendsLinkActive : ""
-                      }`}
+                    className={`${styles.friendsLink} ${
+                      currentPath === "/shop" ? styles.friendsLinkActive : ""
+                    }`}
                   >
                     <Images.shop className={styles.icon} />
                     <span className={styles.iconTxt}>상점</span>
@@ -303,12 +304,14 @@ function InnerLayout({ children }) {
                       <div
                         key={index}
                         onClick={() => dmLink(friend)}
-                        className={`${styles.friendsLink} ${styles.friendProfile
-                          } ${decodeURIComponent(currentPath) ===
-                            `/channels/me/@${friend.participantName}`
+                        className={`${styles.friendsLink} ${
+                          styles.friendProfile
+                        } ${
+                          decodeURIComponent(currentPath) ===
+                          `/channels/me/@${friend.participantName}`
                             ? styles.friendsLinkActive
                             : ""
-                          }`}
+                        }`}
                       >
                         <div
                           className={styles.profileIcon}

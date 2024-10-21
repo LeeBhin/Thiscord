@@ -16,8 +16,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { chatEditSignal, chatRemoveSignal, chatSignal } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Skeleton from "@/app/components/skeleton";
-import Popup from "@/app/components/popup";
+import Skeleton from "@/app/components/Skeleton";
+import Popup from "@/app/components/Popup";
 
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
@@ -67,11 +67,14 @@ export default function DM({ params }) {
 
     if (!lastReadIndex) setNewMsg();
 
+    console.log(lastReadMessage);
+
     const newMessages =
       lastReadIndex !== -1 ? messages.slice(lastReadIndex + 1) : messages;
 
     const newMessage = newMessages.find((msg) => !msg.isRead[userId]);
 
+    console.log(newMessage);
     return {
       lastReadMessage,
       newMessageId: newMessages.length > 0 ? newMessage?._id : undefined,
@@ -87,9 +90,13 @@ export default function DM({ params }) {
     if (messages?.length > 0) {
       try {
         const { newMessageId } = processMessages(messages, myId);
-        setNewMsg(newMessageId);
+        if (newMessageId && !read.includes(newMessageId)) {
+          setNewMsg(newMessageId);
+        } else {
+          setNewMsg();
+        }
       } finally {
-        setTimeout(() => setIsLoading(false), 3);
+        setTimeout(() => setIsLoading(false), 300);
       }
     }
   }, [messages]);
@@ -110,28 +117,27 @@ export default function DM({ params }) {
         info.userId
       );
       setNewMsg(newMessageId);
+      console.log(newMessageId);
 
       setTimeout(() => {
         document.getElementById(lastReadMessage?._id)?.scrollIntoView({
           behavior: "auto",
           block: "end",
         });
-      }, 1);
+      }, 3);
     } catch (err) {
       console.error("Error fetching chats:", err);
     } finally {
-      setTimeout(() => setIsLoading(false), 3);
+      setTimeout(() => setIsLoading(false), 300);
     }
   };
 
   useEffect(() => {
-    if (chatsRef.current) {
-      chatsRef.current.scrollTop = 0;
-    }
-    setTimeout(() => {
-      fetchChats();
-    }, 1);
-  }, [userId, router, currentPath]);
+    // if (chatsRef.current) {
+    //   chatsRef.current.scrollTop = 0;
+    // }
+    fetchChats();
+  }, []);
 
   useEffect(() => {
     load_friends().then((friendsList) => {
@@ -157,9 +163,13 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
+    // if (isLoading) return;
     loadChat();
-    setNewMsg();
   }, [signalMeReceived]);
+
+  useEffect(() => {
+    // if (isLoading) return;
+  }, [newMsg]);
 
   const sendDelete = () => {
     dispatch(chatRemoveSignal({ receivedUser: receiverName }));
@@ -356,14 +366,20 @@ export default function DM({ params }) {
   };
 
   const handleVisibleMessage = (msgId, senderId, isRead) => {
-    if (isRead && senderId !== myId && !isRead[myId] && !read.includes(msgId)) {
+    if (
+      !isLoading &&
+      isRead &&
+      senderId !== myId &&
+      !isRead[myId] &&
+      !read.includes(msgId)
+    ) {
       read_chat(msgId, receiverName);
       setRead([...read, msgId]);
     }
   };
 
   useEffect(() => {
-    if (isLoading) return;
+    // if (isLoading) return;
 
     if (document.hidden || !document.hasFocus()) return;
 
@@ -423,7 +439,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {/*isLoading && <Skeleton />*/}
+        {isLoading && <Skeleton />}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
@@ -476,16 +492,25 @@ export default function DM({ params }) {
                     >
                       {formatDate(msg.timestamp)}
                     </div>
+                    {newMsg && msg._id === newMsg && (
+                      <span className={styles.newSign}>
+                        <Images.newMsg className={styles.newIcon} />
+                        <span className={styles.newIconTxt}>NEW</span>
+                      </span>
+                    )}
                   </div>
                 )}
-                {!firstMsg && sameDate && newMsg && msg._id === newMsg ? (
-                  <span className={styles.newSign}>
-                    <Images.newMsg />
-                    new
-                  </span>
-                ) : (
-                  <></>
+
+                {!firstMsg && sameDate && newMsg && msg._id === newMsg && (
+                  <div className={styles.newSignWrap}>
+                    <div className={styles.newLine} />
+                    <span className={styles.newSign}>
+                      <Images.newMsg className={styles.newIcon} />
+                      <span className={styles.newIconTxt}>NEW</span>
+                    </span>
+                  </div>
                 )}
+
                 <div
                   className={`${styles.message} ${
                     styles[msg.senderId !== myId ? "received" : "sent"]
