@@ -17,6 +17,7 @@ import { chatEditSignal, chatRemoveSignal, chatSignal } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Skeleton from "@/app/components/skeleton";
+import Popup from "@/app/components/popup";
 
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
@@ -53,29 +54,45 @@ export default function DM({ params }) {
     }
   });
 
+  const processMessages = (messages, userId) => {
+    if (!messages?.length > 0) return;
+
+    const lastReadMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.isRead[userId]);
+
+    const lastReadIndex = lastReadMessage
+      ? messages.findIndex((msg) => msg._id === lastReadMessage._id)
+      : -1;
+
+    if (!lastReadIndex) setNewMsg();
+
+    const newMessages =
+      lastReadIndex !== -1 ? messages.slice(lastReadIndex + 1) : messages;
+
+    const newMessage = newMessages.find((msg) => !msg.isRead[userId]);
+
+    return {
+      lastReadMessage,
+      newMessageId: newMessages.length > 0 ? newMessage?._id : undefined,
+    };
+  };
+
   const loadChat = async () => {
     const chatData = await load_chats(decodeURIComponent(userId));
     setMessages(chatData.messages);
-    if (chatData.messages?.length > 0) {
-      setMessages(chatData.messages);
-      const lastReadMessage = [...chatData.messages]
-        .reverse()
-        .find((msg) => msg.isRead[myId]);
+  };
 
-      const lastReadIndex = lastReadMessage
-        ? chatData.messages.findIndex((msg) => msg._id === lastReadMessage._id)
-        : -1;
-      const newMessages =
-        lastReadIndex !== -1
-          ? chatData.messages.slice(lastReadIndex + 1)
-          : chatData.messages;
-      const newMessage = newMessages.find((msg) => !msg.isRead[myId]);
-
-      if (newMessages.length > 0) {
-        setNewMsg(newMessage?._id);
+  useEffect(() => {
+    if (messages?.length > 0) {
+      try {
+        const { newMessageId } = processMessages(messages, myId);
+        setNewMsg(newMessageId);
+      } finally {
+        setTimeout(() => setIsLoading(false), 3);
       }
     }
-  };
+  }, [messages]);
 
   const fetchChats = async () => {
     try {
@@ -84,33 +101,22 @@ export default function DM({ params }) {
       setMyId(info.userId);
 
       const chatData = await load_chats(decodeURIComponent(userId));
+      setMessages(chatData.messages);
 
-      if (chatData.messages?.length > 0) {
-        setMessages(chatData.messages);
-        const lastReadMessage = [...chatData.messages]
-          .reverse()
-          .find((msg) => msg.isRead[info.userId]);
+      if (!messages?.length > 0) return;
 
-        const lastReadIndex = lastReadMessage
-          ? chatData.messages.findIndex(
-              (msg) => msg._id === lastReadMessage._id
-            )
-          : -1;
-        const newMessages =
-          lastReadIndex !== -1
-            ? chatData.messages.slice(lastReadIndex + 1)
-            : chatData.messages;
-        const newMessage = newMessages.find((msg) => !msg.isRead[myId]);
+      const { lastReadMessage, newMessageId } = processMessages(
+        chatData.messages,
+        info.userId
+      );
+      setNewMsg(newMessageId);
 
-        if (newMessages.length > 0) {
-          setNewMsg(newMessage?._id);
-        }
-
-        setTimeout(() => {
-          const messageElement = document.getElementById(lastReadMessage?._id);
-          messageElement?.scrollIntoView({ behavior: "auto", block: "end" });
-        }, 1);
-      }
+      setTimeout(() => {
+        document.getElementById(lastReadMessage?._id)?.scrollIntoView({
+          behavior: "auto",
+          block: "end",
+        });
+      }, 1);
     } catch (err) {
       console.error("Error fetching chats:", err);
     } finally {
@@ -359,7 +365,6 @@ export default function DM({ params }) {
   useEffect(() => {
     if (isLoading) return;
 
-    // 페이지와 브라우저에 모두 포커스가 없다면 실행하지 않음
     if (document.hidden || !document.hasFocus()) return;
 
     const observer = new IntersectionObserver(
@@ -389,90 +394,16 @@ export default function DM({ params }) {
       <div className={styles.dmBody}>
         <AnimatePresence mode="wait">
           {isPopup && (
-            <motion.div
-              key="delete-popup"
-              className={styles.deletePopup}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className={styles.back} onClick={() => setIsPopup(false)}>
-                <motion.div
-                  key="popup-content"
-                  className={styles.popup}
-                  initial={{ opacity: 0, scale: 0, x: "50%", y: "-50%" }}
-                  animate={{ opacity: 1, scale: 1, x: "50%", y: "-50%" }}
-                  exit={{ opacity: 0, scale: 0, x: "50%", y: "-50%" }}
-                  transition={{
-                    duration: 0.2,
-                    type: "spring",
-                    stiffness: 600,
-                    damping: 35,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className={styles.popWrap}>
-                    <h3 className={styles.popTitle}>메시지 삭제하기</h3>
-                    <p className={styles.popSubTitle}>
-                      정말 이 메시지를 삭제할까요?
-                    </p>
-                    <div className={styles.copyMsg}>
-                      <div className={styles.popupMsg}>
-                        <div className={styles.msgInfos}>
-                          <div
-                            className={styles.msgIcon}
-                            style={{
-                              backgroundColor:
-                                copyContent.senderId === myId
-                                  ? userInfo.iconColor
-                                  : receiverColor,
-                            }}
-                          >
-                            <Images.icon className={styles.chatIcon} />
-                          </div>
-                          <div className={styles.msgInfo}>
-                            <span className={styles.senderId}>
-                              {displayName(copyContent.senderId)}
-                            </span>
-                            <span className={styles.timestamp}>
-                              {copyContent.timestamp}
-                            </span>
-                            <div className={styles.msgContent}>
-                              {copyContent.message}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.popTxt}>
-                      <span className={styles.notice}>참고:</span>
-                      <span className={styles.noticeTxt}>
-                        <b>메시지 삭제</b>를 Shift 버튼과 함께 누르시면 이 확인
-                        창을 건너뛰실 수 있어요.
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={styles.popBtns}>
-                    <div className={styles.popBtnsWrap}>
-                      <div
-                        className={styles.cancel}
-                        onClick={() => closePopup()}
-                      >
-                        취소
-                      </div>
-                      <div
-                        className={styles.confirm}
-                        onClick={() => deleteMsg()}
-                      >
-                        삭제
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
+            <Popup
+              copyContent={copyContent}
+              userInfo={userInfo}
+              receiverColor={receiverColor}
+              myId={myId}
+              closePopup={closePopup}
+              deleteMsg={deleteMsg}
+              setIsPopup={setIsPopup}
+              myName={myName}
+            />
           )}
         </AnimatePresence>
 
