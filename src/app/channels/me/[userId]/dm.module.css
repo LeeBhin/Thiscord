@@ -136,7 +136,7 @@
   display: flex;
 }
 
-.popBtnsWrap > div {
+.popBtnsWrap>div {
   width: 96px;
   height: 38px;
   padding: 2px 16px;
@@ -262,7 +262,7 @@
   height: 13px;
   width: 28px;
   padding-left: 1px;
-  line-height: 13px;
+  line-height: 12px;
 }
 
 .iconTxt .msg {
@@ -278,6 +278,10 @@
 
 .message:has(.msgInfos) {
   margin-top: 18px;
+}
+
+.messages:has(.newSignWrap:first-child)>div:nth-child(2) {
+  margin-top: 5px;
 }
 
 .message:hover {
@@ -338,6 +342,7 @@
 .editBtn .btnIcon {
   color: #b5bac1;
 }
+
 .removeBtn .btnIcon {
   color: #f23f42;
 }
