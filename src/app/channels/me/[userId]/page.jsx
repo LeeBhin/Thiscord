@@ -13,11 +13,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import styles from "./dm.module.css";
 import Images from "@/Images";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  chatEditSignal,
-  chatRemoveSignal,
-  chatSignal,
-} from "@/counterSlice";
+import { chatEditSignal, chatRemoveSignal, chatSignal } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Skeleton from "@/app/components/skeleton";
@@ -37,6 +33,7 @@ export default function DM({ params }) {
   const [myName, setMyName] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [newMsg, setNewMsg] = useState();
+  const [read, setRead] = useState([]);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -56,68 +53,78 @@ export default function DM({ params }) {
     }
   });
 
-  useEffect(() => {
-    const getInfo = async () => {
-      const info = await my_info();
-      setMyName(info.name);
-    };
-    getInfo();
-  }, []);
-
   const loadChat = async () => {
     const chatData = await load_chats(decodeURIComponent(userId));
     setMessages(chatData.messages);
+    if (chatData.messages?.length > 0) {
+      setMessages(chatData.messages);
+      const lastReadMessage = [...chatData.messages]
+        .reverse()
+        .find((msg) => msg.isRead[myId]);
+
+      const lastReadIndex = lastReadMessage
+        ? chatData.messages.findIndex((msg) => msg._id === lastReadMessage._id)
+        : -1;
+      const newMessages =
+        lastReadIndex !== -1
+          ? chatData.messages.slice(lastReadIndex + 1)
+          : chatData.messages;
+      const newMessage = newMessages.find((msg) => !msg.isRead[myId]);
+
+      if (newMessages.length > 0) {
+        setNewMsg(newMessage?._id);
+      }
+    }
   };
 
   const fetchChats = async () => {
     try {
+      const info = await my_info();
+      setMyName(info.name);
+      setMyId(info.userId);
+
       const chatData = await load_chats(decodeURIComponent(userId));
 
-      if (chatData.messages && chatData.messages.length > 0) {
+      if (chatData.messages?.length > 0) {
         setMessages(chatData.messages);
-        setMyId(chatData.senderId);
-
         const lastReadMessage = [...chatData.messages]
           .reverse()
-          .find((msg) => msg.isRead[chatData.senderId] === true);
+          .find((msg) => msg.isRead[info.userId]);
 
-        if (lastReadMessage) {
-          const newMessage = chatData.messages
-            .filter((msg) => msg.timestamp > lastReadMessage.timestamp && !msg.isRead[chatData.senderId])
-            .find(msg => !msg.isRead[chatData.senderId]);
+        const lastReadIndex = lastReadMessage
+          ? chatData.messages.findIndex(
+              (msg) => msg._id === lastReadMessage._id
+            )
+          : -1;
+        const newMessages =
+          lastReadIndex !== -1
+            ? chatData.messages.slice(lastReadIndex + 1)
+            : chatData.messages;
+        const newMessage = newMessages.find((msg) => !msg.isRead[myId]);
 
-          if (newMessage) {
-            setNewMsg(newMessage._id);
-          }
-
-          setTimeout(() => {
-            const messageElement = document.getElementById(lastReadMessage._id);
-            if (messageElement) {
-              messageElement.scrollIntoView({
-                behavior: "auto",
-                block: "end",
-              });
-            }
-          }, 1);
-        } else {
-          setMessages([]);
+        if (newMessages.length > 0) {
+          setNewMsg(newMessage?._id);
         }
-      } else {
-        setMessages([]);
+
+        setTimeout(() => {
+          const messageElement = document.getElementById(lastReadMessage?._id);
+          messageElement?.scrollIntoView({ behavior: "auto", block: "end" });
+        }, 1);
       }
     } catch (err) {
       console.error("Error fetching chats:", err);
+    } finally {
+      setTimeout(() => setIsLoading(false), 3);
     }
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3);
   };
 
   useEffect(() => {
     if (chatsRef.current) {
       chatsRef.current.scrollTop = 0;
     }
-    fetchChats();
+    setTimeout(() => {
+      fetchChats();
+    }, 1);
   }, [userId, router, currentPath]);
 
   useEffect(() => {
@@ -145,6 +152,7 @@ export default function DM({ params }) {
 
   useEffect(() => {
     loadChat();
+    setNewMsg();
   }, [signalMeReceived]);
 
   const sendDelete = () => {
@@ -159,9 +167,6 @@ export default function DM({ params }) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage(e.target.value);
-      setTimeout(() => {
-        loadChat();
-      }, 10);
       const chatElement = chatsRef.current;
       chatElement.scrollTop = chatElement.scrollHeight;
     }
@@ -179,8 +184,8 @@ export default function DM({ params }) {
     const dateString = isToday
       ? "오늘"
       : isYesterday
-        ? "어제"
-        : date
+      ? "어제"
+      : date
           .toLocaleDateString("ko-KR", {
             year: "numeric",
             month: "2-digit",
@@ -313,7 +318,6 @@ export default function DM({ params }) {
     if (msg !== editRef.current.value.trim()) {
       edit_msg(senderId, msgId, receiverName, editRef.current.value.trim());
       sendEdit();
-      loadChat();
       setIsEdit(false);
     } else {
       setIsEdit(false);
@@ -345,33 +349,40 @@ export default function DM({ params }) {
     return currentTime - messageTime < oneWeek;
   };
 
-  const handleVisibleMessage = (msgId, isRead) => {
-    console.log(isRead)
-    if (isRead && isRead[myId] === false) {
+  const handleVisibleMessage = (msgId, senderId, isRead) => {
+    if (isRead && senderId !== myId && !isRead[myId] && !read.includes(msgId)) {
       read_chat(msgId, receiverName);
+      setRead([...read, msgId]);
     }
   };
 
   useEffect(() => {
+    if (isLoading) return;
+
+    // 페이지와 브라우저에 모두 포커스가 없다면 실행하지 않음
+    if (document.hidden || !document.hasFocus()) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const { msgId, isRead } = JSON.parse(
+            const { msgId, senderId, isRead, msg } = JSON.parse(
               entry.target.getAttribute("data-msginfo")
             );
-            handleVisibleMessage(msgId, isRead);
+            handleVisibleMessage(msgId, senderId, isRead, msg);
           }
         });
       },
-      { threshold: 0.6 }
+      { threshold: 0.35 }
     );
 
     const chatElements = chatsRef.current.querySelectorAll(
       `.${styles.message}`
     );
     chatElements.forEach((message) => observer.observe(message));
-  }, []);
+
+    return () => observer.disconnect();
+  }, [messages, isLoading]);
 
   return (
     <>
@@ -481,7 +492,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {isLoading && <Skeleton />}
+        {/*isLoading && <Skeleton />*/}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
@@ -494,12 +505,12 @@ export default function DM({ params }) {
             <div className={styles.topTxt}>
               {isWithinOneWeek(messages[0]?.timestamp) ? (
                 <div>
-                  <b>{receiverName}</b>님과의 전설적인 대화가 지금 막
+                  <b>{receiverName}</b> 님과의 전설적인 대화가 지금 막
                   시작되었어요.
                 </div>
               ) : (
                 <div>
-                  <b>{receiverName}</b>님과 나눈 다이렉트 메시지의 첫
+                  <b>{receiverName}</b> 님과 나눈 다이렉트 메시지의 첫
                   부분이에요.
                 </div>
               )}
@@ -511,25 +522,43 @@ export default function DM({ params }) {
             const sameDate =
               index > 0 &&
               formatDate(messages[index - 1].timestamp) ===
-              formatDate(msg.timestamp);
+                formatDate(msg.timestamp);
             const firstMsg = index === 0;
 
             return (
               <div key={`${msg._id}`} id={msg._id}>
                 {(firstMsg || !sameDate) && (
                   <div className={styles.divisionDate}>
-                    <div className={styles.dateLine} />
-                    <div className={styles.date}>
+                    <div
+                      className={styles.dateLine}
+                      style={{
+                        borderTop: `solid 1px ${
+                          msg._id === newMsg ? "#F13E41" : "#3f4147"
+                        }`,
+                      }}
+                    />
+                    <div
+                      className={styles.date}
+                      style={{
+                        color: msg._id === newMsg ? "#F13E41" : "#b5bac1",
+                      }}
+                    >
                       {formatDate(msg.timestamp)}
                     </div>
                   </div>
                 )}
-                {newMsg && msg._id === newMsg ? (
-                  <Images.newMsg>new</Images.newMsg>
-                ) : (<></>)}
+                {!firstMsg && sameDate && newMsg && msg._id === newMsg ? (
+                  <span className={styles.newSign}>
+                    <Images.newMsg />
+                    new
+                  </span>
+                ) : (
+                  <></>
+                )}
                 <div
-                  className={`${styles.message} ${styles[msg.senderId !== myId ? "received" : "sent"]
-                    }`}
+                  className={`${styles.message} ${
+                    styles[msg.senderId !== myId ? "received" : "sent"]
+                  }`}
                   style={{
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
@@ -537,7 +566,8 @@ export default function DM({ params }) {
                   data-msginfo={JSON.stringify({
                     msgId: msg._id,
                     senderId: msg.senderId,
-                    isRead: msg.isRead
+                    isRead: msg.isRead,
+                    msg: msg.message,
                   })}
                 >
                   {msg.senderId === myId &&
@@ -570,9 +600,9 @@ export default function DM({ params }) {
                     )}
 
                   {firstMsg ||
-                    (sameSender && !sameDate) ||
-                    (!sameSender && !sameDate) ||
-                    (!sameSender && sameDate) ? (
+                  (sameSender && !sameDate) ||
+                  (!sameSender && !sameDate) ||
+                  (!sameSender && sameDate) ? (
                     <div className={styles.msgInfos}>
                       <div
                         className={styles.msgIcon}

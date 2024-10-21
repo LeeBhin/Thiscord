@@ -216,7 +216,7 @@
 }
 
 .dateLine {
-  width: 95%;
+  width: calc(100vw - 350px);
   border-top: solid 1px #3f4147;
 }
 
