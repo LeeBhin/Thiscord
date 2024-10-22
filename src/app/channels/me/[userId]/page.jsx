@@ -370,7 +370,14 @@ export default function DM({ params }) {
     setNewMsg(news[0]);
   }, [news]);
 
-   useEffect(() => {
+  const handleVisibleMessage = (msgId, senderId, isRead) => {
+    if (senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
+      read_chat(msgId, receiverName);
+      setNews((prev) => [...prev, msgId]);
+    }
+  };
+
+  useEffect(() => {
     if (isLoading) return;
 
     let observer = null;
