@@ -25,6 +25,7 @@ export default function DM({ params }) {
   const [receiverColor, setReceiverColor] = useState();
   const [receiverName, setReceiverName] = useState();
   const [isBottom, setIsBottom] = useState(true);
+  const [isTop, setIsTop] = useState(true);
   const [isPopup, setIsPopup] = useState(false);
   const [msgInfo, setMsgInfo] = useState();
   const [copyContent, setCopyContent] = useState();
@@ -35,6 +36,8 @@ export default function DM({ params }) {
   const [isLoading, setIsLoading] = useState(true);
   const [newMsg, setNewMsg] = useState();
   const [news, setNews] = useState([]);
+  const [startMsgId, SetStartMsgId] = useState();
+  const [endMsgId, SetEndMsgId] = useState();
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -54,8 +57,35 @@ export default function DM({ params }) {
     }
   });
 
+  useEffect(() => {
+    console.log(messages.map((msg) => msg.message));
+    console.log("start", startMsgId);
+    console.log("end", endMsgId);
+    SetStartMsgId(messages[0]?._id);
+    SetEndMsgId(messages.at(-1)?._id);
+  }, [messages]);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      if (isTop) {
+        const msg = await load_chats(receiverName, startMsgId, "up");
+        setMessages((prev) => [...msg.messages, ...prev]);
+        setIsTop(false);
+      } else if (isBottom) {
+        const msg = await load_chats(receiverName, endMsgId, "down");
+        setMessages((prev) => [...prev, ...msg.messages]);
+        setIsBottom(false);
+      }
+    };
+
+    fetchChats();
+  }, [isTop, isBottom]);
+
   const loadChat = async () => {
     const chatData = await load_chats(decodeURIComponent(userId));
+    SetStartMsgId(chatData.messages[0]._id);
+    console.log(chatData.messages[0]._id);
+    SetEndMsgId(chatData.messages.at(-1)._id);
     setMessages(chatData.messages);
   };
 
@@ -77,8 +107,10 @@ export default function DM({ params }) {
 
     if (firstUnreadMessage) {
       setNewMsg(firstUnreadMessage._id);
-      console.log(firstUnreadMessage);
-      document.getElementById(lastReadMessage._id)?.scrollIntoView();
+      document.getElementById(lastReadMessage._id)?.scrollIntoView({
+        block: "start",
+        behavior: "auto",
+      });
     } else {
       setNewMsg();
     }
@@ -204,10 +236,15 @@ export default function DM({ params }) {
 
   const handleScroll = () => {
     const chatElement = chatsRef.current;
+
     const isNearBottom =
       chatElement.scrollHeight - chatElement.scrollTop <=
       chatElement.clientHeight + 50;
+
+    const isNearTop = chatElement.scrollTop <= 50;
+
     setIsBottom(isNearBottom);
+    setIsTop(isNearTop);
   };
 
   useEffect(() => {
@@ -399,7 +436,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {isLoading && <Skeleton />}
+        {/* {isLoading && <Skeleton />} */}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
@@ -423,6 +460,7 @@ export default function DM({ params }) {
               )}
             </div>
           </div>
+          <div className={styles.pastMessages}>dd</div>
           {messages?.map((msg, index) => {
             const sameSender =
               index > 0 && messages[index - 1].senderId === msg.senderId;

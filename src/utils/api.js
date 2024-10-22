@@ -60,8 +60,8 @@ export async function accept_friend(friendId) {
     return apiRequest(`friends/accept/${friendId}`, 'PUT');
 }
 
-export async function load_chats(receiverName) {
-    return apiRequest(`chat/history/${receiverName}`, 'GET');
+export async function load_chats(receiverName, lastReadMsgId = null, direction = null) {
+    return apiRequest(`chat/history`, 'POST', { receiverName, lastReadMsgId, direction });
 }
 
 export async function load_chatrooms() {
