@@ -23,7 +23,6 @@ import io from "socket.io-client";
 function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
-  const [friends, setFriends] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
@@ -33,7 +32,6 @@ function InnerLayout({ children }) {
   const {
     signalReceived,
     chatSignalReceived,
-    userInfo,
     chatMessage,
     chatEdit,
     chatRemove,
@@ -54,9 +52,20 @@ function InnerLayout({ children }) {
 
     newSocket.on("connect", () => {});
 
-    newSocket.on("message", () => {
-      dispatch(signalToMe());
-      chatRooms();
+    newSocket.on("message", (chatData) => {
+      Promise.all([
+        dispatch(
+          signalToMe({
+            message: chatData.message,
+            senderId: chatData.senderId,
+            receiverId: chatData.receiverId,
+            isRead: chatData.isRead,
+            timestamp: chatData.timestamp,
+            _id: chatData.messageId,
+          })
+        ),
+        chatRooms(),
+      ]);
     });
 
     newSocket.on("delete", () => {
@@ -146,6 +155,7 @@ function InnerLayout({ children }) {
         message: chatMessage.message,
         receivedUser: chatMessage.receivedUser,
       });
+      dispatch(signalToMe(""));
     }
   }, [chatSignalReceived]);
 

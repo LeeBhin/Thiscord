@@ -10,6 +10,7 @@ export const counterSlice = createSlice({
     chatRemoveReceived: false,
     chatEditReceived: false,
     chatMessage: {},
+    toMeMessage: {},
     chatRemove: {},
     chatEdit: {},
     userInfo: {
@@ -28,8 +29,9 @@ export const counterSlice = createSlice({
     loginSignal: (state) => {
       state.loginReceived = !state.loginReceived;
     },
-    signalToMe: (state) => {
+    signalToMe: (state, action) => {
       state.signalMeReceived = !state.signalMeReceived;
+      state.toMeMessage = action.payload;
     },
     chatSignal: (state, action) => {
       state.chatSignalReceived = !state.chatSignalReceived;

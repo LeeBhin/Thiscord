@@ -34,7 +34,7 @@ export default function DM({ params }) {
   const [myName, setMyName] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [newMsg, setNewMsg] = useState();
-  const [news, setNews] = useState([])
+  const [news, setNews] = useState([]);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -64,10 +64,21 @@ export default function DM({ params }) {
     const chatData = await load_chats(decodeURIComponent(userId));
     setMessages(chatData.messages);
 
-    const firstUnreadMessage = chatData.messages.find(msg => !msg.isRead[info.userId]);
+    const readMessages = chatData.messages.filter(
+      (msg) => msg.isRead[info.userId]
+    );
+
+    const lastReadMessage =
+      readMessages.length > 0 ? readMessages[readMessages.length - 1] : null;
+
+    const firstUnreadMessage = chatData.messages.find(
+      (msg) => !msg.isRead[info.userId]
+    );
 
     if (firstUnreadMessage) {
       setNewMsg(firstUnreadMessage._id);
+      console.log(firstUnreadMessage);
+      document.getElementById(lastReadMessage._id)?.scrollIntoView();
     } else {
       setNewMsg();
     }
@@ -76,21 +87,16 @@ export default function DM({ params }) {
   const fetchChats = async () => {
     try {
       const info = await my_info();
-      const chatData = await load_chats(decodeURIComponent(userId));
       setMyName(info.name);
       setMyId(info.userId);
 
       fetchNew();
-
-      if (chatData.messages?.length > 0 && news) {
-        document.getElementById(news)?.scrollIntoView();
-      }
     } catch (err) {
       console.error("Error:", err);
     } finally {
       setTimeout(() => {
         setIsLoading(false);
-      }, 350);
+      }, 100);
     }
   };
 
@@ -127,7 +133,6 @@ export default function DM({ params }) {
     loadChat();
   }, [signalMeReceived]);
 
-
   const sendDelete = () => {
     dispatch(chatRemoveSignal({ receivedUser: receiverName }));
   };
@@ -157,8 +162,8 @@ export default function DM({ params }) {
     const dateString = isToday
       ? "오늘"
       : isYesterday
-        ? "어제"
-        : date
+      ? "어제"
+      : date
           .toLocaleDateString("ko-KR", {
             year: "numeric",
             month: "2-digit",
@@ -323,14 +328,13 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
-    setNewMsg(news[0])
-    console.log(news[0])
-  }, [news])
+    setNewMsg(news[0]);
+  }, [news]);
 
   const handleVisibleMessage = (msgId, senderId, isRead) => {
     if (senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
       read_chat(msgId, receiverName);
-      setNews(prev => [...prev, msgId])
+      setNews((prev) => [...prev, msgId]);
     }
   };
 
@@ -341,8 +345,14 @@ export default function DM({ params }) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const msgInfo = JSON.parse(entry.target.getAttribute("data-msginfo"));
-            handleVisibleMessage(msgInfo.msgId, msgInfo.senderId, msgInfo.isRead);
+            const msgInfo = JSON.parse(
+              entry.target.getAttribute("data-msginfo")
+            );
+            handleVisibleMessage(
+              msgInfo.msgId,
+              msgInfo.senderId,
+              msgInfo.isRead
+            );
           }
         });
       },
@@ -350,7 +360,7 @@ export default function DM({ params }) {
     );
 
     const messages = chatsRef.current.querySelectorAll(`.${styles.message}`);
-    messages.forEach(message => observer.observe(message));
+    messages.forEach((message) => observer.observe(message));
 
     return () => observer.disconnect();
   }, [messages, isLoading]);
@@ -419,7 +429,7 @@ export default function DM({ params }) {
             const sameDate =
               index > 0 &&
               formatDate(messages[index - 1].timestamp) ===
-              formatDate(msg.timestamp);
+                formatDate(msg.timestamp);
             const firstMsg = index === 0;
 
             return (
@@ -429,8 +439,9 @@ export default function DM({ params }) {
                     <div
                       className={styles.dateLine}
                       style={{
-                        borderTop: `solid 1px ${msg._id === newMsg ? "#F13E41" : "#3f4147"
-                          }`,
+                        borderTop: `solid 1px ${
+                          msg._id === newMsg ? "#F13E41" : "#3f4147"
+                        }`,
                       }}
                     />
                     <div
@@ -461,8 +472,9 @@ export default function DM({ params }) {
                 )}
 
                 <div
-                  className={`${styles.message} ${styles[msg.senderId !== myId ? "received" : "sent"]
-                    }`}
+                  className={`${styles.message} ${
+                    styles[msg.senderId !== myId ? "received" : "sent"]
+                  }`}
                   style={{
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
@@ -504,9 +516,9 @@ export default function DM({ params }) {
                     )}
 
                   {firstMsg ||
-                    (sameSender && !sameDate) ||
-                    (!sameSender && !sameDate) ||
-                    (!sameSender && sameDate) ? (
+                  (sameSender && !sameDate) ||
+                  (!sameSender && !sameDate) ||
+                  (!sameSender && sameDate) ? (
                     <div className={styles.msgInfos}>
                       <div
                         className={styles.msgIcon}

@@ -136,7 +136,7 @@
   display: flex;
 }
 
-.popBtnsWrap>div {
+.popBtnsWrap > div {
   width: 96px;
   height: 38px;
   padding: 2px 16px;
@@ -273,15 +273,19 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 2px 30px 2px 16px;
+  padding: 2px 15px 2px 16px;
 }
 
 .message:has(.msgInfos) {
   margin-top: 18px;
 }
 
-.messages:has(.newSignWrap:first-child)>div:nth-child(2) {
+.messages:has(.newSignWrap:first-child) .message:has(.msgInfos:first-child) {
   margin-top: 5px;
+}
+
+.messages:has(.newSignWrap:first-child) .message:has(.singleMsg:first-child) {
+  margin-top: 0px;
 }
 
 .message:hover {
@@ -386,7 +390,7 @@
   gap: 8px;
   align-items: flex-start;
   margin-left: -5px;
-  width: 100%;
+  word-break: break-all;
 }
 
 .message:hover .singleMsgTime {
@@ -408,6 +412,7 @@
   white-space: pre-wrap;
   margin-bottom: 3px;
   display: flex;
+  width: 100%;
   align-items: flex-end;
 }
 
