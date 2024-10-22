@@ -106,7 +106,9 @@ export default function DM({ params }) {
     );
 
     if (firstUnreadMessage) {
-      setNewMsg(firstUnreadMessage._id);
+      if (document.hidden) {
+        setNewMsg(firstUnreadMessage._id);
+      }
       document.getElementById(lastReadMessage._id)?.scrollIntoView({
         block: "start",
         behavior: "auto",
