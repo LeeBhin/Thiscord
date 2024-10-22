@@ -370,38 +370,57 @@ export default function DM({ params }) {
     setNewMsg(news[0]);
   }, [news]);
 
-  const handleVisibleMessage = (msgId, senderId, isRead) => {
-    if (senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
-      read_chat(msgId, receiverName);
-      setNews((prev) => [...prev, msgId]);
+   useEffect(() => {
+    if (isLoading) return;
+
+    let observer = null;
+
+    const createObserver = () => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const msgInfo = JSON.parse(
+                entry.target.getAttribute("data-msginfo")
+              );
+              handleVisibleMessage(
+                msgInfo.msgId,
+                msgInfo.senderId,
+                msgInfo.isRead
+              );
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+
+      const messages = chatsRef.current.querySelectorAll(`.${styles.message}`);
+      messages.forEach((message) => observer.observe(message));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (observer) {
+          observer.disconnect();
+          observer = null;
+        }
+      } else {
+        createObserver();
+      }
+    };
+
+    if (!document.hidden) {
+      createObserver();
     }
-  };
 
-  useEffect(() => {
-    if (document.hidden || isLoading) return;
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const msgInfo = JSON.parse(
-              entry.target.getAttribute("data-msginfo")
-            );
-            handleVisibleMessage(
-              msgInfo.msgId,
-              msgInfo.senderId,
-              msgInfo.isRead
-            );
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    const messages = chatsRef.current.querySelectorAll(`.${styles.message}`);
-    messages.forEach((message) => observer.observe(message));
-
-    return () => observer.disconnect();
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (observer) {
+        observer.disconnect();
+      }
+    };
   }, [messages, isLoading]);
 
   return (
