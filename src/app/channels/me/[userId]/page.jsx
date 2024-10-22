@@ -376,7 +376,10 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
-    if (document.hidden || isLoading) return;
+    if (document.hidden || isLoading) {
+      observer.disconnect();
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
