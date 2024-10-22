@@ -136,7 +136,7 @@
   display: flex;
 }
 
-.popBtnsWrap > div {
+.popBtnsWrap>div {
   width: 96px;
   height: 38px;
   padding: 2px 16px;
@@ -185,7 +185,7 @@
 .topName {
   color: #dbdee1;
   font-size: 32px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .topTxt {
@@ -197,14 +197,14 @@
 .chats {
   position: absolute;
   right: 0;
-  bottom: 46px;
+  bottom: 75px;
   display: flex;
   flex-direction: column;
   height: auto;
   padding-top: 8px;
   overflow-x: hidden;
   overflow-y: scroll;
-  max-height: calc(100vh - 95px);
+  max-height: calc(100vh - 125px);
   width: calc(100vw - 312px);
 }
 
@@ -227,9 +227,10 @@
   font-weight: bold;
   position: absolute;
   background-color: #313338;
-  width: 108px;
+  width: auto;
   text-align: center;
   margin-bottom: 2px;
+  padding: 0 4px;
 }
 
 .newSignWrap {
@@ -485,7 +486,7 @@
 }
 
 .noName {
-  min-height: 53px;
+  min-height: 15px;
   position: relative;
 }
 

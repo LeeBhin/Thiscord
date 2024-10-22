@@ -34,7 +34,7 @@ export default function DM({ params }) {
   const [myId, setMyId] = useState();
   const [myName, setMyName] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [newMsg, setNewMsg] = useState();
+  const [newMsg, setNewMsg] = useState([]);
   const [news, setNews] = useState([]);
   const [startMsgId, SetStartMsgId] = useState();
   const [endMsgId, SetEndMsgId] = useState();
@@ -46,7 +46,6 @@ export default function DM({ params }) {
   const editRef = useRef(null);
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
-  const noNameRef = useRef(null);
   const { userInfo, receiverInfo, signalMeReceived } = useSelector(
     (state) => state.counter
   );
@@ -58,11 +57,13 @@ export default function DM({ params }) {
   });
 
   useEffect(() => {
-    console.log(messages.map((msg) => msg.message));
-    console.log("start", startMsgId);
-    console.log("end", endMsgId);
+    if (isLoading) return;
     SetStartMsgId(messages[0]?._id);
     SetEndMsgId(messages.at(-1)?._id);
+    let isWindowFocused = document.hasFocus();
+    if ((document.hidden || !isWindowFocused) && !isLoading && messages?.at(-1)?.senderId !== myId && messages?.at(-1).isRead[myId] === false) {
+      setNews((prev) => [...prev, messages.at(-1)]);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -74,7 +75,6 @@ export default function DM({ params }) {
       } else if (isBottom) {
         const msg = await load_chats(receiverName, endMsgId, "down");
         setMessages((prev) => [...prev, ...msg.messages]);
-        setIsBottom(false);
       }
     };
 
@@ -84,7 +84,6 @@ export default function DM({ params }) {
   const loadChat = async () => {
     const chatData = await load_chats(decodeURIComponent(userId));
     SetStartMsgId(chatData.messages[0]._id);
-    console.log(chatData.messages[0]._id);
     SetEndMsgId(chatData.messages.at(-1)._id);
     setMessages(chatData.messages);
   };
@@ -111,8 +110,6 @@ export default function DM({ params }) {
         block: "start",
         behavior: "auto",
       });
-    } else {
-      setNewMsg();
     }
   };
 
@@ -156,10 +153,19 @@ export default function DM({ params }) {
       inputRef.current.value = "";
       chatAreaHeight();
       dispatch(chatSignal({ message: msg, receivedUser: receiverName }));
-      setNewMsg();
-      // setNews([]);
+      setNews([]);
     }
   };
+
+  // test용
+  // useEffect(() => {
+  //   if (myName === 'c') {
+  //     setInterval(() => {
+  //       dispatch(chatSignal({ message: 'test', receivedUser: receiverName }));
+  //       setNews([]);
+  //     }, 3000);
+  //   }
+  // }, [isLoading])
 
   useEffect(() => {
     loadChat();
@@ -254,7 +260,7 @@ export default function DM({ params }) {
     return () => {
       chatElement.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
     const chatElement = chatsRef.current;
@@ -306,13 +312,11 @@ export default function DM({ params }) {
   const chatAreaHeight = () => {
     const target = inputRef.current;
     const targetWrap = chatWrapRef.current;
-    const noname = noNameRef.current;
 
     target.style.height = "auto";
     target.style.height = `${target.scrollHeight}px`;
     targetWrap.style.height = "auto";
     targetWrap.style.height = `${targetWrap.scrollHeight}px`;
-    noname.style.marginBottom = `${targetWrap.scrollHeight - 80}px`;
   };
 
   const handleEditKey = async (senderId, msgId, e, msg) => {
@@ -365,24 +369,21 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
-    setNewMsg(news[0]);
+    if (isLoading) return;
+    setNewMsg(news[0]?._id);
   }, [news]);
 
   const handleVisibleMessage = (msgId, senderId, isRead) => {
-    if (!document.hidden && senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
+    if (senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
       read_chat(msgId, receiverName);
-      setNews((prev) => [...prev, msgId]);
     }
   };
 
   useEffect(() => {
-    if (document.hidden || isLoading) {
-      observer.disconnect();
-      return;
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
+
+
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const msgInfo = JSON.parse(
@@ -402,7 +403,6 @@ export default function DM({ params }) {
     const messages = chatsRef.current.querySelectorAll(`.${styles.message}`);
     messages.forEach((message) => observer.observe(message));
 
-    return () => observer.disconnect();
   }, [messages, isLoading]);
 
   return (
@@ -439,7 +439,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {/* {isLoading && <Skeleton />} */}
+        {isLoading && <Skeleton />}
         <div className={styles.chats} ref={chatsRef}>
           <div className={styles.top}>
             <div
@@ -683,26 +683,22 @@ export default function DM({ params }) {
               </div>
             );
           })}
-          <div className={styles.noName} ref={noNameRef} />
-          <div className={styles.chatInputWrap} ref={chatWrapRef}>
-            <div className={styles.chatInput}>
-              <textarea
-                type="text"
-                rows={1}
-                placeholder={`@${receiverName}에 메시지 보내기`}
-                className={styles.input}
-                onChange={() => {
-                  chatAreaHeight();
-                  if (isBottom) {
-                    const chatElement = chatsRef.current;
-                    chatElement.scrollTop = chatElement.scrollHeight;
-                  }
-                }}
-                ref={inputRef}
-                onKeyDown={handleEnter}
-              />
-            </div>
-          </div>
+          <div className={styles.noName} />
+        </div>
+      </div>
+      <div className={styles.chatInputWrap} ref={chatWrapRef}>
+        <div className={styles.chatInput}>
+          <textarea
+            type="text"
+            rows={1}
+            placeholder={`@${receiverName}에 메시지 보내기`}
+            className={styles.input}
+            onChange={() => {
+              chatAreaHeight();
+            }}
+            ref={inputRef}
+            onKeyDown={handleEnter}
+          />
         </div>
       </div>
     </>
