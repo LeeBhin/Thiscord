@@ -410,7 +410,7 @@ export default function DM({ params }) {
             </div>
             <h3 className={styles.topName}>{receiverName}</h3>
             <div className={styles.topTxt}>
-              {isWithinOneWeek(messages[0]?.timestamp) ? (
+              {messages && isWithinOneWeek(messages[0]?.timestamp) ? (
                 <div>
                   <b>{receiverName}</b> 님과의 전설적인 대화가 지금 막
                   시작되었어요.
@@ -423,7 +423,7 @@ export default function DM({ params }) {
               )}
             </div>
           </div>
-          {messages.map((msg, index) => {
+          {messages?.map((msg, index) => {
             const sameSender =
               index > 0 && messages[index - 1].senderId === msg.senderId;
             const sameDate =
