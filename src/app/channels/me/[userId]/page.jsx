@@ -509,32 +509,35 @@ export default function DM({ params }) {
 
             return (
               <div key={`${msg._id}`} id={msg._id} className={styles.messages}>
-                {(firstMsg || !sameDate) && (
-                  <div className={styles.divisionDate}>
-                    <div
-                      className={styles.dateLine}
-                      style={{
-                        borderTop: `solid 1px ${
-                          msg._id === newMsg ? "#F13E41" : "#3f4147"
-                        }`,
-                      }}
-                    />
-                    <div
-                      className={styles.date}
-                      style={{
-                        color: msg._id === newMsg ? "#F13E41" : "#b5bac1",
-                      }}
-                    >
-                      {formatDate(msg.timestamp)}
+                {(firstMsg || !sameDate) &&
+                  !(firstMsg && hasMore !== messages.length) && (
+                    <div className={styles.divisionDate}>
+                      <div
+                        className={styles.dateLine}
+                        style={{
+                          borderTop: `solid 1px ${
+                            msg._id === newMsg ? "#F13E41" : "#3f4147"
+                          }`,
+                        }}
+                      />
+                      <div
+                        className={styles.date}
+                        style={{
+                          color: msg._id === newMsg ? "#F13E41" : "#b5bac1",
+                        }}
+                      >
+                        {formatDate(msg.timestamp)}
+                      </div>
+                      {newMsg &&
+                        msg._id === newMsg &&
+                        msg.senderId !== myId && (
+                          <span className={styles.newSign}>
+                            <Images.newMsg className={styles.newIcon} />
+                            <span className={styles.newIconTxt}>NEW</span>
+                          </span>
+                        )}
                     </div>
-                    {newMsg && msg._id === newMsg && msg.senderId !== myId && (
-                      <span className={styles.newSign}>
-                        <Images.newMsg className={styles.newIcon} />
-                        <span className={styles.newIconTxt}>NEW</span>
-                      </span>
-                    )}
-                  </div>
-                )}
+                  )}
 
                 {!firstMsg &&
                   sameDate &&
