@@ -8,16 +8,10 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { checkToken, load_chatrooms, my_info } from "@/utils/api";
-import { load_friends } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
 import store from "@/store";
 import { useDispatch } from "react-redux";
-import {
-  chatRemoveSignal,
-  setReceiverInfo,
-  setUserInfo,
-  signalToMe,
-} from "@/counterSlice";
+import { setReceiverInfo, setUserInfo, signalToMe } from "@/counterSlice";
 import io from "socket.io-client";
 
 function InnerLayout({ children }) {
@@ -37,6 +31,7 @@ function InnerLayout({ children }) {
     chatRemove,
     loginReceived,
     chatEditReceived,
+    chatRemoveReceived,
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor) => {
@@ -56,20 +51,26 @@ function InnerLayout({ children }) {
       Promise.all([
         dispatch(
           signalToMe({
-            message: chatData.message,
-            senderId: chatData.senderId,
-            receiverId: chatData.receiverId,
-            isRead: chatData.isRead,
-            timestamp: chatData.timestamp,
-            _id: chatData.messageId,
+            chatData,
+            action: "message",
           })
         ),
         chatRooms(),
       ]);
     });
 
-    newSocket.on("delete", () => {
-      dispatch(signalToMe());
+    newSocket.on("delete", (msgId) => {
+      dispatch(signalToMe({ msgId, action: "delete" }));
+    });
+
+    newSocket.on("edit", (data) => {
+      dispatch(
+        signalToMe({
+          msgId: data.msgId,
+          message: data.message,
+          action: "edit",
+        })
+      );
     });
 
     newSocket.on("friendRes", () => {
@@ -154,8 +155,8 @@ function InnerLayout({ children }) {
       socket.emit("message", {
         message: chatMessage.message,
         receivedUser: chatMessage.receivedUser,
+        timestamp: chatMessage.timestamp,
       });
-      dispatch(signalToMe(""));
     }
   }, [chatSignalReceived]);
 
@@ -164,15 +165,17 @@ function InnerLayout({ children }) {
     if (socket) {
       socket.emit("delete", {
         receivedUser: chatRemove.receivedUser,
+        msgId: chatRemove.msgId,
       });
     }
-  }, [chatRemoveSignal, chatRemove]);
+  }, [chatRemoveReceived, chatRemove]);
 
   useEffect(() => {
-    chatRooms();
     if (socket) {
-      socket.emit("delete", {
+      socket.emit("edit", {
         receivedUser: chatEdit.receivedUser,
+        msgId: chatEdit.msgId,
+        message: chatEdit.message,
       });
     }
   }, [chatEditReceived, chatEdit]);
