@@ -79,8 +79,7 @@ export default function DM({ params }) {
           setIsLoading(true);
           const msg = await load_chats(receiverName, startMsgId, "up", 100);
 
-          setHasMore(msg.totalCount);
-
+          setHasMore(msg.totalCount - 1);
           const beforeHeight = chatsRef.current.scrollHeight;
 
           setMessages((prev) => [...msg.messages, ...prev]);
