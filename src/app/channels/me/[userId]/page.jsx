@@ -211,7 +211,7 @@ export default function DM({ params }) {
       setMessages((prevMessages) => {
         return prevMessages.map((msg) =>
           msg._id === toMeMessage.msgId
-            ? { ...msg, message: toMeMessage.message }
+            ? { ...msg, message: toMeMessage.message, isEdit: true }
             : msg
         );
       });
@@ -247,8 +247,8 @@ export default function DM({ params }) {
     const dateString = isToday
       ? "오늘"
       : isYesterday
-      ? "어제"
-      : date
+        ? "어제"
+        : date
           .toLocaleDateString("ko-KR", {
             year: "numeric",
             month: "2-digit",
@@ -513,7 +513,7 @@ export default function DM({ params }) {
             const sameDate =
               index > 0 &&
               formatDate(messages[index - 1].timestamp) ===
-                formatDate(msg.timestamp);
+              formatDate(msg.timestamp);
             const firstMsg = index === 0;
 
             return (
@@ -524,9 +524,8 @@ export default function DM({ params }) {
                       <div
                         className={styles.dateLine}
                         style={{
-                          borderTop: `solid 1px ${
-                            msg._id === newMsg ? "#F13E41" : "#3f4147"
-                          }`,
+                          borderTop: `solid 1px ${msg._id === newMsg ? "#F13E41" : "#3f4147"
+                            }`,
                         }}
                       />
                       <div
@@ -563,9 +562,8 @@ export default function DM({ params }) {
                   )}
 
                 <div
-                  className={`${styles.message} ${
-                    styles[msg.senderId !== myId ? "received" : "sent"]
-                  }`}
+                  className={`${styles.message} ${styles[msg.senderId !== myId ? "received" : "sent"]
+                    }`}
                   style={{
                     backgroundColor:
                       isEdit && msg._id === editMsg ? "#2e3035" : "",
@@ -607,10 +605,10 @@ export default function DM({ params }) {
                     )}
 
                   {!(firstMsg && hasMore !== messages?.length) &&
-                  (firstMsg ||
-                    (sameSender && !sameDate) ||
-                    (!sameSender && !sameDate) ||
-                    (!sameSender && sameDate)) ? (
+                    (firstMsg ||
+                      (sameSender && !sameDate) ||
+                      (!sameSender && !sameDate) ||
+                      (!sameSender && sameDate)) ? (
                     <div className={styles.msgInfos}>
                       <div
                         className={styles.msgIcon}
