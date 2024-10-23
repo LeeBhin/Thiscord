@@ -163,6 +163,7 @@ export default function DM({ params }) {
     if (msg && msg.trim() !== "") {
       inputRef.current.value = "";
       chatAreaHeight();
+
       dispatch(
         chatSignal({
           message: msg,
@@ -170,7 +171,15 @@ export default function DM({ params }) {
           timestamp: new Date().toISOString(),
         })
       );
+
       setNews([]);
+
+      setMessages((prevMessages) => {
+        if (prevMessages.length > 100) {
+          return prevMessages.slice(-100);
+        }
+        return prevMessages;
+      });
     }
   };
 
