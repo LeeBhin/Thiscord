@@ -101,6 +101,7 @@ export default function All_Friends({ friendsSign }) {
                           delete_friend(friend.name);
                           setIsPopup(false);
                           e.stopPropagation();
+                          location.reload();
                         }}
                       >
                         친구 삭제하기

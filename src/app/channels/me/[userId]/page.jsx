@@ -13,7 +13,12 @@ import { useEffect, useState, useRef } from "react";
 import styles from "./dm.module.css";
 import Images from "@/Images";
 import { useDispatch, useSelector } from "react-redux";
-import { chatEditSignal, chatRemoveSignal, chatSignal } from "@/counterSlice";
+import {
+  chatEditSignal,
+  chatRemoveSignal,
+  chatSignal,
+  signalToMe,
+} from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
 import Skeleton from "@/app/components/Skeleton";
@@ -25,7 +30,7 @@ export default function DM({ params }) {
   const [receiverColor, setReceiverColor] = useState();
   const [receiverName, setReceiverName] = useState();
   const [isBottom, setIsBottom] = useState(true);
-  const [isTop, setIsTop] = useState(true);
+  const [isTop, setIsTop] = useState(false);
   const [isPopup, setIsPopup] = useState(false);
   const [msgInfo, setMsgInfo] = useState();
   const [copyContent, setCopyContent] = useState();
@@ -58,7 +63,6 @@ export default function DM({ params }) {
   });
 
   useEffect(() => {
-    if (isLoading) return;
     SetStartMsgId(messages[0]?._id);
     SetEndMsgId(messages.at(-1)?._id);
     let isWindowFocused = document.hasFocus();
@@ -74,15 +78,16 @@ export default function DM({ params }) {
 
   useEffect(() => {
     const fetchChats = async () => {
-      if (isTop && hasMore !== messages.length) {
+      if (isTop && hasMore !== messages.length && startMsgId) {
         try {
           setIsLoading(true);
           const msg = await load_chats(receiverName, startMsgId, "up", 100);
 
-          setHasMore(msg.totalCount - 1);
           const beforeHeight = chatsRef.current.scrollHeight;
 
           setMessages((prev) => [...msg.messages, ...prev]);
+
+          setHasMore(msg.totalCount);
 
           requestAnimationFrame(() => {
             const afterHeight = chatsRef.current.scrollHeight;
@@ -101,8 +106,12 @@ export default function DM({ params }) {
 
   const fetchNew = async () => {
     const info = await my_info();
+    if (!receiverName || !myId || !myName) return;
     const chatData = await load_chats(decodeURIComponent(userId));
     setMessages(chatData.messages);
+    setHasMore(chatData.totalCount);
+
+    checkScrollPosition();
 
     const readMessages = chatData.messages.filter(
       (msg) => msg.isRead[info.userId]
@@ -129,7 +138,7 @@ export default function DM({ params }) {
       const info = await my_info();
       setMyName(info.name);
       setMyId(info.userId);
-
+      if (!receiverName || !myId || !myName) return;
       fetchNew();
     } catch (err) {
       console.error("Error:", err);
@@ -142,9 +151,14 @@ export default function DM({ params }) {
 
   useEffect(() => {
     fetchChats();
-  }, []);
+  }, [receiverName, myId, myName]);
 
   const checkScrollPosition = () => {
+    const chatElement = chatsRef.current;
+
+    if (chatElement.scrollHeight <= chatElement.clientHeight) {
+      return;
+    }
     if (chatsRef.current) {
       const chatContainer = chatsRef.current;
       if (chatContainer.scrollHeight <= chatContainer.clientHeight) {
@@ -154,10 +168,6 @@ export default function DM({ params }) {
       }
     }
   };
-
-  useEffect(() => {
-    fetchChats();
-  }, []);
 
   useEffect(() => {
     if (!isLoading) checkScrollPosition();
@@ -193,12 +203,14 @@ export default function DM({ params }) {
 
       setNews([]);
 
-      setMessages((prevMessages) => {
-        if (prevMessages.length > 100) {
-          return prevMessages.slice(-100);
-        }
-        return prevMessages;
-      });
+      if (messages.length > 100) {
+        setMessages((prevMessages) => {
+          if (prevMessages.length > 100) {
+            return prevMessages.slice(-100);
+          }
+          return prevMessages;
+        });
+      }
     }
   };
 
@@ -223,7 +235,10 @@ export default function DM({ params }) {
             : msg
         );
       });
+    } else {
+      return;
     }
+    // dispatch(signalToMe({}));
   }, [signalMeReceived]);
 
   const sendDelete = (msgId) => {
@@ -298,6 +313,10 @@ export default function DM({ params }) {
   const handleScroll = () => {
     const chatElement = chatsRef.current;
 
+    if (chatElement.scrollHeight <= chatElement.clientHeight) {
+      return;
+    }
+
     const isNearBottom =
       chatElement.scrollHeight - chatElement.scrollTop <=
       chatElement.clientHeight + 50;
@@ -310,6 +329,10 @@ export default function DM({ params }) {
 
   useEffect(() => {
     const chatElement = chatsRef.current;
+
+    if (chatElement.scrollHeight <= chatElement.clientHeight) {
+      return;
+    }
     chatElement.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -491,7 +514,7 @@ export default function DM({ params }) {
 
         {isLoading && <Skeleton />}
         <div className={styles.chats} ref={chatsRef}>
-          {hasMore === messages?.length && (
+          {(hasMore === messages?.length || !hasMore) && (
             <div className={styles.top}>
               <div
                 className={styles.topIconWrap}
@@ -501,7 +524,8 @@ export default function DM({ params }) {
               </div>
               <h3 className={styles.topName}>{receiverName}</h3>
               <div className={styles.topTxt}>
-                {messages && isWithinOneWeek(messages[0]?.timestamp) ? (
+                {!messages.length > 0 ||
+                isWithinOneWeek(messages[0]?.timestamp) ? (
                   <div>
                     <b>{receiverName}</b> 님과의 전설적인 대화가 지금 막
                     시작되었어요.
@@ -515,6 +539,7 @@ export default function DM({ params }) {
               </div>
             </div>
           )}
+
           {messages?.map((msg, index) => {
             const sameSender =
               index > 0 && messages[index - 1].senderId === msg.senderId;
