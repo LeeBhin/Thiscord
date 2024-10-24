@@ -127,8 +127,9 @@ export async function friends_recommand(userId) {
     const query = `
         query GetFriendRecommendations($userId: ID!) {
             getFriendRecommendations(userId: $userId) {
-                userId
                 name
+                iconColor
+                mutualFriends
             }
         }
     `;

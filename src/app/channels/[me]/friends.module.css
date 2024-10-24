@@ -68,6 +68,8 @@
 .statusWrap > div:nth-child(1),
 .statusWrap > div:nth-child(3) {
   min-width: 48px;
+  display: flex;
+  justify-content: space-around;
 }
 .statusWrap > div:nth-child(2) {
   display: flex;

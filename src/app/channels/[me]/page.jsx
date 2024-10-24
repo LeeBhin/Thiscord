@@ -15,6 +15,7 @@ import { triggerSignal } from "@/counterSlice";
 export default function Friends() {
   const [whichActive, setWichActive] = useState("all");
   const [counting, setCounting] = useState(0);
+  const [recommands, setRecommands] = useState([]);
   const currentPath = usePathname();
   const router = useRouter();
 
@@ -49,10 +50,9 @@ export default function Friends() {
   };
 
   useEffect(() => {
-    console.log(userInfo);
     friends_recommand(userInfo?.userId)
       .then((friends) => {
-        console.log(friends);
+        setRecommands(friends.getFriendRecommendations);
       })
       .catch((error) => {
         console.error("Error fetching friends:", error);
@@ -74,7 +74,7 @@ export default function Friends() {
           />
         );
       case "recommand":
-        return <Recommend />;
+        return <Recommend recommands={recommands} userId={userInfo.userId} />;
       case "add":
         return <Add_Friend sendFriendReq={sendFriendReq} />;
       default:
@@ -113,13 +113,10 @@ export default function Friends() {
               style={counting > 0 ? { minWidth: "100px" } : {}}
             >
               대기 중
-              {counting > 0 ? (
+              {counting > 0 && (
                 <div className={styles.pendingCount}>
-                  {" "}
-                  {<div className={styles.counting}>{counting}</div>}
+                  <div className={styles.counting}>{counting}</div>
                 </div>
-              ) : (
-                <></>
               )}
             </div>
 
@@ -128,8 +125,14 @@ export default function Friends() {
                 whichActive === "recommand" ? styles.statusActive : ""
               }`}
               onClick={() => handleActive("recommand")}
+              style={recommands.length > 0 ? { minWidth: "73px" } : {}}
             >
               추천
+              {recommands.length > 0 && (
+                <div className={styles.pendingCount}>
+                  <div className={styles.counting}>{recommands.length}</div>
+                </div>
+              )}
             </div>
           </div>
 
