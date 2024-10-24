@@ -1,8 +1,3 @@
 export default function Recommend() {
-    return (
-        <div>
-
-            Recommend
-        </div>
-    )
+  return <div>Recommend</div>;
 }

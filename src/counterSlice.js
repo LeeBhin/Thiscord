@@ -16,6 +16,7 @@ export const counterSlice = createSlice({
     userInfo: {
       name: '',
       iconColor: '',
+      userId: ''
     },
     receiverInfo: {
       name: '',
@@ -46,8 +47,8 @@ export const counterSlice = createSlice({
       state.chatEdit = action.payload;
     },
     setUserInfo: (state, action) => {
-      const { name = '', iconColor = '' } = action.payload || {};
-      state.userInfo = { name, iconColor };
+      const { name = '', iconColor = '', userId = '' } = action.payload || {};
+      state.userInfo = { name, iconColor, userId };
     },
     setReceiverInfo: (state, action) => {
       const { name = '', iconColor = '' } = action.payload || {};

@@ -7,7 +7,7 @@ import All_Friends from "./friend_pages/allFriend";
 import Pending from "./friend_pages/pending";
 import Recommend from "./friend_pages/recommend";
 import Add_Friend from "./friend_pages/addFriend";
-import { pending_friends } from "@/utils/api";
+import { friends_recommand, pending_friends } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { triggerSignal } from "@/counterSlice";
@@ -19,9 +19,7 @@ export default function Friends() {
   const router = useRouter();
 
   const dispatch = useDispatch();
-  const signalMeReceived = useSelector(
-    (state) => state.counter.signalMeReceived
-  );
+  const { signalMeReceived, userInfo } = useSelector((state) => state.counter);
 
   const sendFriendReq = () => {
     dispatch(triggerSignal());
@@ -49,6 +47,17 @@ export default function Friends() {
   const refresh = () => {
     pendingCount();
   };
+
+  useEffect(() => {
+    console.log(userInfo);
+    friends_recommand(userInfo?.userId)
+      .then((friends) => {
+        console.log(friends);
+      })
+      .catch((error) => {
+        console.error("Error fetching friends:", error);
+      });
+  }, [userInfo]);
 
   const friendsSign = () => {};
 

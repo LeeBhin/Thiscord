@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const GRAPHQL_URL = `${API_URL}/graphql`;
 
 export async function apiRequest(endpoint, method, body = null) {
     const options = {
@@ -90,4 +91,47 @@ export async function delete_user(password) {
 
 export async function read_chat(msgId, receiverName) {
     return apiRequest('chat/messages/read', 'PATCH', { msgId, receiverName })
+}
+
+export async function graphqlRequest(query, variables = {}) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+            query,
+            variables
+        })
+    };
+
+    const response = await fetch(GRAPHQL_URL, options);
+
+    if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 401) {
+            throw new Error('Unauthorized');
+        }
+        throw new Error(error.message || '영 좋지 않아요.');
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+        throw new Error(data.errors[0].message);
+    }
+
+    return data.data;
+}
+
+export async function friends_recommand(userId) {
+    const query = `
+        query GetFriendRecommendations($userId: ID!) {
+            getFriendRecommendations(userId: $userId) {
+                userId
+                name
+            }
+        }
+    `;
+
+    return graphqlRequest(query, { userId });
 }

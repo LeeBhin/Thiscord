@@ -34,8 +34,8 @@ function InnerLayout({ children }) {
     chatRemoveReceived,
   } = useSelector((state) => state.counter);
 
-  const handleUserInfoUpdate = (name, iconColor) => {
-    dispatch(setUserInfo({ name, iconColor }));
+  const handleUserInfoUpdate = (name, iconColor, userId) => {
+    dispatch(setUserInfo({ name, iconColor, userId }));
   };
 
   const connectSocket = useCallback(() => {
@@ -136,7 +136,7 @@ function InnerLayout({ children }) {
     }
     const getInfo = async () => {
       const info = await my_info();
-      handleUserInfoUpdate(info.name, info.iconColor);
+      handleUserInfoUpdate(info.name, info.iconColor, info.userId);
       setUser(info);
     };
     getInfo();
