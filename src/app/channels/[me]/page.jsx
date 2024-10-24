@@ -101,10 +101,12 @@ export default function Friends() {
                 whichActive === "pending" ? styles.statusActive : ""
               }`}
               onClick={() => handleActive("pending")}
+              style={counting > 0 ? { minWidth: "100px" } : {}}
             >
               대기 중
               {counting > 0 ? (
                 <div className={styles.pendingCount}>
+                  {" "}
                   {<div className={styles.counting}>{counting}</div>}
                 </div>
               ) : (

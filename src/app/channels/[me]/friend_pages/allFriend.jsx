@@ -3,13 +3,14 @@
 import Images from "@/Images";
 import styles from "../friends.module.css";
 import { useEffect, useState } from "react";
-import { load_friends } from "@/utils/api";
+import { delete_friend, load_friends } from "@/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function All_Friends({ friendsSign }) {
   const [friends, setFriends] = useState([]);
   const router = useRouter();
+  const [isPopup, setIsPopup] = useState(false);
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -27,6 +28,20 @@ export default function All_Friends({ friendsSign }) {
   const gotoDM = (user) => {
     router.push(`/channels/me/${user}`);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isPopup && !event.target.closest(`.${styles.pop}`)) {
+        setIsPopup(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isPopup]);
 
   return (
     <div>
@@ -72,11 +87,26 @@ export default function All_Friends({ friendsSign }) {
                   <div
                     className={styles.btn}
                     onClick={(e) => {
+                      setIsPopup(true);
                       e.stopPropagation();
                     }}
                   >
                     <Images.threeDot className={styles.btnIcon} />
                   </div>
+                  {isPopup && (
+                    <div className={styles.pop}>
+                      <div
+                        className={styles.deleteFriend}
+                        onClick={(e) => {
+                          delete_friend(friend.name);
+                          setIsPopup(false);
+                          e.stopPropagation();
+                        }}
+                      >
+                        친구 삭제하기
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
