@@ -50,14 +50,20 @@ export default function Friends() {
   };
 
   useEffect(() => {
+    const storedFriends =
+      JSON.parse(localStorage.getItem("excludedFriends")) || [];
+
     friends_recommand(userInfo?.userId)
-      .then((friends) => {
-        setRecommands(friends.getFriendRecommendations);
+      .then((response) => {
+        const filteredFriends = response.getFriendRecommendations.filter(
+          (friend) => !storedFriends.includes(friend.name)
+        );
+        setRecommands(filteredFriends);
       })
       .catch((error) => {
         console.error("Error fetching friends:", error);
       });
-  }, [userInfo]);
+  }, [userInfo, signalMeReceived]);
 
   const friendsSign = () => {};
 
@@ -74,7 +80,13 @@ export default function Friends() {
           />
         );
       case "recommand":
-        return <Recommend recommands={recommands} userId={userInfo.userId} />;
+        return (
+          <Recommend
+            recommands={recommands}
+            userId={userInfo.userId}
+            sendFriendReq={sendFriendReq}
+          />
+        );
       case "add":
         return <Add_Friend sendFriendReq={sendFriendReq} />;
       default:

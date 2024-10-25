@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 export default function All_Friends({ friendsSign }) {
   const [friends, setFriends] = useState([]);
   const router = useRouter();
-  const [isPopup, setIsPopup] = useState(false);
+  const [activePopupIndex, setActivePopupIndex] = useState(null);
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -31,8 +31,8 @@ export default function All_Friends({ friendsSign }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isPopup && !event.target.closest(`.${styles.pop}`)) {
-        setIsPopup(false);
+      if (activePopupIndex !== null && !event.target.closest(`.${styles.pop}`)) {
+        setActivePopupIndex(null);
       }
     };
 
@@ -41,7 +41,7 @@ export default function All_Friends({ friendsSign }) {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isPopup]);
+  }, [activePopupIndex]);
 
   return (
     <div>
@@ -52,9 +52,7 @@ export default function All_Friends({ friendsSign }) {
         </div>
 
         <div className={styles.friendsWrap}>
-          <p
-            className={styles.countFriends}
-          >{`모든 친구 – ${friends.length}명`}</p>
+          <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
         </div>
       </div>
 
@@ -63,10 +61,7 @@ export default function All_Friends({ friendsSign }) {
           friends.map((friend, index) => (
             <div key={index}>
               <div className={styles.friendsLine} />
-              <div
-                onClick={() => gotoDM(friend.name)}
-                className={styles.friend}
-              >
+              <div onClick={() => gotoDM(friend.name)} className={styles.friend}>
                 <div className={styles.profileWrap}>
                   <div
                     className={styles.profile}
@@ -78,28 +73,25 @@ export default function All_Friends({ friendsSign }) {
                 </div>
 
                 <div className={styles.btns}>
-                  <Link
-                    href={`/channels/me/${friend.name}`}
-                    className={styles.btn}
-                  >
+                  <Link href={`/channels/me/${friend.name}`} className={styles.btn}>
                     <Images.chat className={styles.btnIcon} />
                   </Link>
                   <div
                     className={styles.btn}
                     onClick={(e) => {
-                      setIsPopup(true);
+                      setActivePopupIndex(index);
                       e.stopPropagation();
                     }}
                   >
                     <Images.threeDot className={styles.btnIcon} />
                   </div>
-                  {isPopup && (
+                  {activePopupIndex === index && (
                     <div className={styles.pop}>
                       <div
                         className={styles.deleteFriend}
                         onClick={(e) => {
                           delete_friend(friend.name);
-                          setIsPopup(false);
+                          setActivePopupIndex(null);
                           e.stopPropagation();
                           location.reload();
                         }}
