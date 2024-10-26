@@ -174,9 +174,7 @@
   position: absolute;
   width: 98%;
   left: 10px;
-  border-top: solid 1px color-mix(in oklab,
-      hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%,
-      hsl(0 0% 0% / 0.48) 0%);
+  border-top: solid 1px rgba(76, 80, 90, 0.48);
 }
 
 .friend {
@@ -363,9 +361,7 @@
   top: 230px;
   left: 0;
   width: 100%;
-  border-bottom: solid 1px color-mix(in oklab,
-      hsl(228 calc(1 * 6%) 32.5% / 0.48) 100%,
-      hsl(0 0% 0% / 0.48) 0%);
+  border-top: solid 1px rgba(76, 80, 90, 0.48);
 }
 
 .bottom {
