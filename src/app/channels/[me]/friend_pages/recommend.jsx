@@ -83,9 +83,9 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
                         {friend.mutualFriends?.length
                           ? <>
                             {friend.mutualFriends.slice(0, 3).map((name, index) => (
-                              <React.Fragment key={index}>
+                              <div key={`mutual-${index}`}>
                                 <strong>{name}</strong>님{index < 2 && ", "}
-                              </React.Fragment>
+                              </div>
                             ))}
                             {friend.mutualFriends.length > 3
                               ? ` 외 ${friend.mutualFriends.length - 3}명`
