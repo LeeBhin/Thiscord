@@ -52,71 +52,76 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
 
   return (
     <div>
-      <div className={styles.bodyWrap}>
-        <div className={styles.searchFriend}>
-          <input type="text" placeholder="검색하기" />
-          <Images.search className={styles.searchIcon} />
-        </div>
+      {friends.length > 0 ? (
+        <div className={styles.bodyWrap}>
+          <div className={styles.searchFriend}>
+            <input type="text" placeholder="검색하기" />
+            <Images.search className={styles.searchIcon} />
+          </div>
 
-        <div className={styles.friendsWrap}>
-          <p
-            className={styles.countFriends}
-          >{`친구 추천 – ${friends.length}명`}</p>
+          <div className={styles.friendsWrap}>
+            <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+          </div>
         </div>
+      ) : null}
 
-        <div className={styles.friendsList}>
-          {friends.length > 0 ? (
-            friends.map((friend, index) => (
-              <div key={index}>
-                <div className={styles.friendsLine} />
-                <div className={`${styles.friend} ${styles.friendPending}`}>
-                  <div className={styles.profileWrap}>
-                    <div
-                      className={styles.profile}
-                      style={{ backgroundColor: friend.iconColor }}
-                    >
-                      <Images.icon className={styles.icon} />
-                    </div>
-                    <div className={styles.nameWrap}>
-                      <div className={styles.name}>{friend.name}</div>
-                      <div className={styles.pending}>
-                        {friend.mutualFriends?.length
-                          ? <>
-                            {friend.mutualFriends.slice(0, 3).map((name, index) => (
-                              <div key={`mutual-${index}`}>
-                                <strong>{name}</strong>님{index < 2 && ", "}
-                              </div>
-                            ))}
-                            {friend.mutualFriends.length > 3
-                              ? ` 외 ${friend.mutualFriends.length - 3}명`
-                              : null}과 친구입니다.
-                          </>
-                          : null}
-                      </div>
-                    </div>
+      <div className={styles.friendsList}>
+        {friends.length > 0 ? (
+          friends.map((friend, index) => (
+            <div key={index}>
+              <div className={styles.friendsLine} />
+              <div className={`${styles.friend} ${styles.friendPending}`}>
+                <div className={styles.profileWrap}>
+                  <div
+                    className={styles.profile}
+                    style={{ backgroundColor: friend.iconColor }}
+                  >
+                    <Images.icon className={styles.icon} />
                   </div>
-
-                  <div className={styles.ox}>
-                    <div
-                      className={styles.accept}
-                      onClick={() => acceptFriend(friend.name)}
-                    >
-                      <Images.accept />
-                    </div>
-                    <div
-                      className={styles.deny}
-                      onClick={() => deleteFriend(friend.name)}
-                    >
-                      <Images.deny />
+                  <div className={styles.nameWrap}>
+                    <div className={styles.name}>{friend.name}</div>
+                    <div className={styles.pending}>
+                      {friend.mutualFriends?.length ? (
+                        <>
+                          {friend.mutualFriends.slice(0, 3).map((name, index) => (
+                            <span key={`mutual-${index}`}>
+                              <strong>{name}</strong>님
+                              {index < Math.min(2, friend.mutualFriends.length - 1) ? ", " : ""}
+                            </span>
+                          ))}
+                          {friend.mutualFriends.length > 3
+                            ? ` 외 ${friend.mutualFriends.length - 3}명`
+                            : null}
+                          과 친구입니다.
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 </div>
+
+                <div className={styles.ox}>
+                  <div
+                    className={styles.accept}
+                    onClick={() => acceptFriend(friend.name)}
+                  >
+                    <Images.accept />
+                  </div>
+                  <div
+                    className={styles.deny}
+                    onClick={() => deleteFriend(friend.name)}
+                  >
+                    <Images.deny />
+                  </div>
+                </div>
               </div>
-            ))
-          ) : (
-            <p>추천할 친구가 없습니다.</p>
-          )}
-        </div>
+            </div>
+          ))
+        ) : (
+          <div className={styles.bottom}>
+            <Images.norecommand className={styles.wumpus} />
+            <p>Wumpus가 친구 찾기에 열심히예요. 곧 멋진 친구를 소개해줄 거예요!</p>
+          </div>
+        )}
       </div>
     </div>
   );

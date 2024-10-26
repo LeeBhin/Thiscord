@@ -17,6 +17,9 @@ import remove from '@/../../public/svgs/remove.svg'
 import logout from '@/../../public/svgs/logout.svg'
 import esc from '@/../../public/svgs/esc.svg'
 import newMsg from '@/../../public/svgs/new.svg'
+import nobody from '@/../../public/svgs/nobody.svg'
+import nopending from '@/../../public/svgs/nopending.svg'
+import norecommand from '@/../../public/svgs/norecommand.svg'
 
 const Images = {
   background,
@@ -36,9 +39,12 @@ const Images = {
   remove,
   logout,
   esc,
-  newMsg
+  newMsg,
+  nobody,
+  nopending,
+  norecommand
 };
 
 export default {
-  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove, logout, esc, newMsg
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove, logout, esc, newMsg, nobody, nopending,norecommand
 };

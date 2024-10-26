@@ -81,9 +81,9 @@ export default function Add_Friend({ sendFriendReq }) {
 
       <div className={styles.line} />
 
-      <div className={styles.bottom}>
+      <div className={styles.bottomAdd}>
         <Images.wumpus className={styles.wumpus} />
-        <p>wumpus는 친구를 기다리고 있어요.</p>
+        <p>Wumpus는 친구를 기다리고 있어요.</p>
       </div>
     </div>
   );

@@ -45,16 +45,18 @@ export default function All_Friends({ friendsSign }) {
 
   return (
     <div>
-      <div className={styles.bodyWrap}>
-        <div className={styles.searchFriend}>
-          <input type="text" placeholder="검색하기" />
-          <Images.search className={styles.searchIcon} />
-        </div>
+      {friends.length > 0 ? (
+        <div className={styles.bodyWrap}>
+          <div className={styles.searchFriend}>
+            <input type="text" placeholder="검색하기" />
+            <Images.search className={styles.searchIcon} />
+          </div>
 
-        <div className={styles.friendsWrap}>
-          <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+          <div className={styles.friendsWrap}>
+            <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className={styles.friendsList}>
         {friends.length > 0 ? (
@@ -105,7 +107,10 @@ export default function All_Friends({ friendsSign }) {
             </div>
           ))
         ) : (
-          <></>
+          <div className={styles.bottom}>
+            <Images.nobody className={styles.wumpus} />
+            <p>아무도 Wumpus와 놀고 싶지 않은가 봐요.</p>
+          </div>
         )}
       </div>
     </div>
