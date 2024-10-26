@@ -80,19 +80,18 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
                     <div className={styles.nameWrap}>
                       <div className={styles.name}>{friend.name}</div>
                       <div className={styles.pending}>
-                        {friend.mutualFriends &&
-                        friend.mutualFriends.length > 0 ? (
-                          friend.mutualFriends.length >= 4 ? (
-                            <>
-                              {friend.mutualFriends.slice(0, 3).join(", ")}님 외{" "}
-                              {friend.mutualFriends.length - 3}명과 친구입니다.
-                            </>
-                          ) : (
-                            `${friend.mutualFriends.join(", ")}님과 친구입니다.`
-                          )
-                        ) : (
-                          "추천할 친구가 없습니다."
-                        )}
+                        {friend.mutualFriends?.length
+                          ? <>
+                            {friend.mutualFriends.slice(0, 3).map((name, index) => (
+                              <React.Fragment key={index}>
+                                <strong>{name}</strong>님{index < 2 && ", "}
+                              </React.Fragment>
+                            ))}
+                            {friend.mutualFriends.length > 3
+                              ? ` 외 ${friend.mutualFriends.length - 3}명`
+                              : null}과 친구입니다.
+                          </>
+                          : null}
                       </div>
                     </div>
                   </div>
