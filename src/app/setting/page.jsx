@@ -2,7 +2,15 @@
 
 import Images from "@/Images";
 import styles from "./setting.module.css";
-import { delete_user, logout, my_info, update_name } from "@/utils/api";
+import {
+  delete_user,
+  getPushNotification,
+  logout,
+  my_info,
+  subscribePushNotification,
+  unsubscribePushNotification,
+  update_name,
+} from "@/utils/api";
 import { useEffect, useRef, useState } from "react";
 import { setUserInfo } from "@/counterSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +20,7 @@ import { motion } from "framer-motion";
 
 export default function Setting() {
   const [isEdit, setIsEdit] = useState(false);
-  const [name, setName] = useState();
+  const [name, setName] = useState("");
   const dispatch = useDispatch();
   const bodyRef = useRef(null);
   const btnRef = useRef(null);
@@ -22,6 +30,8 @@ export default function Setting() {
   const [pw, setPw] = useState("");
   const [allow, setAllow] = useState(false);
   const [err, setErr] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleUserInfoUpdate = (name, iconColor) => {
     dispatch(setUserInfo({ name, iconColor }));
@@ -37,7 +47,7 @@ export default function Setting() {
 
   const changeName = () => {
     setIsEdit(true);
-    setName(userInfo?.name);
+    setName(userInfo?.name || "");
   };
 
   const handleChange = (e) => {
@@ -57,7 +67,6 @@ export default function Setting() {
   const newName = () => {
     update_name(name);
     setIsEdit(false);
-
     handleUserInfoUpdate(name, userInfo?.iconColor);
   };
 
@@ -67,9 +76,7 @@ export default function Setting() {
         router.back();
       }
     };
-
     document.addEventListener("keydown", handleEscPress);
-
     return () => {
       document.removeEventListener("keydown", handleEscPress);
     };
@@ -101,6 +108,121 @@ export default function Setting() {
       setAllow(true);
     }
   };
+
+  const checkSubscription = async () => {
+    console.log("dd");
+    try {
+      const permission = await Notification.requestPermission();
+
+      if (permission !== "granted") {
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        const registration = await navigator.serviceWorker.ready;
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+          ),
+        });
+      }
+
+      const response = getPushNotification(subscription);
+      console.log(response)
+      if (response.success === true) {
+        setIsSubscribed(true);
+      } else {
+        setIsSubscribed(false);
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to check push subscription:", error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkSubscription();
+  }, []);
+
+  const handleToggle = async () => {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      return;
+    }
+
+    if (!isSubscribed) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+          ),
+        });
+
+        const success = await subscribePushNotification(subscription);
+
+        if (!success) {
+          throw new Error("Failed to subscribe to push notifications");
+        }
+        setIsSubscribed(true);
+      } catch (error) {
+        console.error("Push notification subscription failed:", error);
+      }
+    } else {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          const success = await unsubscribePushNotification();
+
+          if (success) {
+            setIsSubscribed(false);
+          } else {
+            setIsSubscribed(true);
+            console.error("Failed to unsubscribe from push notifications");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to unsubscribe from push notifications:", error);
+      }
+    }
+  };
+
+  const registerServiceWorker = async () => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+      return;
+    }
+
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (let registration of registrations) {
+        await registration.unregister();
+      }
+
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+      });
+
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+      });
+    } catch (error) {
+      console.error("Service Worker 등록 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
 
   return (
     <div className={styles.wrap}>
@@ -208,7 +330,7 @@ export default function Setting() {
                       <input
                         className={styles.nameInput}
                         value={name}
-                        onChange={(e) => handleChange(e)}
+                        onChange={handleChange}
                         onKeyDown={handleEnter}
                       />
                       <div className={styles.editAction}>
@@ -244,9 +366,28 @@ export default function Setting() {
               <div className={styles.circle}>
                 <Images.esc />
               </div>
-
               <span className={styles.txt}>ESC</span>
             </div>
+          </div>
+
+          <div className={styles.rmWrap}>
+            <span className={styles.rmTitle}>푸시 알림</span>
+            <span className={styles.rmSubtitle}>
+              {isLoading
+                ? "알림 상태를 확인하는 중이에요..."
+                : isSubscribed
+                ? "알림을 받고 계세요. 끄고 싶다면 토글을 눌러주세요."
+                : "알림을 받고 있지 않아요. 켜고 싶다면 토글을 눌러주세요."}
+            </span>
+            <label className={styles.toggleSwitch}>
+              <input
+                type="checkbox"
+                checked={isSubscribed}
+                onChange={handleToggle}
+                disabled={isLoading}
+              />
+              <span className={styles.slider}></span>
+            </label>
           </div>
 
           <div className={styles.rmWrap}>

@@ -9,6 +9,7 @@ const nextConfig = {
             },
         ];
     },
+
     webpack(config) {
         config.module.rules.push({
             test: /\.svg$/,
@@ -16,6 +17,20 @@ const nextConfig = {
         });
 
         return config;
+    },
+
+    async headers() {
+        return [
+            {
+                source: '/manifest.json',
+                headers: [
+                    {
+                        key: 'Access-Control-Allow-Origin',
+                        value: '*',
+                    },
+                ],
+            },
+        ];
     },
 };
 
