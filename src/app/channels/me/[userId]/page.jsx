@@ -215,28 +215,33 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
-    if (toMeMessage?.action === "message") {
-      setMessages((prevMessages) => {
-        return [...prevMessages, toMeMessage.chatData];
-      });
-      setHasMore(hasMore + 1);
-    } else if (toMeMessage?.action === "delete") {
-      setMessages((prevMessages) => {
-        return prevMessages.filter(
-          (msg) => msg._id !== toMeMessage.msgId.msgId
-        );
-      });
-      setHasMore(hasMore - 1);
-    } else if (toMeMessage?.action === "edit") {
-      setMessages((prevMessages) => {
-        return prevMessages.map((msg) =>
-          msg._id === toMeMessage.msgId
-            ? { ...msg, message: toMeMessage.message, isEdit: true }
-            : msg
-        );
-      });
-    } else {
-      return;
+    if (
+      toMeMessage.chatData?.senderName === myName ||
+      toMeMessage.chatData?.senderName === receiverName
+    ) {
+      if (toMeMessage?.action === "message") {
+        setMessages((prevMessages) => {
+          return [...prevMessages, toMeMessage.chatData];
+        });
+        setHasMore(hasMore + 1);
+      } else if (toMeMessage?.action === "delete") {
+        setMessages((prevMessages) => {
+          return prevMessages.filter(
+            (msg) => msg._id !== toMeMessage.msgId.msgId
+          );
+        });
+        setHasMore(hasMore - 1);
+      } else if (toMeMessage?.action === "edit") {
+        setMessages((prevMessages) => {
+          return prevMessages.map((msg) =>
+            msg._id === toMeMessage.msgId
+              ? { ...msg, message: toMeMessage.message, isEdit: true }
+              : msg
+          );
+        });
+      } else {
+        return;
+      }
     }
     // dispatch(signalToMe({}));
   }, [signalMeReceived]);

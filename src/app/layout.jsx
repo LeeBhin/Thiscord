@@ -50,20 +50,15 @@ function InnerLayout({ children }) {
     newSocket.on("connect", () => {});
 
     newSocket.on("message", (chatData) => {
-      if (
-        extractString(currentPath) === chatData.senderName ||
-        extractString(currentPath) === chatData.receiverName
-      ) {
-        Promise.all([
-          dispatch(
-            signalToMe({
-              chatData,
-              action: "message",
-            })
-          ),
-          chatRooms(),
-        ]);
-      }
+      Promise.all([
+        dispatch(
+          signalToMe({
+            chatData,
+            action: "message",
+          })
+        ),
+        chatRooms(),
+      ]);
     });
 
     newSocket.on("delete", (msgId) => {
