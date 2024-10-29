@@ -124,10 +124,8 @@ export default function Setting() {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
-          await subscription.unsubscribe();
-          await unsubscribePushNotification();
+          setIsSubscribed(true);
         }
-        setIsSubscribed(true);
       }
     };
     setIsLoading(false);
