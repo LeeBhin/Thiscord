@@ -22,6 +22,7 @@ function InnerLayout({ children }) {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("Thiscord");
   const [user, setUser] = useState();
+  const [focus, setFocus] = useState();
 
   const {
     signalReceived,
@@ -32,6 +33,7 @@ function InnerLayout({ children }) {
     loginReceived,
     chatEditReceived,
     chatRemoveReceived,
+    userInfo,
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor, userId) => {
@@ -48,15 +50,17 @@ function InnerLayout({ children }) {
     newSocket.on("connect", () => {});
 
     newSocket.on("message", (chatData) => {
-      Promise.all([
-        dispatch(
-          signalToMe({
-            chatData,
-            action: "message",
-          })
-        ),
-        chatRooms(),
-      ]);
+      if (extractString(currentPath) === chatData.senderName) {
+        Promise.all([
+          dispatch(
+            signalToMe({
+              chatData,
+              action: "message",
+            })
+          ),
+          chatRooms(),
+        ]);
+      }
     });
 
     newSocket.on("delete", (msgId) => {
@@ -224,6 +228,60 @@ function InnerLayout({ children }) {
         : "Thiscord";
     setTitle(title);
   }, [currentPath]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setFocus(false);
+      } else {
+        setFocus(document.hasFocus());
+      }
+    };
+
+    const handleFocus = () => {
+      setFocus(true);
+    };
+
+    const handleBlur = () => {
+      setFocus(false);
+    };
+
+    handleVisibilityChange();
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+      setFocus(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isWindowFocused = document.hasFocus();
+    if (document.hidden || !isWindowFocused || !focus) return;
+    if (socket && userInfo) {
+      socket.emit("current", {
+        userId: userInfo?.userId,
+        current: extractString(currentPath),
+      });
+    }
+  }, [currentPath, userInfo, focus]);
+
+  const extractString = (url) => {
+    const prefix = "/channels/me/";
+
+    if (url.startsWith(prefix)) {
+      const atIndex = url.indexOf("@");
+      if (atIndex !== -1) {
+        return url.slice(atIndex + 1);
+      }
+    }
+    return null;
+  };
 
   const isAuthPath =
     currentPath === "/login" ||
