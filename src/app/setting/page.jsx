@@ -112,9 +112,6 @@ export default function Setting() {
   useEffect(() => {
     const checkSub = async () => {
       try {
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") return;
-
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
 
