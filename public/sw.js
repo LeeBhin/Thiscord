@@ -72,7 +72,6 @@ self.addEventListener('push', function (event) {
             data: {
                 url: data.url
             },
-            actions: data.actions || []
         };
 
         event.waitUntil(
@@ -84,18 +83,14 @@ self.addEventListener('push', function (event) {
 });
 
 self.addEventListener('notificationclick', function (event) {
-    event.notification.close();
-
-    if (event.action) {
-        switch (event.action) {
-            case 'read':
-                break;
-            case 'reply':
-                break;
-        }
-    } else {
-        event.waitUntil(
-            clients.openWindow(event.notification.data.url)
-        );
-    }
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url)
+            .then(() => {
+                event.notification.close();
+            })
+            .catch((error) => {
+                console.error('Failed to open window:', error);
+                event.notification.close();
+            })
+    );
 });

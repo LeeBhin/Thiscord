@@ -109,120 +109,88 @@ export default function Setting() {
     }
   };
 
-  const checkSubscription = async () => {
-    console.log("dd");
-    try {
+  useEffect(() => {
+    const checkSub = async () => {
       const permission = await Notification.requestPermission();
-
+      setIsSubscribed(false);
       if (permission !== "granted") {
         return;
       }
 
-      const registration = await navigator.serviceWorker.ready;
-      let subscription = await registration.pushManager.getSubscription();
-
-      if (!subscription) {
-        const registration = await navigator.serviceWorker.ready;
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(
-            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-          ),
-        });
-      }
-
-      const response = getPushNotification(subscription);
-      console.log(response)
-      if (response.success === true) {
-        setIsSubscribed(true);
-      } else {
+      const response = await getPushNotification();
+      if (response.settings.message === "!settings") {
         setIsSubscribed(false);
+      } else {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          await unsubscribePushNotification();
+        }
+        setIsSubscribed(true);
       }
-
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Failed to check push subscription:", error);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkSubscription();
+    };
+    setIsLoading(false);
+    checkSub();
   }, []);
 
   const handleToggle = async () => {
     const permission = await Notification.requestPermission();
-
-    if (permission !== "granted") {
+    if (permission !== "granted" || isLoading) {
       return;
     }
 
     if (!isSubscribed) {
+      setIsSubscribed(true);
+
       try {
         const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.subscribe({
+        const newSubscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
             process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
           ),
         });
-
-        const success = await subscribePushNotification(subscription);
-
-        if (!success) {
-          throw new Error("Failed to subscribe to push notifications");
-        }
-        setIsSubscribed(true);
+        await subscribePushNotification(newSubscription);
       } catch (error) {
-        console.error("Push notification subscription failed:", error);
+        setIsSubscribed(false);
+        console.error("Failed to subscribe:", error);
       }
     } else {
+      setIsSubscribed(false);
       try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
           await subscription.unsubscribe();
-          const success = await unsubscribePushNotification();
-
-          if (success) {
-            setIsSubscribed(false);
-          } else {
-            setIsSubscribed(true);
-            console.error("Failed to unsubscribe from push notifications");
-          }
+          await unsubscribePushNotification();
         }
       } catch (error) {
-        console.error("Failed to unsubscribe from push notifications:", error);
+        setIsSubscribed(true);
+        console.error("Failed to unsubscribe:", error);
       }
     }
   };
 
-  const registerServiceWorker = async () => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
-      return;
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js");
+    });
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, "+")
+      .replace(/_/g, "/");
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
     }
-
-    try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (let registration of registrations) {
-        await registration.unregister();
-      }
-
-      const registration = await navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-      });
-
-      registration.addEventListener("updatefound", () => {
-        const newWorker = registration.installing;
-      });
-    } catch (error) {
-      console.error("Service Worker 등록 실패:", error);
-    }
-  };
-
-  useEffect(() => {
-    registerServiceWorker();
-  }, []);
+    return outputArray;
+  }
 
   return (
     <div className={styles.wrap}>
@@ -376,8 +344,8 @@ export default function Setting() {
               {isLoading
                 ? "알림 상태를 확인하는 중이에요..."
                 : isSubscribed
-                ? "알림을 받고 계세요. 끄고 싶다면 토글을 눌러주세요."
-                : "알림을 받고 있지 않아요. 켜고 싶다면 토글을 눌러주세요."}
+                ? "알림이 켜져있어요! 중요한 소식을 바로바로 알려드릴게요."
+                : "쉿! 너무 조용한가요? 알림을 켜면 더 재미있을 거예요!"}
             </span>
             <label className={styles.toggleSwitch}>
               <input

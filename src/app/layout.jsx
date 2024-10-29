@@ -243,6 +243,7 @@ function InnerLayout({ children }) {
   return (
     <html lang="ko">
       <head>
+        <link rel="manifest" href="/manifest.json" />
         <title>{title}</title>
       </head>
       <body className={styles.body}>

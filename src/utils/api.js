@@ -137,8 +137,8 @@ export async function friends_recommand(userId) {
     return graphqlRequest(query, { userId });
 }
 
-export async function getPushNotification(subscription) {
-    return apiRequest('notifications/settings', 'POST', { subscription });
+export async function getPushNotification() {
+    return apiRequest('notifications/settings', 'GET')
 }
 
 export async function subscribePushNotification(subscription) {
@@ -148,4 +148,3 @@ export async function subscribePushNotification(subscription) {
 export async function unsubscribePushNotification() {
     return apiRequest('notifications/unsubscribe', 'POST');
 }
-
