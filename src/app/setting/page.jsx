@@ -112,20 +112,21 @@ export default function Setting() {
   useEffect(() => {
     const checkSub = async () => {
       const permission = await Notification.requestPermission();
-      setIsSubscribed(false);
       if (permission !== "granted") {
         return;
       }
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
 
-      const response = await getPushNotification();
-      if (response.settings.message === "!settings") {
+      const response = await getPushNotification(subscription);
+      console.log(response.settings);
+      if (
+        response?.settings?.message === "!settings" ||
+        response?.settings !== null
+      ) {
         setIsSubscribed(false);
       } else {
-        const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) {
-          setIsSubscribed(true);
-        }
+        setIsSubscribed(true);
       }
     };
     setIsLoading(false);
@@ -158,9 +159,10 @@ export default function Setting() {
       setIsSubscribed(false);
       try {
         const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) {
-          await subscription.unsubscribe();
+        const newSubscription =
+          await registration.pushManager.getSubscription();
+        if (newSubscription) {
+          await newSubscription.unsubscribe();
           await unsubscribePushNotification();
         }
       } catch (error) {
@@ -170,11 +172,13 @@ export default function Setting() {
     }
   };
 
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("/sw.js");
-    });
-  }
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js");
+      });
+    }
+  });
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);

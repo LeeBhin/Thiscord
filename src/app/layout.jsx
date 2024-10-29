@@ -259,6 +259,7 @@ function InnerLayout({ children }) {
   }, []);
 
   useEffect(() => {
+    if (!userInfo) return;
     let isWindowFocused = document.hasFocus();
     if (document.hidden || !isWindowFocused || !focus) return;
     if (socket && userInfo) {
