@@ -50,7 +50,10 @@ function InnerLayout({ children }) {
     newSocket.on("connect", () => {});
 
     newSocket.on("message", (chatData) => {
-      if (extractString(currentPath) === chatData.senderName) {
+      if (
+        extractString(currentPath) === chatData.senderName ||
+        extractString(currentPath) === chatData.receiverName
+      ) {
         Promise.all([
           dispatch(
             signalToMe({
