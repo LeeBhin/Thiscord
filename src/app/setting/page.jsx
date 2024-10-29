@@ -111,25 +111,36 @@ export default function Setting() {
 
   useEffect(() => {
     const checkSub = async () => {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        return;
-      }
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") return;
 
-      const response = await getPushNotification(subscription);
-      console.log(response.settings);
-      if (
-        response?.settings?.message === "!settings" ||
-        response?.settings !== null
-      ) {
-        setIsSubscribed(false);
-      } else {
-        setIsSubscribed(true);
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+          setIsSubscribed(false);
+          return;
+        }
+
+        const response = await getPushNotification(subscription);
+
+        if (response?.settings?.message === "!settings") {
+          setIsSubscribed(false);
+        } else if (response?.settings?.success) {
+          setIsSubscribed(true);
+        }
+      } catch (error) {
+        console.error("구독 상태 확인 중 오류:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    setIsLoading(false);
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+
     checkSub();
   }, []);
 
@@ -159,10 +170,9 @@ export default function Setting() {
       setIsSubscribed(false);
       try {
         const registration = await navigator.serviceWorker.ready;
-        const newSubscription =
-          await registration.pushManager.getSubscription();
-        if (newSubscription) {
-          await newSubscription.unsubscribe();
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
           await unsubscribePushNotification();
         }
       } catch (error) {
@@ -171,14 +181,6 @@ export default function Setting() {
       }
     }
   };
-
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker.register("/sw.js");
-      });
-    }
-  });
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
