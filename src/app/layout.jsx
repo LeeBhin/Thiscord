@@ -14,6 +14,14 @@ import { useDispatch } from "react-redux";
 import { setReceiverInfo, setUserInfo, signalToMe } from "@/counterSlice";
 import io from "socket.io-client";
 
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
 function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
@@ -23,6 +31,7 @@ function InnerLayout({ children }) {
   const [title, setTitle] = useState("Thiscord");
   const [user, setUser] = useState();
   const [focus, setFocus] = useState();
+  const [isLoadingChatrooms, setIsLoadingChatrooms] = useState(false);
 
   const {
     signalReceived,
@@ -42,7 +51,7 @@ function InnerLayout({ children }) {
 
   const connectSocket = useCallback(() => {
     const newSocket = io(process.env.NEXT_PUBLIC_API_URL, {
-      transports: ["websocket", "polling"],
+      transports: ["websocket"],
       withCredentials: true,
       reconnection: true,
     });
@@ -151,15 +160,17 @@ function InnerLayout({ children }) {
   }, [signalReceived]);
 
   useEffect(() => {
-    chatRooms();
-    if (socket) {
-      socket.emit("message", {
-        message: chatMessage.message,
-        receivedUser: chatMessage.receivedUser,
-        timestamp: chatMessage.timestamp,
-      });
+    if (chatSignalReceived) {
+      debouncedChatRooms();
+      if (socket && chatMessage) {
+        socket.emit("message", {
+          message: chatMessage.message,
+          receivedUser: chatMessage.receivedUser,
+          timestamp: chatMessage.timestamp,
+        });
+      }
     }
-  }, [chatSignalReceived]);
+  }, [chatSignalReceived, socket, chatMessage, debouncedChatRooms]);
 
   useEffect(() => {
     chatRooms();
@@ -199,21 +210,30 @@ function InnerLayout({ children }) {
   //   }
   // }, [currentPath]);
 
-  const chatRooms = async () => {
-    if (currentPath === "/login" || currentPath === "/register") {
+  const chatRooms = useCallback(async () => {
+    if (
+      currentPath === "/login" ||
+      currentPath === "/register" ||
+      isLoadingChatrooms
+    ) {
       return;
     }
-    try {
-      const rooms = await load_chatrooms();
 
-      const sortedRooms = rooms.sort((a, b) => {
-        return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
-      });
-      setChatrooms(sortedRooms);
+    try {
+      setIsLoadingChatrooms(true);
+      const rooms = await load_chatrooms();
+      setChatrooms(rooms);
     } catch (error) {
       console.error("Failed to load chatrooms:", error);
+    } finally {
+      setIsLoadingChatrooms(false);
     }
-  };
+  }, [currentPath, isLoadingChatrooms]);
+
+  const debouncedChatRooms = useMemo(
+    () => debounce(chatRooms, 1000),
+    [chatRooms]
+  );
 
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
