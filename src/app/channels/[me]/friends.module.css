@@ -54,7 +54,7 @@
   font-size: 16px;
 }
 
-.statusWrap>div {
+.statusWrap > div {
   padding: 2px 8px;
   border-radius: 3px;
   height: 24px;
@@ -65,24 +65,24 @@
   gap: 8px;
 }
 
-.statusWrap>div:nth-child(1),
-.statusWrap>div:nth-child(3) {
+.statusWrap > div:nth-child(1),
+.statusWrap > div:nth-child(3) {
   min-width: 48px;
   display: flex;
   justify-content: space-around;
 }
 
-.statusWrap>div:nth-child(2) {
+.statusWrap > div:nth-child(2) {
   display: flex;
   justify-content: space-around;
   min-width: 70px;
 }
 
-.statusWrap>div:hover {
+.statusWrap > div:hover {
   background-color: #393c41;
 }
 
-.statusWrap>div:active {
+.statusWrap > div:active {
   background-color: #404147;
 }
 
@@ -197,8 +197,8 @@
 }
 
 .profile {
-  width: 32px;
-  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 100%;
   display: flex;
   justify-content: center;
@@ -218,9 +218,13 @@
 }
 
 .name {
-  font-size: 16px;
+  font-size: 15px;
   color: #f2f3f5;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .btns {
@@ -402,6 +406,7 @@
   display: flex;
   flex-direction: column;
   line-height: 16px;
+  gap: 3px;
 }
 
 .pending {
