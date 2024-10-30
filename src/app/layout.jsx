@@ -193,12 +193,22 @@ function InnerLayout({ children }) {
       console.error("Failed to load chatrooms:", error);
     }
   };
-
   useEffect(() => {
     if (!rooms?.senderName && !rooms?.receiverName) return;
 
     setChatrooms((prevRooms) => {
       const newRooms = [...prevRooms];
+
+      let senderExists = newRooms.some(
+        (room) => room.participantName === rooms.senderName
+      );
+      let receiverExists = newRooms.some(
+        (room) => room.participantName === rooms.receiverName
+      );
+
+      if (!senderExists && !receiverExists && rooms) {
+        chatRooms();
+      }
 
       let targetIndex = newRooms.findIndex(
         (room) => room.participantName === rooms.senderName
