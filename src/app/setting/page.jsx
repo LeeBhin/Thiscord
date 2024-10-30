@@ -64,10 +64,15 @@ export default function Setting() {
     }
   };
 
-  const newName = () => {
-    update_name(name);
+  const newName = async () => {
+    const newname = await update_name(name);
+    if (newname.updatedUser === "이미 사용중인 이름입니다.") {
+      alert("이미 사용중인 이름입니다.");
+    } else {
+      alert(`이름이 변경되었습니다: ${newname.updatedUser}`);
+      handleUserInfoUpdate(newname.updatedUser, userInfo?.iconColor);
+    }
     setIsEdit(false);
-    handleUserInfoUpdate(name, userInfo?.iconColor);
   };
 
   useEffect(() => {
