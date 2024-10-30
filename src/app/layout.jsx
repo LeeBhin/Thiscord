@@ -145,14 +145,12 @@ function InnerLayout({ children }) {
   }, [router, currentPath]);
 
   useEffect(() => {
-    chatRooms();
     if (socket) {
       socket.emit("friendReq", {});
     }
   }, [signalReceived]);
 
   useEffect(() => {
-    chatRooms();
     if (socket) {
       socket.emit("message", {
         message: chatMessage.message,
