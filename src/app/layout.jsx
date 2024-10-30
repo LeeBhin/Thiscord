@@ -23,6 +23,7 @@ function InnerLayout({ children }) {
   const [title, setTitle] = useState("Thiscord");
   const [user, setUser] = useState();
   const [focus, setFocus] = useState();
+  const [rooms, setRooms] = useState();
 
   const {
     signalReceived,
@@ -33,6 +34,7 @@ function InnerLayout({ children }) {
     loginReceived,
     chatEditReceived,
     chatRemoveReceived,
+    signalMeReceived,
     userInfo,
   } = useSelector((state) => state.counter);
 
@@ -47,18 +49,14 @@ function InnerLayout({ children }) {
       reconnection: true,
     });
 
-    newSocket.on("connect", () => {});
-
     newSocket.on("message", (chatData) => {
-      Promise.all([
-        dispatch(
-          signalToMe({
-            chatData,
-            action: "message",
-          })
-        ),
-        chatRooms(),
-      ]);
+      setRooms(chatData);
+      dispatch(
+        signalToMe({
+          chatData,
+          action: "message",
+        })
+      );
     });
 
     newSocket.on("delete", (msgId) => {
@@ -180,24 +178,6 @@ function InnerLayout({ children }) {
     }
   }, [chatEditReceived, chatEdit]);
 
-  // useEffect(() => {
-  //   const loadFriends = async () => {
-  //     if (!userInfo) {
-  //       return;
-  //     }
-  //     try {
-  //       const friends = await load_friends();
-  //       setFriends(friends);
-  //     } catch (error) {
-  //       console.error("Failed to load friends:", error);
-  //     }
-  //   };
-
-  //   if (currentPath !== "/login" && currentPath !== "/register") {
-  //     loadFriends();
-  //   }
-  // }, [currentPath]);
-
   const chatRooms = async () => {
     if (currentPath === "/login" || currentPath === "/register") {
       return;
@@ -213,6 +193,31 @@ function InnerLayout({ children }) {
       console.error("Failed to load chatrooms:", error);
     }
   };
+
+  useEffect(() => {
+    if (!rooms?.senderName && !rooms?.receiverName) return;
+
+    setChatrooms((prevRooms) => {
+      const newRooms = [...prevRooms];
+
+      let targetIndex = newRooms.findIndex(
+        (room) => room.participantName === rooms.senderName
+      );
+
+      if (targetIndex === -1) {
+        targetIndex = newRooms.findIndex(
+          (room) => room.participantName === rooms.receiverName
+        );
+      }
+
+      if (targetIndex > 0) {
+        const [targetRoom] = newRooms.splice(targetIndex, 1);
+        newRooms.unshift(targetRoom);
+      }
+
+      return newRooms;
+    });
+  }, [signalMeReceived]);
 
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
