@@ -18,7 +18,6 @@ import {
   chatRemoveSignal,
   chatSignal,
   signalToMe,
-  triggerSignal,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
@@ -136,7 +135,6 @@ export default function DM({ params }) {
 
   const fetchChats = async () => {
     try {
-      setIsLoading(true);
       const info = await my_info();
       setMyName(info.name);
       setMyId(info.userId);
@@ -147,7 +145,7 @@ export default function DM({ params }) {
     } finally {
       setTimeout(() => {
         setIsLoading(false);
-      }, 250);
+      }, 100);
     }
   };
 
@@ -217,6 +215,7 @@ export default function DM({ params }) {
   };
 
   useEffect(() => {
+    if (!toMeMessage.chatData) return;
     if (
       toMeMessage.chatData?.senderName === myName ||
       toMeMessage.chatData?.senderName === receiverName
@@ -226,7 +225,6 @@ export default function DM({ params }) {
           return [...prevMessages, toMeMessage.chatData];
         });
         setHasMore(hasMore + 1);
-        dispatch(triggerSignal());
       } else if (toMeMessage?.action === "delete") {
         setMessages((prevMessages) => {
           return prevMessages.filter(
@@ -246,7 +244,7 @@ export default function DM({ params }) {
         return;
       }
     }
-    // dispatch(signalToMe({}));
+    dispatch(signalToMe({}));
   }, [signalMeReceived]);
 
   const sendDelete = (msgId) => {
