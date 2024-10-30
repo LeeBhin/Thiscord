@@ -159,6 +159,11 @@ function InnerLayout({ children }) {
     }
   }, [signalReceived]);
 
+  const debouncedChatRooms = useMemo(
+    () => debounce(chatRooms, 1000),
+    [chatRooms]
+  );
+
   useEffect(() => {
     if (chatSignalReceived) {
       debouncedChatRooms();
@@ -229,11 +234,6 @@ function InnerLayout({ children }) {
       setIsLoadingChatrooms(false);
     }
   }, [currentPath, isLoadingChatrooms]);
-
-  const debouncedChatRooms = useMemo(
-    () => debounce(chatRooms, 1000),
-    [chatRooms]
-  );
 
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
