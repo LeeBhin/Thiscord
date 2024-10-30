@@ -14,14 +14,6 @@ import { useDispatch } from "react-redux";
 import { setReceiverInfo, setUserInfo, signalToMe } from "@/counterSlice";
 import io from "socket.io-client";
 
-const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
 function InnerLayout({ children }) {
   const currentPath = usePathname();
   const router = useRouter();
@@ -158,11 +150,6 @@ function InnerLayout({ children }) {
     chatRooms();
   }, [signalReceived]);
 
-  const debouncedChatRooms = useMemo(
-    () => debounce(chatRooms, 1000),
-    [chatRooms]
-  );
-
   useEffect(() => {
     if (chatSignalReceived) {
       if (socket && chatMessage) {
@@ -173,7 +160,7 @@ function InnerLayout({ children }) {
         });
       }
     }
-  }, [chatSignalReceived, socket, chatMessage, debouncedChatRooms]);
+  }, [chatSignalReceived, socket, chatMessage]);
 
   useEffect(() => {
     chatRooms();

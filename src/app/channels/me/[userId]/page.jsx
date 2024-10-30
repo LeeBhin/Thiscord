@@ -136,6 +136,7 @@ export default function DM({ params }) {
 
   const fetchChats = async () => {
     try {
+      setIsLoading(true);
       const info = await my_info();
       setMyName(info.name);
       setMyId(info.userId);
@@ -146,7 +147,7 @@ export default function DM({ params }) {
     } finally {
       setTimeout(() => {
         setIsLoading(false);
-      }, 100);
+      }, 250);
     }
   };
 
