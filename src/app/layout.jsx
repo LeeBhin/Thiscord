@@ -57,7 +57,7 @@ function InnerLayout({ children }) {
             action: "message",
           })
         ),
-        chatRooms(),
+        // chatRooms(),
       ]);
     });
 
@@ -151,6 +151,7 @@ function InnerLayout({ children }) {
   }, [signalReceived]);
 
   useEffect(() => {
+    chatRooms();
     if (socket) {
       socket.emit("message", {
         message: chatMessage.message,
