@@ -56,8 +56,6 @@ function InnerLayout({ children }) {
       reconnection: true,
     });
 
-    newSocket.on("connect", () => {});
-
     newSocket.on("message", (chatData) => {
       Promise.all([
         dispatch(
@@ -157,6 +155,7 @@ function InnerLayout({ children }) {
     if (socket) {
       socket.emit("friendReq", {});
     }
+    chatRooms();
   }, [signalReceived]);
 
   const debouncedChatRooms = useMemo(
@@ -166,7 +165,6 @@ function InnerLayout({ children }) {
 
   useEffect(() => {
     if (chatSignalReceived) {
-      debouncedChatRooms();
       if (socket && chatMessage) {
         socket.emit("message", {
           message: chatMessage.message,

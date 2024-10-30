@@ -18,6 +18,7 @@ import {
   chatRemoveSignal,
   chatSignal,
   signalToMe,
+  triggerSignal,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
@@ -224,6 +225,7 @@ export default function DM({ params }) {
           return [...prevMessages, toMeMessage.chatData];
         });
         setHasMore(hasMore + 1);
+        dispatch(triggerSignal());
       } else if (toMeMessage?.action === "delete") {
         setMessages((prevMessages) => {
           return prevMessages.filter(
