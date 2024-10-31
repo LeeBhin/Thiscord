@@ -73,7 +73,7 @@ export default function Register() {
   });
 
   const submit = async () => {
-    if (name.length > 20) {
+    if (name.length > 10) {
       alert("이름이 너무 길구나.");
       return;
     }

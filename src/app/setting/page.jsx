@@ -65,6 +65,11 @@ export default function Setting() {
   };
 
   const newName = async () => {
+    if (name.length > 10) {
+      alert("이름이 너무 길구나");
+      return;
+    }
+
     const newname = await update_name(name);
     if (newname.updatedUser === "이미 사용중인 이름입니다.") {
       alert("이미 사용중인 이름입니다.");
