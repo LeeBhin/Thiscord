@@ -9,10 +9,12 @@ export const counterSlice = createSlice({
     chatSignalReceived: false,
     chatRemoveReceived: false,
     chatEditReceived: false,
+    requestReceived: false,
     chatMessage: {},
     toMeMessage: {},
     chatRemove: {},
     chatEdit: {},
+    requestPage: "",
     userInfo: {
       name: '',
       iconColor: '',
@@ -46,6 +48,10 @@ export const counterSlice = createSlice({
       state.chatEditReceived = !state.chatEditReceived;
       state.chatEdit = action.payload;
     },
+    requestSignal: (state, action) => {
+      state.requestReceived = !state.requestReceived;
+      state.requestPage = action.payload;
+    },
     setUserInfo: (state, action) => {
       const { name = '', iconColor = '', userId = '' } = action.payload || {};
       state.userInfo = { name, iconColor, userId };
@@ -57,5 +63,5 @@ export const counterSlice = createSlice({
   },
 });
 
-export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal, loginSignal } = counterSlice.actions;
+export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal, loginSignal, requestSignal } = counterSlice.actions;
 export default counterSlice.reducer;

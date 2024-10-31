@@ -11,7 +11,12 @@ import { checkToken, load_chatrooms, my_info } from "@/utils/api";
 import { Provider, useSelector } from "react-redux";
 import store from "@/store";
 import { useDispatch } from "react-redux";
-import { setReceiverInfo, setUserInfo, signalToMe } from "@/counterSlice";
+import {
+  requestSignal,
+  setReceiverInfo,
+  setUserInfo,
+  signalToMe,
+} from "@/counterSlice";
 import io from "socket.io-client";
 
 function InnerLayout({ children }) {
@@ -81,6 +86,13 @@ function InnerLayout({ children }) {
 
     return newSocket;
   }, []);
+
+  useEffect(() => {
+    if (currentPath === "/channels/@me/request") {
+      dispatch(requestSignal("request"));
+      router.push("/channels/@me");
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     if (currentPath === "/login" || currentPath === "/register") return;
@@ -238,6 +250,8 @@ function InnerLayout({ children }) {
         ? `Thiscord | ${path[path.length - 1]}`
         : "Thiscord";
     setTitle(title);
+
+    chatRooms();
   }, [currentPath]);
 
   useEffect(() => {

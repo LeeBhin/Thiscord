@@ -20,7 +20,9 @@ export default function Friends() {
   const router = useRouter();
 
   const dispatch = useDispatch();
-  const { signalMeReceived, userInfo } = useSelector((state) => state.counter);
+  const { signalMeReceived, userInfo, requestPage } = useSelector(
+    (state) => state.counter
+  );
 
   const sendFriendReq = () => {
     dispatch(triggerSignal());
@@ -32,10 +34,14 @@ export default function Friends() {
   };
 
   useEffect(() => {
+    if (requestPage === "request") {
+      setWichActive("pending");
+    }
+
     if (currentPath !== "/channels/@me") {
       router.push("/channels/@me");
     }
-  }, [currentPath]);
+  }, [currentPath, requestPage]);
 
   useEffect(() => {
     pendingCount();
