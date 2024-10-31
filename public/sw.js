@@ -1,3 +1,5 @@
+let notificationTimer = null;  // 타이머를 저장할 전역 변수
+
 self.addEventListener('push', function (event) {
     if (!event.data) {
         console.log('Push event but no data');
@@ -14,10 +16,27 @@ self.addEventListener('push', function (event) {
             data: {
                 url: data.url
             },
+            requireInteraction: false,
         };
 
+        if (notificationTimer) {
+            clearTimeout(notificationTimer);
+        }
+
         event.waitUntil(
-            self.registration.showNotification(data.title || 'New Notification', options)
+            self.registration.getNotifications()
+                .then(notifications => {
+                    notifications.forEach(notification => notification.close());
+                    return self.registration.showNotification(data.title || 'New Notification', options)
+                        .then(() => {
+                            notificationTimer = setTimeout(() => {
+                                self.registration.getNotifications().then(notifications => {
+                                    notifications.forEach(notification => notification.close());
+                                });
+                                notificationTimer = null;
+                            }, 5000);
+                        });
+                })
         );
     } catch (err) {
         console.error('Error showing notification:', err);

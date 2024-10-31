@@ -18,46 +18,112 @@
 
 .channelWrap {
   display: flex;
+  flex-direction: column;
   align-items: center;
+}
+
+.Link:last-child {
+  margin-bottom: 8px;
 }
 
 .channelBar {
   position: absolute;
-  transform: translateX(-5px);
+  left: 0;
+  transform: translateX(-17px);
   width: 9px;
-  height: 30px;
+  height: 8px;
+  background-color: #f2f3f5;
+  border-radius: 20px;
+  clip-path: inset(0 0 0 50%);
+  transition: 0.25s ease;
+}
+
+.Link:first-child .channelBar {
+  position: absolute;
+  left: 0;
+  transform: translateX(-17px);
+  width: 9px;
+  height: 40px;
   background-color: #f2f3f5;
   border-radius: 20px;
   clip-path: inset(0 0 0 50%);
 }
 
-.channel:hover .channelBar {
-  transform: translateX(-5px) scale(0);
+.Link:not(:first-child):hover .channelBar {
+  height: 20px;
+}
+
+.Link:not(:first-child):hover .channel {
+  border-radius: 16px;
+}
+
+.dmCount {
+  width: 23px;
+  height: 23px;
+  position: absolute;
+  background-color: #1e1f22;
+  border-radius: 100%;
+  right: -3px;
+  bottom: -3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.countNumber {
+  color: white;
+  width: 16px;
+  height: 16px;
+  border-radius: 100%;
+  background-color: #f23f42;
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 15px;
 }
 
 .channel {
   width: 48px;
   height: 48px;
   border-radius: 100%;
-  background-color: #313338;
+  background-color: #1e1f22;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.25s ease;
+  position: relative;
+}
+
+.Link:first-child .channel {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background-color: #5865f2;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: 0.25s ease;
 }
 
-.channel:hover {
-  border-radius: 15px;
-  background-color: #5865f2;
+.Link:first-child .direct {
+  margin: 12px 12px 0 12px;
 }
 
 .direct {
-  margin: 12px 12px 8px 12px;
+  margin: 8px 12px 0 12px;
+}
+
+.Link:first-child .serverImg {
+  width: 30px;
+  height: 30px;
 }
 
 .serverImg {
-  width: 30px;
-  height: 30px;
+  width: 31px;
+  height: 31px;
   color: white;
 }
 

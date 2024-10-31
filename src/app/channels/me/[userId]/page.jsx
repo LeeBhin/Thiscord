@@ -18,6 +18,7 @@ import {
   chatRemoveSignal,
   chatSignal,
   signalToMe,
+  triggerSignal,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
@@ -186,6 +187,8 @@ export default function DM({ params }) {
         router.push("/");
       }
     });
+
+    // dispatch(triggerSignal(currentPath));
   }, [router, currentPath]);
 
   const sendMessage = (msg) => {
@@ -245,6 +248,7 @@ export default function DM({ params }) {
     } else {
       return;
     }
+    dispatch(triggerSignal(currentPath));
   }, [signalMeReceived]);
 
   const sendDelete = (msgId) => {

@@ -16,6 +16,7 @@ import {
   setReceiverInfo,
   setUserInfo,
   signalToMe,
+  triggerSignal,
 } from "@/counterSlice";
 import io from "socket.io-client";
 
@@ -41,6 +42,7 @@ function InnerLayout({ children }) {
     chatRemoveReceived,
     signalMeReceived,
     userInfo,
+    currentPage,
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor, userId) => {
@@ -91,7 +93,21 @@ function InnerLayout({ children }) {
     if (currentPath === "/channels/@me/request") {
       dispatch(requestSignal("request"));
       router.push("/channels/@me");
+      return;
     }
+    dispatch(triggerSignal(currentPath));
+
+    const extractedName = extractString(decodeURIComponent(currentPath));
+
+    if (!extractedName) return;
+
+    setChatrooms((prev) =>
+      prev.map((room) =>
+        room.participantName === extractedName
+          ? { ...room, unreadCount: 0 }
+          : room
+      )
+    );
   }, [currentPath]);
 
   useEffect(() => {
@@ -205,6 +221,7 @@ function InnerLayout({ children }) {
       console.error("Failed to load chatrooms:", error);
     }
   };
+
   useEffect(() => {
     if (!rooms?.senderName && !rooms?.receiverName) return;
 
@@ -239,7 +256,13 @@ function InnerLayout({ children }) {
 
       return newRooms;
     });
-  }, [signalMeReceived]);
+    if (
+      rooms?.senderName !== user?.name &&
+      rooms?.senderName !== extractString(decodeURIComponent(currentPage))
+    ) {
+      chatRooms();
+    }
+  }, [signalMeReceived, signalReceived]);
 
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
@@ -250,8 +273,6 @@ function InnerLayout({ children }) {
         ? `Thiscord | ${path[path.length - 1]}`
         : "Thiscord";
     setTitle(title);
-
-    chatRooms();
   }, [currentPath]);
 
   useEffect(() => {
@@ -292,7 +313,7 @@ function InnerLayout({ children }) {
     if (socket && userInfo) {
       socket.emit("current", {
         userId: userInfo?.userId,
-        current: extractString(currentPath),
+        current: extractString(decodeURIComponent(currentPath)),
       });
     }
   }, [currentPath, userInfo, focus]);
@@ -338,12 +359,36 @@ function InnerLayout({ children }) {
             <header className={styles.header}>
               <div className={styles.headerWrap}>
                 <div className={styles.channelWrap}>
-                  <div className={styles.channelBar} />
-                  <Link href="/channels/me">
+                  <Link href="/channels/me" className={styles.Link}>
                     <div className={`${styles.channel} ${styles.direct}`}>
+                      <div className={styles.channelBar} />
                       <Images.icon className={styles.serverImg} />
                     </div>
                   </Link>
+                  {chatrooms
+                    .filter((room) => room.unreadCount > 0)
+                    .map((room, index) => (
+                      <Link
+                        href={`/channels/me/@${room.participantName}`}
+                        className={styles.Link}
+                        key={index}
+                      >
+                        <div
+                          className={`${styles.channel} ${styles.direct}`}
+                          style={{ backgroundColor: room.iconColor }}
+                        >
+                          <div className={styles.channelBar} />
+                          {room.unreadCount > 0 && (
+                            <div className={styles.dmCount}>
+                              <div className={styles.countNumber}>
+                                {room.unreadCount}
+                              </div>
+                            </div>
+                          )}
+                          <Images.icon className={styles.serverImg} />
+                        </div>
+                      </Link>
+                    ))}
                 </div>
                 <div className={styles.barricade} />
               </div>

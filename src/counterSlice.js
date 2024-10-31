@@ -15,6 +15,7 @@ export const counterSlice = createSlice({
     chatRemove: {},
     chatEdit: {},
     requestPage: "",
+    currentPage: "",
     userInfo: {
       name: '',
       iconColor: '',
@@ -26,8 +27,9 @@ export const counterSlice = createSlice({
     },
   },
   reducers: {
-    triggerSignal: (state) => {
+    triggerSignal: (state, action) => {
       state.signalReceived = !state.signalReceived;
+      state.currentPage = action.payload;
     },
     loginSignal: (state) => {
       state.loginReceived = !state.loginReceived;
