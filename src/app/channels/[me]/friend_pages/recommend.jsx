@@ -60,7 +60,7 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
           </div>
 
           <div className={styles.friendsWrap}>
-            <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+            <p className={styles.countFriends}>{`친구 추천 – ${friends.length}명`}</p>
           </div>
         </div>
       ) : null}

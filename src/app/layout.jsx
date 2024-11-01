@@ -156,6 +156,8 @@ function InnerLayout({ children }) {
     };
 
     verifyToken();
+
+    chatRooms();
   }, [router, currentPath]);
 
   useEffect(() => {
