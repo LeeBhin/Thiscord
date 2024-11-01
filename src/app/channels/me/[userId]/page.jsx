@@ -466,7 +466,6 @@ export default function DM({ params }) {
         read_chat(msgId, receiverName);
         setRead((prev) => [...prev, msgId]);
       }
-      console.log(read);
     };
 
     const observer = new IntersectionObserver(
