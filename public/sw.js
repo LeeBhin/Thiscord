@@ -10,7 +10,7 @@ self.addEventListener('push', function (event) {
         const data = event.data.json();
         const options = {
             body: data.body || 'New message',
-            icon: `images/${data.icon.slice(1)}.png` || 'svgs/icon.svg',
+            icon: `images/${data.icon}.png` || 'svgs/icon.svg',
             badge: data.badge || `images/colorIcon.png`,
             tag: data.tag,
             data: {
