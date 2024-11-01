@@ -191,7 +191,10 @@ export default function DM({ params }) {
   }, [router, currentPath]);
 
   const sendMessage = (msg) => {
-    if (msg && msg.trim() !== "") {
+    if (msg.length > 500) {
+      return;
+    }
+    if (msg && msg.trim() !== "" && msg.length < 500) {
       inputRef.current.value = "";
       chatAreaHeight();
 
@@ -457,14 +460,15 @@ export default function DM({ params }) {
     setNewMsg(news[0]?._id);
   }, [news]);
 
-  const handleVisibleMessage = (msgId, senderId, isRead) => {
-    if (senderId !== myId && !isRead[myId] && !read.includes(msgId)) {
-      read_chat(msgId, receiverName);
-      setRead([...read, msgId]);
-    }
-  };
-
   useEffect(() => {
+    const handleVisibleMessage = (msgId, senderId, isRead) => {
+      if (senderId !== myId && !isRead[myId] && !read.includes(msgId)) {
+        read_chat(msgId, receiverName);
+        setRead((prev) => [...prev, msgId]);
+      }
+      console.log(read);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -485,7 +489,12 @@ export default function DM({ params }) {
 
     const messages = chatsRef.current.querySelectorAll(`.${styles.message}`);
     messages.forEach((message) => observer.observe(message));
-  }, [messages, isLoading]);
+
+    return () => {
+      messages.forEach((message) => observer.unobserve(message));
+      observer.disconnect();
+    };
+  }, [messages, isLoading, read, myId, receiverName]);
 
   return (
     <>
