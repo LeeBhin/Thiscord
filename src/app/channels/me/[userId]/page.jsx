@@ -45,6 +45,7 @@ export default function DM({ params }) {
   const [startMsgId, SetStartMsgId] = useState();
   const [endMsgId, SetEndMsgId] = useState();
   const [hasMore, setHasMore] = useState();
+  const [read, setRead] = useState([]);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -187,8 +188,6 @@ export default function DM({ params }) {
         router.push("/");
       }
     });
-
-    // dispatch(triggerSignal(currentPath));
   }, [router, currentPath]);
 
   const sendMessage = (msg) => {
@@ -248,7 +247,6 @@ export default function DM({ params }) {
     } else {
       return;
     }
-    dispatch(triggerSignal(currentPath));
   }, [signalMeReceived]);
 
   const sendDelete = (msgId) => {
@@ -460,8 +458,9 @@ export default function DM({ params }) {
   }, [news]);
 
   const handleVisibleMessage = (msgId, senderId, isRead) => {
-    if (senderId !== myId && !isRead[myId] && !news.includes(msgId)) {
+    if (senderId !== myId && !isRead[myId] && !read.includes(msgId)) {
       read_chat(msgId, receiverName);
+      setRead([...read, msgId]);
     }
   };
 

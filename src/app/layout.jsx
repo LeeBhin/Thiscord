@@ -30,6 +30,7 @@ function InnerLayout({ children }) {
   const [user, setUser] = useState();
   const [focus, setFocus] = useState();
   const [rooms, setRooms] = useState();
+  const [newChat, setNewChat] = useState([]);
 
   const {
     signalReceived,
@@ -95,13 +96,12 @@ function InnerLayout({ children }) {
       router.push("/channels/@me");
       return;
     }
-    dispatch(triggerSignal(currentPath));
 
     const extractedName = extractString(decodeURIComponent(currentPath));
 
     if (!extractedName) return;
 
-    setChatrooms((prev) =>
+    setNewChat((prev) =>
       prev.map((room) =>
         room.participantName === extractedName
           ? { ...room, unreadCount: 0 }
@@ -182,6 +182,7 @@ function InnerLayout({ children }) {
         message: chatMessage.message,
         receivedUser: chatMessage.receivedUser,
         timestamp: chatMessage.timestamp,
+        iconColor: userInfo.iconColor,
       });
     }
   }, [chatSignalReceived]);
@@ -216,6 +217,7 @@ function InnerLayout({ children }) {
       const sortedRooms = rooms.sort((a, b) => {
         return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
       });
+      setNewChat(sortedRooms);
       setChatrooms(sortedRooms);
     } catch (error) {
       console.error("Failed to load chatrooms:", error);
@@ -258,11 +260,43 @@ function InnerLayout({ children }) {
     });
     if (
       rooms?.senderName !== user?.name &&
-      rooms?.senderName !== extractString(decodeURIComponent(currentPage))
+      rooms?.senderName !== extractString(decodeURIComponent(currentPath))
     ) {
-      chatRooms();
+      setNewChat(updateNewChat(rooms, newChat));
     }
-  }, [signalMeReceived, signalReceived]);
+  }, [signalMeReceived]);
+
+  const updateNewChat = (rooms, prevChat) => {
+    const updatedChat = prevChat.map((chat) => ({ ...chat }));
+
+    const participantIndex = updatedChat.findIndex(
+      (participant) => participant.participantName === rooms.senderName
+    );
+
+    if (participantIndex !== -1) {
+      const participant = { ...updatedChat[participantIndex] };
+
+      updatedChat.splice(participantIndex, 1);
+
+      const updatedParticipant = {
+        ...participant,
+        unreadCount: participant.unreadCount + 1,
+        lastMessageAt: rooms.timestamp,
+      };
+
+      updatedChat.unshift(updatedParticipant);
+    } else {
+      const newParticipant = {
+        participantName: rooms.senderName,
+        iconColor: rooms.iconColor,
+        lastMessageAt: rooms.timestamp,
+        unreadCount: 1,
+      };
+
+      updatedChat.unshift(newParticipant);
+    }
+    return updatedChat;
+  };
 
   useEffect(() => {
     const path = decodeURIComponent(currentPath).split("/");
@@ -365,30 +399,31 @@ function InnerLayout({ children }) {
                       <Images.icon className={styles.serverImg} />
                     </div>
                   </Link>
-                  {chatrooms
-                    .filter((room) => room.unreadCount > 0)
-                    .map((room, index) => (
-                      <Link
-                        href={`/channels/me/@${room.participantName}`}
-                        className={styles.Link}
-                        key={index}
-                      >
-                        <div
-                          className={`${styles.channel} ${styles.direct}`}
-                          style={{ backgroundColor: room.iconColor }}
+                  {newChat?.length > 0 &&
+                    newChat
+                      .filter((room) => room.unreadCount > 0)
+                      .map((room, index) => (
+                        <Link
+                          href={`/channels/me/@${room.participantName}`}
+                          className={styles.Link}
+                          key={room.participantName}
                         >
-                          <div className={styles.channelBar} />
-                          {room.unreadCount > 0 && (
-                            <div className={styles.dmCount}>
-                              <div className={styles.countNumber}>
-                                {room.unreadCount}
+                          <div
+                            className={`${styles.channel} ${styles.direct}`}
+                            style={{ backgroundColor: room.iconColor }}
+                          >
+                            <div className={styles.channelBar} />
+                            {room.unreadCount > 0 && (
+                              <div className={styles.dmCount}>
+                                <div className={styles.countNumber}>
+                                  {room.unreadCount}
+                                </div>
                               </div>
-                            </div>
-                          )}
-                          <Images.icon className={styles.serverImg} />
-                        </div>
-                      </Link>
-                    ))}
+                            )}
+                            <Images.icon className={styles.serverImg} />
+                          </div>
+                        </Link>
+                      ))}
                 </div>
                 <div className={styles.barricade} />
               </div>
@@ -442,7 +477,7 @@ function InnerLayout({ children }) {
                 </div>
 
                 <div className={styles.friends}>
-                  {chatrooms.length > 0 ? (
+                  {chatrooms?.length > 0 ? (
                     chatrooms.map((friend, index) => (
                       <div
                         key={index}
