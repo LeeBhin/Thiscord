@@ -157,7 +157,7 @@ function InnerLayout({ children }) {
 
     verifyToken();
 
-    chatRooms();
+    if (currentPath === "/channels/@me") chatRooms();
   }, [router, currentPath]);
 
   useEffect(() => {
