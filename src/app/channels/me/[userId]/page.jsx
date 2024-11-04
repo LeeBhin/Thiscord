@@ -26,18 +26,44 @@ import Popup from "@/app/components/Popup";
 import { throttle } from "lodash";
 
 const useThrottledWritingSignal = (dispatch, delay = 6500) => {
-  const throttledDispatch = useCallback(
-    throttle(
-      (params) => {
-        dispatch(writingSignal(params));
-      },
-      delay,
-      { leading: true, trailing: false }
-    ),
+  const throttledRef = useRef();
+
+  const createThrottled = useCallback(
+    (delay) => {
+      return throttle(
+        (params) => {
+          dispatch(writingSignal(params));
+        },
+        delay,
+        { leading: true, trailing: false }
+      );
+    },
     [dispatch]
   );
 
-  return throttledDispatch;
+  // Initialize throttled function
+  useEffect(() => {
+    throttledRef.current = createThrottled(delay);
+    return () => {
+      if (throttledRef.current?.cancel) {
+        throttledRef.current.cancel();
+      }
+    };
+  }, [delay, createThrottled]);
+
+  const throttledDispatch = useCallback((params) => {
+    throttledRef.current(params);
+  }, []);
+
+  // Add reset function
+  const reset = useCallback(() => {
+    if (throttledRef.current?.cancel) {
+      throttledRef.current.cancel();
+    }
+    throttledRef.current = createThrottled(delay);
+  }, [delay, createThrottled]);
+
+  return [throttledDispatch, reset];
 };
 
 export default function DM({ params }) {
@@ -78,7 +104,8 @@ export default function DM({ params }) {
     writingReceived,
     whoWriting,
   } = useSelector((state) => state.counter);
-  const throttledWritingSignal = useThrottledWritingSignal(dispatch);
+  const [throttledWritingSignal, resetThrottle] =
+    useThrottledWritingSignal(dispatch);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -98,6 +125,8 @@ export default function DM({ params }) {
     ) {
       setNews((prev) => [...prev, messages.at(-1)]);
     }
+
+    setWriting(false);
   }, [messages]);
 
   useEffect(() => {
@@ -229,6 +258,7 @@ export default function DM({ params }) {
       );
 
       setNews([]);
+      resetThrottle();
 
       if (messages.length > 100) {
         setMessages((prevMessages) => {
@@ -522,7 +552,11 @@ export default function DM({ params }) {
   }, [messages, isLoading, read, myId, receiverName]);
 
   useEffect(() => {
-    if (whoWriting.data === myName || whoWriting.action !== "receiver") return;
+    if (
+      whoWriting.data?.receivedUser !== myName ||
+      whoWriting.action !== "receiver"
+    )
+      return;
 
     setWriting(true);
     const timer = setTimeout(() => {
@@ -839,7 +873,7 @@ export default function DM({ params }) {
             ref={inputRef}
             onKeyDown={handleEnter}
           />
-          {writing && myName && receiverName && (
+          {writing && whoWriting.data.senderUser === receiverName && (
             <div className={styles.typingMsg}>
               <div className={styles.typingDots}>
                 <div className={styles.dot} />
