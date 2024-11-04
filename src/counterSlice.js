@@ -5,6 +5,7 @@ export const counterSlice = createSlice({
   initialState: {
     signalReceived: false,
     loginReceived: false,
+    writingReceived: false,
     signalMeReceived: false,
     chatSignalReceived: false,
     chatRemoveReceived: false,
@@ -16,6 +17,7 @@ export const counterSlice = createSlice({
     chatEdit: {},
     requestPage: "",
     currentPage: "",
+    whoWriting: {},
     userInfo: {
       name: '',
       iconColor: '',
@@ -33,6 +35,10 @@ export const counterSlice = createSlice({
     },
     loginSignal: (state) => {
       state.loginReceived = !state.loginReceived;
+    },
+    writingSignal: (state, action) => {
+      state.writingReceived = !state.writingReceived;
+      state.whoWriting = action.payload;
     },
     signalToMe: (state, action) => {
       state.signalMeReceived = !state.signalMeReceived;
@@ -65,5 +71,5 @@ export const counterSlice = createSlice({
   },
 });
 
-export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal, loginSignal, requestSignal } = counterSlice.actions;
+export const { triggerSignal, signalToMe, chatSignal, setUserInfo, setReceiverInfo, chatRemoveSignal, chatEditSignal, loginSignal, requestSignal, writingSignal } = counterSlice.actions;
 export default counterSlice.reducer;

@@ -60,7 +60,9 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
           </div>
 
           <div className={styles.friendsWrap}>
-            <p className={styles.countFriends}>{`친구 추천 – ${friends.length}명`}</p>
+            <p
+              className={styles.countFriends}
+            >{`친구 추천 – ${friends.length}명`}</p>
           </div>
         </div>
       ) : null}
@@ -83,14 +85,19 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
                     <div className={styles.pending}>
                       {friend.mutualFriends?.length ? (
                         <>
-                          {friend.mutualFriends.slice(0, 3).map((name, index) => (
-                            <span key={`mutual-${index}`}>
-                              <strong>{name}</strong>님
-                              {index < Math.min(2, friend.mutualFriends.length - 1) ? ", " : ""}
-                            </span>
-                          ))}
-                          {friend.mutualFriends.length > 3
-                            ? ` 외 ${friend.mutualFriends.length - 3}명`
+                          {friend.mutualFriends
+                            .slice(0, 2)
+                            .map((name, index) => (
+                              <span key={`mutual-${index}`}>
+                                <strong>{name}</strong>님
+                                {index <
+                                Math.min(1, friend.mutualFriends.length - 1)
+                                  ? ", "
+                                  : ""}
+                              </span>
+                            ))}
+                          {friend.mutualFriends.length > 2
+                            ? ` 외 ${friend.mutualFriends.length - 2}명`
                             : null}
                           과 친구입니다.
                         </>
@@ -119,7 +126,9 @@ export default function Recommend({ recommands, userId, sendFriendReq }) {
         ) : (
           <div className={styles.bottom}>
             <Images.norecommand className={styles.wumpus} />
-            <p>Wumpus가 친구 찾기에 열심히예요. 곧 멋진 친구를 소개해줄 거예요!</p>
+            <p>
+              Wumpus가 친구 찾기에 열심히예요. 곧 멋진 친구를 소개해줄 거예요!
+            </p>
           </div>
         )}
       </div>

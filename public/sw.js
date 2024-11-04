@@ -1,4 +1,4 @@
-let notificationTimer = null;  // 타이머를 저장할 전역 변수
+let notificationTimer = null;
 
 self.addEventListener('push', function (event) {
     if (!event.data) {

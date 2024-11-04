@@ -17,6 +17,7 @@ import {
   setUserInfo,
   signalToMe,
   triggerSignal,
+  writingSignal,
 } from "@/counterSlice";
 import io from "socket.io-client";
 
@@ -31,6 +32,7 @@ function InnerLayout({ children }) {
   const [focus, setFocus] = useState();
   const [rooms, setRooms] = useState();
   const [newChat, setNewChat] = useState([]);
+  const [isCooldown, setIsCooldown] = useState(false);
 
   const {
     signalReceived,
@@ -43,7 +45,8 @@ function InnerLayout({ children }) {
     chatRemoveReceived,
     signalMeReceived,
     userInfo,
-    currentPage,
+    writingReceived,
+    whoWriting,
   } = useSelector((state) => state.counter);
 
   const handleUserInfoUpdate = (name, iconColor, userId) => {
@@ -83,6 +86,10 @@ function InnerLayout({ children }) {
 
     newSocket.on("friendRes", () => {
       dispatch(signalToMe());
+    });
+
+    newSocket.on("writing", (data) => {
+      dispatch(writingSignal({ data, action: "receiver" }));
     });
 
     setSocket(newSocket);
@@ -208,6 +215,15 @@ function InnerLayout({ children }) {
       });
     }
   }, [chatEditReceived, chatEdit]);
+
+  useEffect(() => {
+    if (socket && whoWriting.action === "sender") {
+      socket.emit("writing", {
+        receivedUser: whoWriting.receiverName,
+        senderUser: whoWriting.myName,
+      });
+    }
+  }, [writingReceived]);
 
   const chatRooms = async () => {
     if (currentPath === "/login" || currentPath === "/register") {

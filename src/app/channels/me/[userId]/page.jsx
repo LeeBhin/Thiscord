@@ -9,7 +9,7 @@ import {
   read_chat,
 } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import styles from "./dm.module.css";
 import Images from "@/Images";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,13 +17,28 @@ import {
   chatEditSignal,
   chatRemoveSignal,
   chatSignal,
-  signalToMe,
-  triggerSignal,
+  writingSignal,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
 import Skeleton from "@/app/components/Skeleton";
 import Popup from "@/app/components/Popup";
+import { throttle } from "lodash";
+
+const useThrottledWritingSignal = (dispatch, delay = 6500) => {
+  const throttledDispatch = useCallback(
+    throttle(
+      (params) => {
+        dispatch(writingSignal(params));
+      },
+      delay,
+      { leading: true, trailing: false }
+    ),
+    [dispatch]
+  );
+
+  return throttledDispatch;
+};
 
 export default function DM({ params }) {
   const userId = decodeURIComponent(params.userId).replace("@", "");
@@ -46,6 +61,7 @@ export default function DM({ params }) {
   const [endMsgId, SetEndMsgId] = useState();
   const [hasMore, setHasMore] = useState();
   const [read, setRead] = useState([]);
+  const [writing, setWriting] = useState(false);
 
   const router = useRouter();
   const currentPath = usePathname();
@@ -54,9 +70,15 @@ export default function DM({ params }) {
   const editRef = useRef(null);
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
-  const { userInfo, receiverInfo, signalMeReceived, toMeMessage } = useSelector(
-    (state) => state.counter
-  );
+  const {
+    userInfo,
+    receiverInfo,
+    signalMeReceived,
+    toMeMessage,
+    writingReceived,
+    whoWriting,
+  } = useSelector((state) => state.counter);
+  const throttledWritingSignal = useThrottledWritingSignal(dispatch);
 
   useEffect(() => {
     if (!currentPath.startsWith("/channels/me/@")) {
@@ -404,6 +426,10 @@ export default function DM({ params }) {
     target.style.height = `${target.scrollHeight}px`;
     targetWrap.style.height = "auto";
     targetWrap.style.height = `${targetWrap.scrollHeight}px`;
+
+    if (target.value !== "" && myName && receiverName) {
+      throttledWritingSignal({ myName, receiverName, action: "sender" });
+    }
   };
 
   const handleEditKey = async (senderId, msgId, e, msg) => {
@@ -494,6 +520,17 @@ export default function DM({ params }) {
       observer.disconnect();
     };
   }, [messages, isLoading, read, myId, receiverName]);
+
+  useEffect(() => {
+    if (whoWriting.data === myName || whoWriting.action !== "receiver") return;
+
+    setWriting(true);
+    const timer = setTimeout(() => {
+      setWriting(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [writingReceived]);
 
   return (
     <>
@@ -802,6 +839,17 @@ export default function DM({ params }) {
             ref={inputRef}
             onKeyDown={handleEnter}
           />
+          {writing && myName && receiverName && (
+            <div className={styles.typingMsg}>
+              <div className={styles.typingDots}>
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+              </div>
+              <strong>{receiverName}</strong>
+              <span>님이 입력하고 있어요...</span>
+            </div>
+          )}
         </div>
       </div>
     </>
