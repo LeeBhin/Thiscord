@@ -41,7 +41,6 @@ const useThrottledWritingSignal = (dispatch, delay = 6500) => {
     [dispatch]
   );
 
-  // Initialize throttled function
   useEffect(() => {
     throttledRef.current = createThrottled(delay);
     return () => {
@@ -55,7 +54,6 @@ const useThrottledWritingSignal = (dispatch, delay = 6500) => {
     throttledRef.current(params);
   }, []);
 
-  // Add reset function
   const reset = useCallback(() => {
     if (throttledRef.current?.cancel) {
       throttledRef.current.cancel();
@@ -506,7 +504,7 @@ export default function DM({ params }) {
   const isWithinOneWeek = (timestamp) => {
     const currentTime = new Date();
     const messageTime = new Date(timestamp);
-    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    const oneWeek = 5 * 24 * 60 * 60 * 1000;
 
     return currentTime - messageTime < oneWeek;
   };
