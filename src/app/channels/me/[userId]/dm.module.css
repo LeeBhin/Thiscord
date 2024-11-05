@@ -561,7 +561,7 @@
   margin-right: 3px;
 }
 
-.dot {
+.typingDots > .dot {
   width: 7px;
   height: 7px;
   background-color: #b9bbbe;
@@ -569,13 +569,13 @@
   animation: bounce 1.3s infinite;
 }
 
-.dot:nth-child(1) {
+.typingDots > .dot:nth-child(1) {
   animation-delay: 0s;
 }
-.dot:nth-child(2) {
+.typingDots > .dot:nth-child(2) {
   animation-delay: 0.15s;
 }
-.dot:nth-child(3) {
+.typingDots > .dot:nth-child(3) {
   animation-delay: 0.3s;
 }
 
