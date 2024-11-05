@@ -871,7 +871,7 @@ export default function DM({ params }) {
             ref={inputRef}
             onKeyDown={handleEnter}
           />
-          {writing && whoWriting.data.senderUser === receiverName && (
+          {writing && whoWriting?.data?.senderUser === receiverName && (
             <div className={styles.typingMsg}>
               <div className={styles.typingDots}>
                 <div className={styles.dot} />
