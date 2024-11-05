@@ -30,7 +30,12 @@ export default function Friends() {
 
   const pendingCount = async () => {
     const friends = await pending_friends();
-    setCounting(friends.length);
+
+    const filteredFriends = friends.filter(
+      (friend) => friend.who !== userInfo?.name
+    );
+
+    setCounting(filteredFriends.length);
   };
 
   useEffect(() => {
@@ -45,7 +50,7 @@ export default function Friends() {
 
   useEffect(() => {
     pendingCount();
-  }, [signalMeReceived]);
+  }, [signalMeReceived, userInfo]);
 
   const handleActive = (target) => {
     setWichActive(target);
