@@ -552,6 +552,7 @@ export default function DM({ params }) {
   useEffect(() => {
     if (
       whoWriting.data?.receivedUser !== myName ||
+      whoWriting.data?.senderUser === myName ||
       whoWriting.action !== "receiver"
     )
       return;
