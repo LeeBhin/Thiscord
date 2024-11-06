@@ -18,6 +18,7 @@ import {
   chatRemoveSignal,
   chatSignal,
   writingSignal,
+  writingToMe,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
@@ -99,8 +100,8 @@ export default function DM({ params }) {
     receiverInfo,
     signalMeReceived,
     toMeMessage,
-    writingReceived,
-    whoWriting,
+    writingToMeReceived,
+    whoWritingToMe,
   } = useSelector((state) => state.counter);
   const [throttledWritingSignal, resetThrottle] =
     useThrottledWritingSignal(dispatch);
@@ -123,8 +124,6 @@ export default function DM({ params }) {
     ) {
       setNews((prev) => [...prev, messages.at(-1)]);
     }
-
-    setWriting(false);
   }, [messages]);
 
   useEffect(() => {
@@ -282,6 +281,7 @@ export default function DM({ params }) {
         return [...prevMessages, toMeMessage.chatData];
       });
       setHasMore(hasMore + 1);
+      setWriting(false);
     } else if (toMeMessage?.action === "delete") {
       setMessages((prevMessages) => {
         return prevMessages.filter(
@@ -456,7 +456,7 @@ export default function DM({ params }) {
     targetWrap.style.height = `${targetWrap.scrollHeight}px`;
 
     if (target.value !== "" && myName && receiverName) {
-      throttledWritingSignal({ myName, receiverName, action: "sender" });
+      throttledWritingSignal({ myName, receiverName });
     }
   };
 
@@ -551,19 +551,19 @@ export default function DM({ params }) {
 
   useEffect(() => {
     if (
-      whoWriting.data?.receivedUser !== myName ||
-      whoWriting.data?.senderUser === myName ||
-      whoWriting.action !== "receiver"
+      whoWritingToMe?.data?.senderUser !== receiverName ||
+      whoWritingToMe?.data?.senderUser === undefined
     )
       return;
 
     setWriting(true);
+
     const timer = setTimeout(() => {
       setWriting(false);
-    }, 8000);
+    }, 7000);
 
     return () => clearTimeout(timer);
-  }, [writingReceived]);
+  }, [writingToMeReceived]);
 
   return (
     <>
@@ -872,7 +872,7 @@ export default function DM({ params }) {
             ref={inputRef}
             onKeyDown={handleEnter}
           />
-          {writing && whoWriting?.data?.senderUser === receiverName && (
+          {writing && (
             <div className={styles.typingMsg}>
               <div className={styles.typingDots}>
                 <div className={styles.dot} />

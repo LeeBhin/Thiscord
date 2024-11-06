@@ -18,6 +18,7 @@ import {
   signalToMe,
   triggerSignal,
   writingSignal,
+  writingToMe,
 } from "@/counterSlice";
 import io from "socket.io-client";
 
@@ -89,7 +90,7 @@ function InnerLayout({ children }) {
     });
 
     newSocket.on("writing", (data) => {
-      dispatch(writingSignal({ data, action: "receiver" }));
+      dispatch(writingToMe({ data }));
     });
 
     setSocket(newSocket);
@@ -217,7 +218,7 @@ function InnerLayout({ children }) {
   }, [chatEditReceived, chatEdit]);
 
   useEffect(() => {
-    if (socket && whoWriting.action === "sender") {
+    if (socket) {
       socket.emit("writing", {
         receivedUser: whoWriting.receiverName,
         senderUser: whoWriting.myName,
