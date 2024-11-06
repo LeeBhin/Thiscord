@@ -281,7 +281,7 @@ export default function DM({ params }) {
         return [...prevMessages, toMeMessage.chatData];
       });
       setHasMore(hasMore + 1);
-      setWriting(false);
+      if (toMeMessage?.chatData.senderName === receiverName) setWriting(false);
     } else if (toMeMessage?.action === "delete") {
       setMessages((prevMessages) => {
         return prevMessages.filter(
