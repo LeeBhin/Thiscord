@@ -597,7 +597,7 @@
 .sk-skeleton {
   height: calc(100vh - 120px);
   width: calc(100vw - 312px);
-  position: absolute;
+  /* position: absolute; */
   z-index: 1;
   background-color: #313338;
   right: 0;

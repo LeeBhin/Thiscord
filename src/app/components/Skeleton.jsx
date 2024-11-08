@@ -63,9 +63,9 @@ SkeletonMessage.displayName = "SkeletonMessage";
 
 export default function Skeleton() {
   return (
-    <div className={styles["sk-skeleton"]}>
+    <div className={styles["sk-skeleton"]} style={{ height: "auto" }}>
       <div className={styles["sk-messages"]}>
-        {[...Array(8)].map((_, index) => (
+        {[...Array(10)].map((_, index) => (
           <SkeletonMessage key={index} />
         ))}
       </div>

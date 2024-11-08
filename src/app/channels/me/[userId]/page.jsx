@@ -18,13 +18,13 @@ import {
   chatRemoveSignal,
   chatSignal,
   writingSignal,
-  writingToMe,
 } from "@/counterSlice";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
 import Skeleton from "@/app/components/Skeleton";
 import Popup from "@/app/components/Popup";
 import { throttle } from "lodash";
+import { createRoot } from "react-dom/client";
 
 const useThrottledWritingSignal = (dispatch, delay = 6500) => {
   const throttledRef = useRef();
@@ -95,6 +95,7 @@ export default function DM({ params }) {
   const editRef = useRef(null);
   const inputRef = useRef(null);
   const chatWrapRef = useRef(null);
+  const skeletonRef = useRef(null);
   const {
     userInfo,
     receiverInfo,
@@ -126,27 +127,51 @@ export default function DM({ params }) {
     }
   }, [messages]);
 
+  const addSkeleton = () => {
+    if (chatsRef.current && !skeletonRef.current) {
+      const skeletonContainer = document.createElement("div");
+      chatsRef.current.prepend(skeletonContainer);
+
+      skeletonRef.current = skeletonContainer;
+
+      const root = createRoot(skeletonContainer);
+      root.render(<Skeleton />);
+    }
+  };
+
+  const removeSkeleton = () => {
+    if (skeletonRef.current) {
+      skeletonRef.current.remove();
+      skeletonRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (isTop || typeof window !== "undefined") {
+      addSkeleton();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      removeSkeleton();
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     const fetchChats = async () => {
       if (isTop && hasMore !== messages.length && startMsgId) {
+        let msg;
+        addSkeleton();
+        setIsLoading(true);
         try {
-          setIsLoading(true);
-          const msg = await load_chats(receiverName, startMsgId, "up", 100);
-
-          const beforeHeight = chatsRef.current.scrollHeight;
-
-          setMessages((prev) => [...msg.messages, ...prev]);
-
+          msg = await load_chats(receiverName, startMsgId, "up", 100);
           setHasMore(msg.totalCount);
-
-          requestAnimationFrame(() => {
-            const afterHeight = chatsRef.current.scrollHeight;
-            const heightDiff = afterHeight - beforeHeight;
-            chatsRef.current.scrollTop = heightDiff;
-          });
         } finally {
-          setIsLoading(false);
           setIsTop(false);
+          setMessages((prev) => [...msg.messages, ...prev]);
+          setIsLoading(false);
+          removeSkeleton();
         }
       }
     };
@@ -160,8 +185,6 @@ export default function DM({ params }) {
     const chatData = await load_chats(decodeURIComponent(userId));
     setMessages(chatData.messages);
     setHasMore(chatData.totalCount);
-
-    checkScrollPosition();
 
     const readMessages = chatData.messages.filter(
       (msg) => msg.isRead[info.userId]
@@ -193,35 +216,13 @@ export default function DM({ params }) {
     } catch (err) {
       console.error("Error:", err);
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 100);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchChats();
   }, [receiverName, myId, myName]);
-
-  const checkScrollPosition = () => {
-    const chatElement = chatsRef.current;
-
-    if (chatElement.scrollHeight <= chatElement.clientHeight) {
-      return;
-    }
-    if (chatsRef.current) {
-      const chatContainer = chatsRef.current;
-      if (chatContainer.scrollHeight <= chatContainer.clientHeight) {
-        setIsTop(true);
-      } else {
-        setIsTop(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (!isLoading) checkScrollPosition();
-  }, [isLoading]);
 
   useEffect(() => {
     load_friends().then((friendsList) => {
@@ -599,7 +600,7 @@ export default function DM({ params }) {
           </div>
         </header>
 
-        {isLoading && <Skeleton />}
+        {/* {isLoading && <Skeleton />} */}
         <div className={styles.chats} ref={chatsRef}>
           {(hasMore === messages?.length || !hasMore) && (
             <div className={styles.top}>
