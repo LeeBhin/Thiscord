@@ -40,7 +40,7 @@ export default function Pending({ refresh, sendFriendReq }) {
           </div>
 
           <div className={styles.friendsWrap}>
-            <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+            <p className={styles.countFriends}>{`대기 중 – ${friends.length}명`}</p>
           </div>
         </div>
       ) : null}
