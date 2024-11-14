@@ -31,7 +31,10 @@ export default function All_Friends({ friendsSign }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (activePopupIndex !== null && !event.target.closest(`.${styles.pop}`)) {
+      if (
+        activePopupIndex !== null &&
+        !event.target.closest(`.${styles.pop}`)
+      ) {
         setActivePopupIndex(null);
       }
     };
@@ -53,7 +56,9 @@ export default function All_Friends({ friendsSign }) {
           </div>
 
           <div className={styles.friendsWrap}>
-            <p className={styles.countFriends}>{`모든 친구 – ${friends.length}명`}</p>
+            <p
+              className={styles.countFriends}
+            >{`모든 친구 – ${friends.length}명`}</p>
           </div>
         </div>
       ) : null}
@@ -63,7 +68,10 @@ export default function All_Friends({ friendsSign }) {
           friends.map((friend, index) => (
             <div key={index}>
               <div className={styles.friendsLine} />
-              <div onClick={() => gotoDM(friend.name)} className={styles.friend}>
+              <div
+                onClick={() => gotoDM(friend.name)}
+                className={styles.friend}
+              >
                 <div className={styles.profileWrap}>
                   <div
                     className={styles.profile}
@@ -75,7 +83,10 @@ export default function All_Friends({ friendsSign }) {
                 </div>
 
                 <div className={styles.btns}>
-                  <Link href={`/channels/me/${friend.name}`} className={styles.btn}>
+                  <Link
+                    href={`/channels/me/${friend.name}`}
+                    className={styles.btn}
+                  >
                     <Images.chat className={styles.btnIcon} />
                   </Link>
                   <div
@@ -91,11 +102,12 @@ export default function All_Friends({ friendsSign }) {
                     <div className={styles.pop}>
                       <div
                         className={styles.deleteFriend}
-                        onClick={(e) => {
-                          delete_friend(friend.name);
-                          setActivePopupIndex(null);
-                          e.stopPropagation();
-                          location.reload();
+                        onClick={async (e) => {
+                          await delete_friend(friend.name); 
+                          setActivePopupIndex(null); 
+                          e.stopPropagation(); 
+                          const friends = load_friends(); 
+                          setFriends(friends); 
                         }}
                       >
                         친구 삭제하기
