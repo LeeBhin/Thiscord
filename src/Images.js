@@ -46,5 +46,5 @@ const Images = {
 };
 
 export default {
-  Images
-};
+  Images, friends, nitro, shop, plus, icon, notFound, setting, search, wumpus, accept, deny, chat, threeDot, edit, remove, logout, esc, newMsg, nobody, nopending, norecommand
+}
