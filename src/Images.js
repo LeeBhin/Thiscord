@@ -44,6 +44,7 @@ const Images = {
   nopending,
   norecommand
 };
+
 export default {
   Images
 };
