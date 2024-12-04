@@ -44,5 +44,6 @@ const Images = {
   nopending,
   norecommand
 };
-
-export default Images;
+export default {
+  Images
+};
