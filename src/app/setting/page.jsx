@@ -162,16 +162,40 @@ export default function Setting() {
 
       try {
         const registration = await navigator.serviceWorker.ready;
+
+        // 기존 구독이 있는지 확인하고 있다면 먼저 해제
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (existingSubscription) {
+          await existingSubscription.unsubscribe();
+          // 서버에도 해제 요청
+          try {
+            await unsubscribePushNotification();
+          } catch (error) {
+            console.warn('서버 구독 해제 실패:', error);
+          }
+        }
+
+        // 새로운 구독 생성
         const newSubscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
             process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
           ),
         });
+
         await subscribePushNotification(newSubscription);
+
       } catch (error) {
         setIsSubscribed(false);
-        console.error("Failed to subscribe:", error);
+
+        // 사용자에게 친화적인 오류 메시지 표시
+        if (error.name === 'InvalidStateError') {
+          alert('푸시 알림 설정을 재설정하는 중입니다. 다시 시도해주세요.');
+          // 페이지를 새로고침하여 상태를 초기화
+          window.location.reload();
+        } else {
+          alert('푸시 알림 구독에 실패했습니다. 다시 시도해주세요.');
+        }
       }
     } else {
       setIsSubscribed(false);
@@ -184,7 +208,7 @@ export default function Setting() {
         }
       } catch (error) {
         setIsSubscribed(true);
-        console.error("Failed to unsubscribe:", error);
+        alert('푸시 알림 해제에 실패했습니다. 다시 시도해주세요.');
       }
     }
   };
@@ -355,8 +379,8 @@ export default function Setting() {
               {isLoading
                 ? "알림 상태를 확인하는 중이에요..."
                 : isSubscribed
-                ? "알림이 켜져있어요! 중요한 소식을 바로바로 알려드릴게요."
-                : "쉿! 너무 조용한가요? 알림을 켜면 더 재미있을 거예요!"}
+                  ? "알림이 켜져있어요! 중요한 소식을 바로바로 알려드릴게요."
+                  : "쉿! 너무 조용한가요? 알림을 켜면 더 재미있을 거예요!"}
             </span>
             <label className={styles.toggleSwitch}>
               <input

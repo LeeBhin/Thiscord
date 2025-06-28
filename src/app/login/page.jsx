@@ -3,7 +3,7 @@
 import Link from "next/link";
 import styles from "./login.module.css";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -19,6 +19,19 @@ export default function Login() {
   const dispatch = useDispatch();
 
   const router = useRouter();
+
+  useEffect(() => {
+    const verifyTokenAndRedirect = async () => {
+      try {
+        await checkToken();
+        router.push("/channels/@me");
+      } catch (err) {
+        router.push("/login");
+      }
+    };
+
+    verifyTokenAndRedirect();
+  }, [router]);
 
   const submit = async () => {
     setIsLoading(true);
@@ -40,7 +53,7 @@ export default function Login() {
     } catch (error) {
       console.error("Login error:", error);
       setErr(true);
-      
+
       // 서버 에러 응답 파싱
       if (error.message === "Unauthorized") {
         setErrorMessage("유효하지 않은 아이디 또는 비밀번호입니다.");
@@ -152,8 +165,8 @@ export default function Login() {
             비밀번호를 잊으셨나요?
           </Link>
 
-          <button 
-            className={styles.submit} 
+          <button
+            className={styles.submit}
             onClick={submit}
             disabled={isLoading}
             style={{

@@ -18,7 +18,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // 유효성 검사 상태
   const [emailPhoneError, setEmailPhoneError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -30,6 +30,19 @@ export default function Register() {
   const pwRef = useRef(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const verifyTokenAndRedirect = async () => {
+      try {
+        await checkToken();
+        router.push("/channels/@me");
+      } catch (err) {
+        router.push("/login");
+      }
+    };
+
+    verifyTokenAndRedirect();
+  }, [router]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,15 +98,15 @@ export default function Register() {
   const validateEmailOrPhone = (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^01[0-9]-?[0-9]{4}-?[0-9]{4}$/;
-    
+
     if (!value) {
       return "이메일 또는 전화번호를 입력해주세요.";
     }
-    
+
     if (!emailRegex.test(value) && !phoneRegex.test(value)) {
       return "올바른 이메일 또는 전화번호 형식을 입력해주세요.";
     }
-    
+
     return "";
   };
 
@@ -102,11 +115,11 @@ export default function Register() {
     if (!value) {
       return "비밀번호를 입력해주세요.";
     }
-    
+
     if (value.length < 6) {
       return "비밀번호는 최소 6자 이상이어야 합니다.";
     }
-    
+
     return "";
   };
 
@@ -115,11 +128,11 @@ export default function Register() {
     if (!value) {
       return "비밀번호 확인을 입력해주세요.";
     }
-    
+
     if (value !== passwordValue) {
       return "비밀번호가 일치하지 않습니다.";
     }
-    
+
     return "";
   };
 
@@ -128,16 +141,16 @@ export default function Register() {
     if (!value) {
       return "이름을 입력해주세요.";
     }
-    
+
     if (value.length > 10) {
       return "이름은 10자 이하로 입력해주세요.";
     }
-    
+
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
     if (specialCharRegex.test(value)) {
       return "특수 문자는 사용할 수 없습니다.";
     }
-    
+
     return "";
   };
 
@@ -196,7 +209,7 @@ export default function Register() {
       }
     } catch (error) {
       console.error("Register error:", error);
-      
+
       // 서버 에러 메시지 처리
       if (error.message.includes("이미 가입된")) {
         setEmailPhoneError("이미 가입된 이메일 또는 전화번호입니다.");
@@ -288,11 +301,10 @@ export default function Register() {
           </motion.div>
 
           <p
-            className={`${
-              isNameFocus
-                ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}`
-                : rgstrSt.inputInfo
-            }`}
+            className={`${isNameFocus
+              ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}`
+              : rgstrSt.inputInfo
+              }`}
           >
             다른 회원에게 표시되는 이름이에요. 특수 문자와 이모지를 사용할 수
             없어요.
@@ -325,11 +337,10 @@ export default function Register() {
                   onChange={(e) => handlePasswordChange(e.target.value)}
                 />
                 <p
-                  className={`${
-                    isPwFocus
-                      ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}`
-                      : rgstrSt.inputInfo
-                  }`}
+                  className={`${isPwFocus
+                    ? `${rgstrSt.inputInfo} ${rgstrSt.showInputInfo}`
+                    : rgstrSt.inputInfo
+                    }`}
                   style={{ marginTop: "70px" }}
                 >
                   제가 유추할 수 있도록 쉽게 만들어주세요.
@@ -385,9 +396,9 @@ export default function Register() {
               </div>
 
               {generalError && (
-                <div style={{ 
-                  color: "#fa777c", 
-                  fontSize: "14px", 
+                <div style={{
+                  color: "#fa777c",
+                  fontSize: "14px",
                   marginBottom: "10px",
                   textAlign: "center"
                 }}>
@@ -395,8 +406,8 @@ export default function Register() {
                 </div>
               )}
 
-              <button 
-                className={loginSt.submit} 
+              <button
+                className={loginSt.submit}
                 onClick={submit}
                 disabled={isLoading}
                 style={{
