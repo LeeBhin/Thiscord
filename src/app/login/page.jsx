@@ -14,11 +14,17 @@ export default function Login() {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   const router = useRouter();
 
   const submit = async () => {
+    setIsLoading(true);
+    setErr(false);
+    setErrorMessage("");
+
     try {
       const response = await login(emailOrPhone, password);
       if (response) {
@@ -31,10 +37,33 @@ export default function Login() {
         dispatch(loginSignal());
         router.push("/channels/me");
       }
-    } catch (err) {
-      alert(err);
-      console.error("Login error:", err);
+    } catch (error) {
+      console.error("Login error:", error);
       setErr(true);
+      
+      // 서버 에러 응답 파싱
+      if (error.message === "Unauthorized") {
+        setErrorMessage("유효하지 않은 아이디 또는 비밀번호입니다.");
+      } else if (error.message.includes("fetch")) {
+        setErrorMessage("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+      } else if (error.message.includes("500")) {
+        setErrorMessage("서버 내부 오류가 발생했습니다. (500)");
+      } else if (error.message.includes("404")) {
+        setErrorMessage("요청한 서비스를 찾을 수 없습니다. (404)");
+      } else if (error.message.includes("403")) {
+        setErrorMessage("접근이 거부되었습니다. (403)");
+      } else {
+        setErrorMessage(error.message || "로그인 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = () => {
+    if (err) {
+      setErr(false);
+      setErrorMessage("");
     }
   };
 
@@ -70,7 +99,7 @@ export default function Login() {
                   <p className={styles.inputErrTxt}>
                     이메일 또는 전화번호 -{" "}
                     <span className={styles.inputErrSubTxt}>
-                      유효하지 않은 아이디 또는 비밀번호입니다.
+                      {errorMessage}
                     </span>
                   </p>
                 )}
@@ -79,7 +108,10 @@ export default function Login() {
                   className={styles.input}
                   required
                   value={emailOrPhone}
-                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  onChange={(e) => {
+                    setEmailOrPhone(e.target.value);
+                    handleInputChange();
+                  }}
                 />
               </div>
             </div>
@@ -93,7 +125,7 @@ export default function Login() {
                   <p className={styles.inputErrTxt}>
                     비밀번호 -{" "}
                     <span className={styles.inputErrSubTxt}>
-                      유효하지 않은 아이디 또는 비밀번호입니다.
+                      {errorMessage}
                     </span>
                   </p>
                 )}
@@ -102,7 +134,15 @@ export default function Login() {
                   className={styles.input}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    handleInputChange();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      submit();
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -112,8 +152,16 @@ export default function Login() {
             비밀번호를 잊으셨나요?
           </Link>
 
-          <button className={styles.submit} onClick={submit}>
-            로그인
+          <button 
+            className={styles.submit} 
+            onClick={submit}
+            disabled={isLoading}
+            style={{
+              opacity: isLoading ? 0.7 : 1,
+              cursor: isLoading ? "not-allowed" : "pointer"
+            }}
+          >
+            {isLoading ? "로그인 중..." : "로그인"}
           </button>
           <p className={styles.needAccount}>
             계정이 필요한가요?{" "}

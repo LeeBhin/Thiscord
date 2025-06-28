@@ -15,8 +15,16 @@ export default function Register() {
   const [isPwFocus, setIsPwFocus] = useState(false);
   const [name, setName] = useState("");
   const [emailOrPhone, setEmailOrPhone] = useState("");
-  const [cfEmailOrPhone, setCfEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // 유효성 검사 상태
+  const [emailPhoneError, setEmailPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [generalError, setGeneralError] = useState("");
 
   const nameRef = useRef(null);
   const pwRef = useRef(null);
@@ -60,6 +68,7 @@ export default function Register() {
     } else if (isPwFocus) {
       return `${rgstrSt.loginForm} ${rgstrSt.formHeightPW}`;
     }
+    return rgstrSt.loginForm;
   };
 
   const moveUp = {
@@ -72,19 +81,136 @@ export default function Register() {
     animate: { y },
   });
 
+  // 이메일 또는 전화번호 유효성 검사
+  const validateEmailOrPhone = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^01[0-9]-?[0-9]{4}-?[0-9]{4}$/;
+    
+    if (!value) {
+      return "이메일 또는 전화번호를 입력해주세요.";
+    }
+    
+    if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+      return "올바른 이메일 또는 전화번호 형식을 입력해주세요.";
+    }
+    
+    return "";
+  };
+
+  // 비밀번호 유효성 검사
+  const validatePassword = (value) => {
+    if (!value) {
+      return "비밀번호를 입력해주세요.";
+    }
+    
+    if (value.length < 6) {
+      return "비밀번호는 최소 6자 이상이어야 합니다.";
+    }
+    
+    return "";
+  };
+
+  // 비밀번호 확인 유효성 검사
+  const validateConfirmPassword = (value, passwordValue) => {
+    if (!value) {
+      return "비밀번호 확인을 입력해주세요.";
+    }
+    
+    if (value !== passwordValue) {
+      return "비밀번호가 일치하지 않습니다.";
+    }
+    
+    return "";
+  };
+
+  // 이름 유효성 검사
+  const validateName = (value) => {
+    if (!value) {
+      return "이름을 입력해주세요.";
+    }
+    
+    if (value.length > 10) {
+      return "이름은 10자 이하로 입력해주세요.";
+    }
+    
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    if (specialCharRegex.test(value)) {
+      return "특수 문자는 사용할 수 없습니다.";
+    }
+    
+    return "";
+  };
+
+  // 입력값 변경 핸들러
+  const handleEmailOrPhoneChange = (value) => {
+    setEmailOrPhone(value);
+    setEmailPhoneError(validateEmailOrPhone(value));
+    setGeneralError("");
+  };
+
+  const handlePasswordChange = (value) => {
+    setPassword(value);
+    setPasswordError(validatePassword(value));
+    if (confirmPassword) {
+      setConfirmPasswordError(validateConfirmPassword(confirmPassword, value));
+    }
+    setGeneralError("");
+  };
+
+  const handleConfirmPasswordChange = (value) => {
+    setConfirmPassword(value);
+    setConfirmPasswordError(validateConfirmPassword(value, password));
+    setGeneralError("");
+  };
+
+  const handleNameChange = (value) => {
+    setName(value);
+    setNameError(validateName(value));
+    setGeneralError("");
+  };
+
   const submit = async () => {
-    if (name.length > 10) {
-      alert("이름이 너무 길구나.");
+    // 모든 필드 유효성 검사
+    const emailPhoneErr = validateEmailOrPhone(emailOrPhone);
+    const nameErr = validateName(name);
+    const passwordErr = validatePassword(password);
+    const confirmPasswordErr = validateConfirmPassword(confirmPassword, password);
+
+    setEmailPhoneError(emailPhoneErr);
+    setNameError(nameErr);
+    setPasswordError(passwordErr);
+    setConfirmPasswordError(confirmPasswordErr);
+
+    // 오류가 있으면 제출하지 않음
+    if (emailPhoneErr || nameErr || passwordErr || confirmPasswordErr) {
       return;
     }
+
+    setIsLoading(true);
+    setGeneralError("");
+
     try {
       const response = await register(name, emailOrPhone, password);
       if (response) {
         router.push("/login");
       }
-    } catch (err) {
-      alert(err);
-      console.error(err);
+    } catch (error) {
+      console.error("Register error:", error);
+      
+      // 서버 에러 메시지 처리
+      if (error.message.includes("이미 가입된")) {
+        setEmailPhoneError("이미 가입된 이메일 또는 전화번호입니다.");
+      } else if (error.message.includes("이미 사용중인")) {
+        setNameError("이미 사용중인 이름입니다.");
+      } else if (error.message.includes("500")) {
+        setGeneralError("서버 내부 오류가 발생했습니다. (500)");
+      } else if (error.message.includes("fetch")) {
+        setGeneralError("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        setGeneralError(error.message || "회원가입 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,24 +245,34 @@ export default function Register() {
 
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
-                <p className={loginSt.inputTxt}>
+                <p className={emailPhoneError ? loginSt.inputErrTxt : loginSt.inputTxt}>
                   이메일 또는 전화번호{" "}
-                  <span className={loginSt.required}>*</span>
+                  {!emailPhoneError && <span className={loginSt.required}>*</span>}
+                  {emailPhoneError && (
+                    <span className={loginSt.inputErrSubTxt}>
+                      {" - " + emailPhoneError}
+                    </span>
+                  )}
                 </p>
                 <input
                   type="text"
                   className={`${loginSt.input} ${rgstrSt.input}`}
                   required
                   value={emailOrPhone}
-                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  onChange={(e) => handleEmailOrPhoneChange(e.target.value)}
                 />
               </div>
             </div>
 
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
-                <p className={loginSt.inputTxt}>
-                  이름 <span className={loginSt.required}>*</span>
+                <p className={nameError ? loginSt.inputErrTxt : loginSt.inputTxt}>
+                  이름 {!nameError && <span className={loginSt.required}>*</span>}
+                  {nameError && (
+                    <span className={loginSt.inputErrSubTxt}>
+                      {" - " + nameError}
+                    </span>
+                  )}
                 </p>
                 <input
                   type="text"
@@ -145,7 +281,7 @@ export default function Register() {
                   onClick={inputClick}
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => handleNameChange(e.target.value)}
                 />
               </div>
             </div>
@@ -171,8 +307,13 @@ export default function Register() {
           >
             <div className={loginSt.inputTxtWrap}>
               <div className={loginSt.idWrap}>
-                <p className={loginSt.inputTxt}>
-                  비밀번호 <span className={loginSt.required}>*</span>
+                <p className={passwordError ? loginSt.inputErrTxt : loginSt.inputTxt}>
+                  비밀번호 {!passwordError && <span className={loginSt.required}>*</span>}
+                  {passwordError && (
+                    <span className={loginSt.inputErrSubTxt}>
+                      {" - " + passwordError}
+                    </span>
+                  )}
                 </p>
                 <input
                   type="password"
@@ -181,7 +322,7 @@ export default function Register() {
                   onClick={inputClick}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                 />
                 <p
                   className={`${
@@ -205,15 +346,20 @@ export default function Register() {
             >
               <div className={loginSt.inputTxtWrap}>
                 <div className={loginSt.idWrap}>
-                  <p className={loginSt.inputTxt}>
-                    비밀번호 확인 <span className={loginSt.required}>*</span>
+                  <p className={confirmPasswordError ? loginSt.inputErrTxt : loginSt.inputTxt}>
+                    비밀번호 확인 {!confirmPasswordError && <span className={loginSt.required}>*</span>}
+                    {confirmPasswordError && (
+                      <span className={loginSt.inputErrSubTxt}>
+                        {" - " + confirmPasswordError}
+                      </span>
+                    )}
                   </p>
                   <input
                     type="password"
                     className={`${loginSt.input} ${rgstrSt.input}`}
                     required
-                    value={cfEmailOrPhone}
-                    onChange={(e) => setCfEmailOrPhone(e.target.value)}
+                    value={confirmPassword}
+                    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                   />
                 </div>
               </div>
@@ -238,8 +384,27 @@ export default function Register() {
                 </label>
               </div>
 
-              <button className={loginSt.submit} onClick={submit}>
-                계속하기
+              {generalError && (
+                <div style={{ 
+                  color: "#fa777c", 
+                  fontSize: "14px", 
+                  marginBottom: "10px",
+                  textAlign: "center"
+                }}>
+                  {generalError}
+                </div>
+              )}
+
+              <button 
+                className={loginSt.submit} 
+                onClick={submit}
+                disabled={isLoading}
+                style={{
+                  opacity: isLoading ? 0.7 : 1,
+                  cursor: isLoading ? "not-allowed" : "pointer"
+                }}
+              >
+                {isLoading ? "가입 중..." : "계속하기"}
               </button>
 
               <p className={`${rgstrSt.agreeTxt} ${rgstrSt.agreeInfo}`}>
