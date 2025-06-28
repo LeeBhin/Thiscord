@@ -26,7 +26,6 @@ export default function Login() {
         await checkToken();
         router.push("/channels/@me");
       } catch (err) {
-        router.push("/login");
       }
     };
 

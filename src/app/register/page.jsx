@@ -37,7 +37,6 @@ export default function Register() {
         await checkToken();
         router.push("/channels/@me");
       } catch (err) {
-        router.push("/login");
       }
     };
 
